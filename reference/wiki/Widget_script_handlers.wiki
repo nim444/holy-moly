@@ -1,0 +1,97 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Widget_script_handlers | revision 6794286 (2026-08-04T10:12:34Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{widgethandler|cat=[[Category:Widget script handlers|Widget handlers]]}} {{tocright}}
+Widget script handlers allow you to respond to user interaction and other types of widget events (such as a frame being shown or hidden). This page lists the available scripts and the list of widget types for which each script is valid. 
+<gallery>
+Widget_Hierarchy.png|Widget hierarchy
+</gallery>
+
+<big>'''Example'''</big>
+: Registers for mouse clicks on a {{api|t=o|Button}} widget with the {{api|t=wh|OnClick}} script.
+<syntaxhighlight lang="lua">
+local btn = CreateFrame("Button", nil, UIParent, "UIPanelButtonTemplate")
+btn:SetPoint("CENTER")
+btn:SetSize(100, 40)
+btn:SetText("Click me")
+btn:SetScript("OnClick", function(self, button, down)
+	print("Pressed", button, down and "down" or "up")
+end)
+btn:RegisterForClicks("AnyDown", "AnyUp")
+-- Pressed LeftButton down
+-- Pressed LeftButton up
+</syntaxhighlight>
+
+==Script Types==
+<onlyinclude>
+==={{uiobject|AnimationGroup}}===
+{{:UIOBJECT_AnimationGroup|script}}
+
+==={{uiobject|Animation}}===
+{{:UIOBJECT_Animation|script}}
+
+==={{uiobject|ScriptRegion}}===
+{{:UIOBJECT_ScriptRegion|script}}
+
+==={{uiobject|Frame}}===
+{{:UIOBJECT_Frame|script}}
+
+==={{uiobject|Button}}===
+{{:UIOBJECT Button|script}}
+
+==={{uiobject|Model}}===
+{{:UIOBJECT Model|script}}
+
+==={{uiobject|CinematicModel}}===
+{{:UIOBJECT CinematicModel|script}}
+
+==={{uiobject|DressUpModel}}===
+{{:UIOBJECT DressUpModel|script}}
+
+==={{uiobject|ModelScene}}===
+{{:UIOBJECT ModelScene|script}}
+
+==={{uiobject|ModelSceneActor}}===
+Scripts for this widget can only be set from XML.
+{{:UIOBJECT ModelSceneActor|script}}
+
+==={{uiobject|EditBox}}===
+{{:UIOBJECT EditBox|script}}
+
+===GameTooltip===
+: [[UIHANDLER OnTooltipCleared|OnTooltipCleared]](self) - Run when the tooltip is hidden or its content is cleared.
+: [[UIHANDLER OnTooltipSetDefaultAnchor|OnTooltipSetDefaultAnchor]](self) - Run when the tooltip is repositioned to its default anchor location.
+: [[UIHANDLER OnTooltipSetFramestack|OnTooltipSetFramestack]](self, highlightFrame) - Run when the tooltip is filled with a list of frames under the mouse cursor.
+{{wow-inline}} The following tooltip script handlers only exist on Classic.
+: [[UIHANDLER OnTooltipAddMoney|OnTooltipAddMoney]](self, cost, maxcost) - Run when an amount of money should be added to the tooltip.
+: [[UIHANDLER OnTooltipSetAchievement|OnTooltipSetAchievement]](self) - Run when the tooltip is filled with information about an achievement.
+: [[UIHANDLER OnTooltipSetEquipmentSet|OnTooltipSetEquipmentSet]](self)  - Run when the tooltip is filled with information about an equipment set.
+: [[UIHANDLER OnTooltipSetItem|OnTooltipSetItem]](self) - Run when the tooltip is filled with information about an item.
+: [[UIHANDLER OnTooltipSetQuest|OnTooltipSetQuest]](self) - Run when the tooltip is filled with information about a quest.
+: [[UIHANDLER OnTooltipSetSpell|OnTooltipSetSpell]](self) - Run when the tooltip is filled with information about a spell.
+: [[UIHANDLER OnTooltipSetUnit|OnTooltipSetUnit]](self) - Run when the tooltip is filled with information about a unit.
+
+==={{uiobject|ColorSelect}}===
+{{:UIOBJECT ColorSelect|script}}
+
+==={{uiobject|Cooldown}}===
+{{:UIOBJECT Cooldown|script}}
+
+==={{uiobject|MovieFrame}}===
+{{:UIOBJECT MovieFrame|script}}
+
+==={{uiobject|ScrollFrame}}===
+{{:UIOBJECT ScrollFrame|script}}
+
+==={{uiobject|Slider}}===
+{{:UIOBJECT Slider|script}}
+
+==={{uiobject|StatusBar}}===
+{{:UIOBJECT StatusBar|script}}
+
+===FogOfWarFrame===
+: [[UIHANDLER OnUiMapChanged|OnUiMapChanged]](self, uiMapID)
+</onlyinclude>
+==References==
+* {{ref web|url=https://books.google.com/books/about/World_of_Warcraft_Programming.html?id=tOSDV71ND_0C|author=James Whitehead II|title=World of Warcraft Programming: A Guide and Reference for Creating WoW Addons - 2nd Edition|date=2010-02-05}}
+* {{ref web|url=https://web.archive.org/web/20170903092106/http://wowprogramming.com/docs/scripts|author=wowprogramming|date=2017-09-03|title=Widget script handlers listing}}
+* {{ref web|url=https://www.townlong-yak.com/framexml/7.2.5/Helix/WidgetAPI.lua|author=Townlong Yak|date=2017-06-27|title=WidgetAPI.lua}}
+* {{ref web|url=https://github.com/Resike/BlizzardInterfaceResources/blob/master/Resources/WidgetReference.lua|author=Resike|date=2019-05-21|title=WidgetReference.lua}}

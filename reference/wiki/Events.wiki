@@ -1,0 +1,2269 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Events | revision 6860120 (2026-09-04T22:53:30Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{apinav}} {{wowapievent|page=list}} {{tocright}}
+{{for|events in Azeroth such as World Events and Holidays|Event}}
+{{for|{{Wow-inline}} Classic events|Events/Classic}}
+{{for|EventRegistry callback events|EventRegistry}}
+'''Frame Events''' are messages sent by the WoW client to UI code (via {{api|t=wh|OnEvent}} script handlers), mostly in reaction to things occurring in the game world. For a general tutorial on setting up event handling in your addon, see [[Handling events]] and the {{api|t=w|Frame:RegisterEvent}}() method.
+
+<big>'''Event Trace'''</big>
+: The Event Trace window for debugging events can be opened via the <code>[[MACRO_eventtrace|/etrace]]</code> slash command. 
+
+[[File:MACRO_eventtrace_01.png|577px|link=|border]]
+
+<big>'''Example'''</big>
+: Shows when a chat channel message appears and when you start/stop moving.
+<syntaxhighlight lang="lua">
+local function OnEvent(self, event, ...)
+	print(event, ...)
+end
+
+local f = CreateFrame("Frame")
+f:RegisterEvent("CHAT_MSG_CHANNEL")
+f:RegisterEvent("PLAYER_STARTED_MOVING")
+f:RegisterEvent("PLAYER_STOPPED_MOVING")
+f:SetScript("OnEvent", OnEvent)
+</syntaxhighlight>
+
+<!-- https://github.com/Ketho/WowpediaDoc/blob/master/Pages/Events.lua -->
+=API systems=
+{{i-note|This page is up to date as of PTR [[Patch_12.1.5/API_changes|Patch 12.1.5]] (69594) Aug 28 2026}}
+These events are categorized by system in Blizzard_APIDocumentation.
+
+=={{api.system|AccountStore}}==
+: {{api|t=e|ACCOUNT_STORE_CURRENCY_AVAILABLE_UPDATED}}<small>: currencyID</small>
+: {{api|t=e|ACCOUNT_STORE_FRONT_UPDATED}}<small>: storeFrontID</small>
+: {{api|t=e|ACCOUNT_STORE_ITEM_INFO_UPDATED}}<small>: itemID</small>
+: {{api|t=e|ACCOUNT_STORE_TRANSACTION_ERROR}}<small>: result</small>
+: {{api|t=e|STORE_FRONT_STATE_UPDATED}}<small>: storeFrontID</small>
+
+=={{api.system|AchievementInfo}}==
+: {{api|t=e|ACHIEVEMENT_EARNED}}<small>: achievementID, alreadyEarned</small>
+: {{api|t=e|ACHIEVEMENT_PLAYER_NAME}}<small>: achievementID</small>
+: {{api|t=e|ACHIEVEMENT_SEARCH_UPDATED}}
+: {{api|t=e|CRITERIA_COMPLETE}}<small>: criteriaID</small>
+: {{api|t=e|CRITERIA_EARNED}}<small>: achievementID, description, achievementAlreadyEarnedOnAccount</small>
+: {{api|t=e|CRITERIA_UPDATE}}
+: {{api|t=e|INSPECT_ACHIEVEMENT_READY}}<small>: guid</small>
+: {{api|t=e|RECEIVED_ACHIEVEMENT_LIST}}
+: {{api|t=e|RECEIVED_ACHIEVEMENT_MEMBER_LIST}}<small>: achievementID</small>
+: {{api|t=e|TRACKED_ACHIEVEMENT_LIST_CHANGED}}<small>: achievementID, added</small>
+: {{api|t=e|TRACKED_ACHIEVEMENT_UPDATE}}<small>: achievementID, criteriaID, elapsed, duration</small>
+
+=={{api.system|ActionBar}}==
+: {{api|t=e|ACTION_RANGE_CHECK_UPDATE}}<small>: slot, isInRange, checksRange</small>
+: {{api|t=e|ACTION_USABLE_CHANGED}}<small>: changes</small>
+: {{api|t=e|ACTIONBAR_HIDEGRID}}
+: {{api|t=e|ACTIONBAR_PAGE_CHANGED}}
+: {{api|t=e|ACTIONBAR_SHOW_BOTTOMLEFT}}
+: {{api|t=e|ACTIONBAR_SHOWGRID}}
+: {{api|t=e|ACTIONBAR_SLOT_CHANGED}}<small>: slot</small>
+: {{api|t=e|ACTIONBAR_UPDATE_COOLDOWN}}
+: {{api|t=e|ACTIONBAR_UPDATE_STATE}}
+: {{api|t=e|ACTIONBAR_UPDATE_USABLE}}
+: {{api|t=e|PET_BAR_UPDATE}}
+: {{api|t=e|UPDATE_BONUS_ACTIONBAR}}
+: {{api|t=e|UPDATE_EXTRA_ACTIONBAR}}
+: {{api|t=e|UPDATE_MULTI_CAST_ACTIONBAR}}
+: {{api|t=e|UPDATE_OVERRIDE_ACTIONBAR}}
+
+=={{api.system|AddOns}}==
+: {{api|t=e|ADDON_LOADED}}<small>: addOnName, containsBindings</small>
+: {{api|t=e|ADDONS_UNLOADING}}<small>: closingClient</small>
+: {{api|t=e|SAVED_VARIABLES_TOO_LARGE}}<small>: addOnName</small>
+
+=={{api.system|AdventureJournal}}==
+: {{api|t=e|AJ_DUNGEON_ACTION}}<small>: lfgDungeonID</small>
+: {{api|t=e|AJ_OPEN}}
+: {{api|t=e|AJ_OPEN_COLLECTIONS_ACTION}}
+: {{api|t=e|AJ_PVE_LFG_ACTION}}
+: {{api|t=e|AJ_PVP_ACTION}}<small>: battleMasterListID</small>
+: {{api|t=e|AJ_PVP_LFG_ACTION}}
+: {{api|t=e|AJ_PVP_RBG_ACTION}}
+: {{api|t=e|AJ_PVP_SKIRMISH_ACTION}}
+: {{api|t=e|AJ_PVP_SPECIAL_BG_ACTION}}
+: {{api|t=e|AJ_PVP_TRAINING_GROUNDS_ACTION}}
+: {{api|t=e|AJ_QUEST_LOG_OPEN}}<small>: questID, uiMapID</small>
+: {{api|t=e|AJ_RAID_ACTION}}<small>: lfgDungeonID</small>
+: {{api|t=e|AJ_REFRESH_DISPLAY}}<small>: newAdventureNotice</small>
+: {{api|t=e|AJ_REWARD_DATA_RECEIVED}}
+
+=={{api.system|AdventureMap}}==
+: {{api|t=e|ADVENTURE_MAP_CLOSE}}
+: {{api|t=e|ADVENTURE_MAP_OPEN}}<small>: followerTypeID</small>
+: {{api|t=e|ADVENTURE_MAP_QUEST_UPDATE}}<small>: questID</small>
+: {{api|t=e|ADVENTURE_MAP_UPDATE_INSETS}}
+: {{api|t=e|ADVENTURE_MAP_UPDATE_POIS}}
+
+=={{api.system|AlliedRaces}}==
+: {{api|t=e|ALLIED_RACE_CLOSE}}
+: {{api|t=e|ALLIED_RACE_OPEN}}<small>: raceID</small>
+
+=={{api.system|AnimaDiversionInfo}}==
+: {{api|t=e|ANIMA_DIVERSION_CLOSE}}
+: {{api|t=e|ANIMA_DIVERSION_OPEN}}<small>: info</small>
+: {{api|t=e|ANIMA_DIVERSION_TALENT_UPDATED}}
+
+=={{api.system|AreaPoiInfo}}==
+: {{api|t=e|AREA_POIS_UPDATED}}
+
+=={{api.system|ArtifactUI}}==
+: {{api|t=e|ARTIFACT_CLOSE}}
+: {{api|t=e|ARTIFACT_ENDGAME_REFUND}}<small>: numRefundedPowers, refundedTier, bagOrSlotIndex, slotIndex</small>
+: {{api|t=e|ARTIFACT_RELIC_FORGE_CLOSE}}
+: {{api|t=e|ARTIFACT_RELIC_FORGE_PREVIEW_RELIC_CHANGED}}
+: {{api|t=e|ARTIFACT_RELIC_FORGE_UPDATE}}
+: {{api|t=e|ARTIFACT_RELIC_INFO_RECEIVED}}
+: {{api|t=e|ARTIFACT_RESPEC_PROMPT}}
+: {{api|t=e|ARTIFACT_TIER_CHANGED}}<small>: newTier, bagOrSlotIndex, slotIndex</small>
+: {{api|t=e|ARTIFACT_UPDATE}}<small>: newItem</small>
+: {{api|t=e|ARTIFACT_XP_UPDATE}}
+
+=={{api.system|AssistedCombat}}==
+: {{api|t=e|ASSISTED_COMBAT_ACTION_SPELL_CAST}}
+
+=={{api.system|AuctionHouse}}==
+: {{api|t=e|AUCTION_CANCELED}}<small>: auctionID</small>
+: {{api|t=e|AUCTION_HOUSE_AUCTION_CREATED}}<small>: auctionID</small>
+: {{api|t=e|AUCTION_HOUSE_AUCTIONS_EXPIRED}}<small>: auctionID</small>
+: {{api|t=e|AUCTION_HOUSE_BROWSE_FAILURE}}
+: {{api|t=e|AUCTION_HOUSE_BROWSE_RESULTS_ADDED}}<small>: addedBrowseResults</small>
+: {{api|t=e|AUCTION_HOUSE_BROWSE_RESULTS_UPDATED}}
+: {{api|t=e|AUCTION_HOUSE_CLOSED}}
+: {{api|t=e|AUCTION_HOUSE_DISABLED}}
+: {{api|t=e|AUCTION_HOUSE_FAVORITES_UPDATED}}
+: {{api|t=e|AUCTION_HOUSE_ITEM_DELIVERY_DELAY_UPDATE}}<small>: purchasedItemDeliveryDelay, cancelledItemDeliveryDelay</small>
+: {{api|t=e|AUCTION_HOUSE_NEW_BID_RECEIVED}}<small>: auctionID</small>
+: {{api|t=e|AUCTION_HOUSE_NEW_RESULTS_RECEIVED}}<small>: itemKey</small>
+: {{api|t=e|AUCTION_HOUSE_POST_ERROR}}
+: {{api|t=e|AUCTION_HOUSE_POST_WARNING}}
+: {{api|t=e|AUCTION_HOUSE_PURCHASE_COMPLETED}}<small>: auctionID</small>
+: {{api|t=e|AUCTION_HOUSE_SCRIPT_DEPRECATED}}
+: {{api|t=e|AUCTION_HOUSE_SHOW}}
+: {{api|t=e|AUCTION_HOUSE_SHOW_COMMODITY_WON_NOTIFICATION}}<small>: commodityName, commodityQuantity</small>
+: {{api|t=e|AUCTION_HOUSE_SHOW_ERROR}}<small>: error</small>
+: {{api|t=e|AUCTION_HOUSE_SHOW_FORMATTED_NOTIFICATION}}<small>: notification, text, auctionID</small>
+: {{api|t=e|AUCTION_HOUSE_SHOW_NOTIFICATION}}<small>: notification</small>
+: {{api|t=e|AUCTION_HOUSE_THROTTLED_MESSAGE_DROPPED}}
+: {{api|t=e|AUCTION_HOUSE_THROTTLED_MESSAGE_QUEUED}}
+: {{api|t=e|AUCTION_HOUSE_THROTTLED_MESSAGE_RESPONSE_RECEIVED}}
+: {{api|t=e|AUCTION_HOUSE_THROTTLED_MESSAGE_SENT}}
+: {{api|t=e|AUCTION_HOUSE_THROTTLED_SYSTEM_READY}}
+: {{api|t=e|AUCTION_MULTISELL_FAILURE}}
+: {{api|t=e|AUCTION_MULTISELL_START}}<small>: numRepetitions</small>
+: {{api|t=e|AUCTION_MULTISELL_UPDATE}}<small>: createdCount, totalToCreate</small>
+: {{api|t=e|BID_ADDED}}<small>: bidID</small>
+: {{api|t=e|BIDS_UPDATED}}
+: {{api|t=e|COMMODITY_PRICE_UNAVAILABLE}}
+: {{api|t=e|COMMODITY_PRICE_UPDATED}}<small>: updatedUnitPrice, updatedTotalPrice</small>
+: {{api|t=e|COMMODITY_PURCHASE_FAILED}}
+: {{api|t=e|COMMODITY_PURCHASE_SUCCEEDED}}
+: {{api|t=e|COMMODITY_PURCHASED}}<small>: itemID, quantity</small>
+: {{api|t=e|COMMODITY_SEARCH_RESULTS_ADDED}}<small>: itemID</small>
+: {{api|t=e|COMMODITY_SEARCH_RESULTS_RECEIVED}}
+: {{api|t=e|COMMODITY_SEARCH_RESULTS_UPDATED}}<small>: itemID</small>
+: {{api|t=e|EXTRA_BROWSE_INFO_RECEIVED}}<small>: itemID</small>
+: {{api|t=e|ITEM_KEY_ITEM_INFO_RECEIVED}}<small>: itemID</small>
+: {{api|t=e|ITEM_PURCHASED}}<small>: itemID</small>
+: {{api|t=e|ITEM_SEARCH_RESULTS_ADDED}}<small>: itemKey</small>
+: {{api|t=e|ITEM_SEARCH_RESULTS_UPDATED}}<small>: itemKey, newAuctionID</small>
+: {{api|t=e|OWNED_AUCTION_BIDDER_INFO_RECEIVED}}<small>: auctionID, bidderName</small>
+: {{api|t=e|OWNED_AUCTIONS_UPDATED}}
+: {{api|t=e|REPLICATE_ITEM_LIST_UPDATE}}
+
+=={{api.system|AzeriteEmpoweredItem}}==
+: {{api|t=e|AZERITE_EMPOWERED_ITEM_EQUIPPED_STATUS_CHANGED}}<small>: isHeartEquipped</small>
+: {{api|t=e|AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED}}<small>: azeriteEmpoweredItemLocation</small>
+
+=={{api.system|AzeriteEssence}}==
+: {{api|t=e|AZERITE_ESSENCE_ACTIVATED}}<small>: slot, essenceID</small>
+: {{api|t=e|AZERITE_ESSENCE_ACTIVATION_FAILED}}<small>: slot, essenceID</small>
+: {{api|t=e|AZERITE_ESSENCE_CHANGED}}<small>: essenceID, newRank</small>
+: {{api|t=e|AZERITE_ESSENCE_FORGE_CLOSE}}
+: {{api|t=e|AZERITE_ESSENCE_FORGE_OPEN}}
+: {{api|t=e|AZERITE_ESSENCE_MILESTONE_UNLOCKED}}<small>: milestoneID</small>
+: {{api|t=e|AZERITE_ESSENCE_UPDATE}}
+: {{api|t=e|PENDING_AZERITE_ESSENCE_CHANGED}}<small>: essenceID</small>
+
+=={{api.system|AzeriteItem}}==
+: {{api|t=e|AZERITE_ITEM_ENABLED_STATE_CHANGED}}<small>: enabled</small>
+: {{api|t=e|AZERITE_ITEM_EXPERIENCE_CHANGED}}<small>: azeriteItemLocation, oldExperienceAmount, newExperienceAmount</small>
+: {{api|t=e|AZERITE_ITEM_POWER_LEVEL_CHANGED}}<small>: azeriteItemLocation, oldPowerLevel, newPowerLevel, unlockedEmpoweredItemsInfo, azeriteItemID</small>
+
+=={{api.system|Bank}}==
+: {{api|t=e|BANK_BAG_SLOT_FLAGS_UPDATED}}<small>: slot</small>
+: {{api|t=e|BANK_TAB_SETTINGS_UPDATED}}<small>: bankType</small>
+: {{api|t=e|BANK_TABS_CHANGED}}<small>: bankType</small>
+: {{api|t=e|BANKFRAME_CLOSED}}
+: {{api|t=e|BANKFRAME_OPENED}}
+: {{api|t=e|PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED}}<small>: slot</small>
+: {{api|t=e|PLAYERBANKSLOTS_CHANGED}}<small>: slot</small>
+
+=={{api.system|BarberShop}}==
+: {{api|t=e|BARBER_SHOP_APPEARANCE_APPLIED}}
+: {{api|t=e|BARBER_SHOP_CAMERA_VALUES_UPDATED}}
+: {{api|t=e|BARBER_SHOP_CLOSE}}
+: {{api|t=e|BARBER_SHOP_COST_UPDATE}}
+: {{api|t=e|BARBER_SHOP_FORCE_CUSTOMIZATIONS_UPDATE}}
+: {{api|t=e|BARBER_SHOP_OPEN}}
+: {{api|t=e|BARBER_SHOP_RESULT}}<small>: success</small>
+
+=={{api.system|BattlePet}}==
+: {{api|t=e|PET_BATTLE_ABILITY_CHANGED}}<small>: owner, petIndex, abilityID</small>
+: {{api|t=e|PET_BATTLE_ACTION_SELECTED}}
+: {{api|t=e|PET_BATTLE_AURA_APPLIED}}<small>: owner, petIndex, auraInstanceID</small>
+: {{api|t=e|PET_BATTLE_AURA_CANCELED}}<small>: owner, petIndex, auraInstanceID</small>
+: {{api|t=e|PET_BATTLE_AURA_CHANGED}}<small>: owner, petIndex, auraInstanceID</small>
+: {{api|t=e|PET_BATTLE_CAPTURED}}<small>: owner, petIndex</small>
+: {{api|t=e|PET_BATTLE_CLOSE}}
+: {{api|t=e|PET_BATTLE_FINAL_ROUND}}<small>: owner</small>
+: {{api|t=e|PET_BATTLE_HEALTH_CHANGED}}<small>: owner, petIndex, healthChange</small>
+: {{api|t=e|PET_BATTLE_LEVEL_CHANGED}}<small>: owner, petIndex, newLevel</small>
+: {{api|t=e|PET_BATTLE_MAX_HEALTH_CHANGED}}<small>: owner, petIndex, healthChange</small>
+: {{api|t=e|PET_BATTLE_OPENING_DONE}}
+: {{api|t=e|PET_BATTLE_OPENING_START}}
+: {{api|t=e|PET_BATTLE_OVER}}
+: {{api|t=e|PET_BATTLE_OVERRIDE_ABILITY}}<small>: abilityIndex</small>
+: {{api|t=e|PET_BATTLE_PET_CHANGED}}<small>: owner</small>
+: {{api|t=e|PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE}}<small>: roundNumber</small>
+: {{api|t=e|PET_BATTLE_PET_ROUND_RESULTS}}<small>: roundNumber</small>
+: {{api|t=e|PET_BATTLE_PET_TYPE_CHANGED}}<small>: owner, petIndex, stateValue</small>
+: {{api|t=e|PET_BATTLE_PVP_DUEL_REQUEST_CANCEL}}
+: {{api|t=e|PET_BATTLE_PVP_DUEL_REQUESTED}}<small>: fullName</small>
+: {{api|t=e|PET_BATTLE_QUEUE_PROPOSAL_ACCEPTED}}
+: {{api|t=e|PET_BATTLE_QUEUE_PROPOSAL_DECLINED}}
+: {{api|t=e|PET_BATTLE_QUEUE_PROPOSE_MATCH}}
+: {{api|t=e|PET_BATTLE_QUEUE_STATUS}}
+: {{api|t=e|PET_BATTLE_XP_CHANGED}}<small>: owner, petIndex, xpChange</small>
+
+=={{api.system|BehavioralMessaging}}==
+: {{api|t=e|BEHAVIORAL_NOTIFICATION}}<small>: notificationType, dbId</small>
+
+=={{api.system|BlackMarketInfo}}==
+: {{api|t=e|BLACK_MARKET_BID_RESULT}}<small>: marketID, resultCode</small>
+: {{api|t=e|BLACK_MARKET_CLOSE}}
+: {{api|t=e|BLACK_MARKET_ITEM_UPDATE}}
+: {{api|t=e|BLACK_MARKET_OPEN}}
+: {{api|t=e|BLACK_MARKET_OUTBID}}<small>: marketID, itemID</small>
+: {{api|t=e|BLACK_MARKET_UNAVAILABLE}}
+: {{api|t=e|BLACK_MARKET_WON}}<small>: marketID, itemID</small>
+
+=={{api.system|Browser}}==
+: {{api|t=e|FULLSCREEN_BROWSER_SPINNER_HIDE}}
+: {{api|t=e|FULLSCREEN_BROWSER_SPINNER_SHOW}}
+: {{api|t=e|SIMPLE_BROWSER_POPUP}}<small>: url</small>
+: {{api|t=e|SIMPLE_BROWSER_SOCIAL_CALLBACK_INVOKED}}<small>: url</small>
+: {{api|t=e|SIMPLE_BROWSER_WEB_ERROR}}<small>: errorCode</small>
+: {{api|t=e|SIMPLE_BROWSER_WEB_PROXY_FAILED}}
+: {{api|t=e|SIMPLE_CHECKOUT_CLOSED}}
+
+=={{api.system|Calendar}}==
+: {{api|t=e|CALENDAR_ACTION_PENDING}}<small>: pending</small>
+: {{api|t=e|CALENDAR_CLOSE_EVENT}}
+: {{api|t=e|CALENDAR_EVENT_ALARM}}<small>: title, hour, minute</small>
+: {{api|t=e|CALENDAR_NEW_EVENT}}<small>: isCopy</small>
+: {{api|t=e|CALENDAR_OPEN_EVENT}}<small>: calendarType</small>
+: {{api|t=e|CALENDAR_UPDATE_ERROR}}<small>: errorReason</small>
+: {{api|t=e|CALENDAR_UPDATE_ERROR_WITH_COUNT}}<small>: errorReason, count</small>
+: {{api|t=e|CALENDAR_UPDATE_ERROR_WITH_PLAYER_NAME}}<small>: errorReason, playerName</small>
+: {{api|t=e|CALENDAR_UPDATE_EVENT}}
+: {{api|t=e|CALENDAR_UPDATE_EVENT_LIST}}
+: {{api|t=e|CALENDAR_UPDATE_GUILD_EVENTS}}
+: {{api|t=e|CALENDAR_UPDATE_INVITE_LIST}}<small>: hasCompleteList</small>
+: {{api|t=e|CALENDAR_UPDATE_PENDING_INVITES}}
+
+=={{api.system|CatalogShop}}==
+: {{api|t=e|BULK_PURCHASE_RESULT_RECEIVED}}<small>: result, productResults, bestTopUpProductID, totalCost</small>
+: {{api|t=e|BULK_REFUND_RESULT_RECEIVED}}<small>: result</small>
+: {{api|t=e|CATALOG_SHOP_ADD_PENDING_PRODUCT}}<small>: productID</small>
+: {{api|t=e|CATALOG_SHOP_DATA_REFRESH}}<small>: shoppingSessionUUIDStr</small>
+: {{api|t=e|CATALOG_SHOP_DISABLED}}
+: {{api|t=e|CATALOG_SHOP_FETCH_FAILURE}}<small>: shoppingSessionUUIDStr</small>
+: {{api|t=e|CATALOG_SHOP_FETCH_SUCCESS}}<small>: shoppingSessionUUIDStr</small>
+: {{api|t=e|CATALOG_SHOP_OPEN_SIMPLE_CHECKOUT}}<small>: checkoutID</small>
+: {{api|t=e|CATALOG_SHOP_PURCHASE_SUCCESS}}<small>: productID</small>
+: {{api|t=e|CATALOG_SHOP_REBUILD_SCROLL_BOX}}
+: {{api|t=e|CATALOG_SHOP_REFUNDABLE_DECORS_UPDATED}}
+: {{api|t=e|CATALOG_SHOP_REMOVE_PENDING_PRODUCT}}<small>: productID</small>
+: {{api|t=e|CATALOG_SHOP_RESULT_ERROR}}
+: {{api|t=e|CATALOG_SHOP_SPECIFIC_PRODUCT_REFRESH}}<small>: productID</small>
+: {{api|t=e|CATALOG_SHOP_VIRTUAL_CURRENCY_BALANCE_UPDATE}}<small>: currencyCode, balance</small>
+: {{api|t=e|CATALOG_SHOP_VIRTUAL_CURRENCY_BALANCE_UPDATE_FAILURE}}<small>: currencyCode</small>
+: {{api|t=e|SET_SEEN_PRODUCTS}}<small>: productIds</small>
+: {{api|t=e|SHOW_NEW_PRODUCT_NOTIFICATION}}
+
+=={{api.system|ChallengeModeInfo}}==
+: {{api|t=e|CHALLENGE_MODE_COMPLETED}}
+: {{api|t=e|CHALLENGE_MODE_COMPLETED_REWARDS}}<small>: mapID, medal, timeMS, money, rewards</small>
+: {{api|t=e|CHALLENGE_MODE_DEATH_COUNT_UPDATED}}
+: {{api|t=e|CHALLENGE_MODE_KEYSTONE_RECEPTABLE_OPEN}}
+: {{api|t=e|CHALLENGE_MODE_KEYSTONE_SLOTTED}}<small>: keystoneID</small>
+: {{api|t=e|CHALLENGE_MODE_LEADERBOARD_RESULT}}<small>: mapID, challengeModeID, page, results</small>
+: {{api|t=e|CHALLENGE_MODE_LEADERS_UPDATE}}
+: {{api|t=e|CHALLENGE_MODE_LEAVER_TIMER_ENDED}}
+: {{api|t=e|CHALLENGE_MODE_LEAVER_TIMER_STARTED}}
+: {{api|t=e|CHALLENGE_MODE_MAPS_UPDATE}}
+: {{api|t=e|CHALLENGE_MODE_MEMBER_INFO_UPDATED}}
+: {{api|t=e|CHALLENGE_MODE_NEW_RECORD}}<small>: mapID, timeMS, medal</small>
+: {{api|t=e|CHALLENGE_MODE_RESET}}<small>: mapID</small>
+: {{api|t=e|CHALLENGE_MODE_START}}<small>: mapID</small>
+
+=={{api.system|ChatInfo}}==
+: {{api|t=e|ALTERNATIVE_DEFAULT_LANGUAGE_CHANGED}}
+: {{api|t=e|BN_CHAT_MSG_ADDON}}<small>: prefix, text, channel, senderID</small>
+: {{api|t=e|CAN_LOCAL_WHISPER_TARGET_RESPONSE}}<small>: whisperTarget, status</small>
+: {{api|t=e|CAN_PLAYER_SPEAK_LANGUAGE_CHANGED}}<small>: languageId, canSpeakLanguage</small>
+: {{api|t=e|CAUTIONARY_CHANNEL_MESSAGE}}<small>: confirmNumber</small>
+: {{api|t=e|CAUTIONARY_CHAT_MESSAGE}}<small>: chatLineID, confirmNumber</small>
+: {{api|t=e|CHANNEL_COUNT_UPDATE}}<small>: displayIndex, count</small>
+: {{api|t=e|CHANNEL_FLAGS_UPDATED}}<small>: displayIndex</small>
+: {{api|t=e|CHANNEL_INVITE_REQUEST}}<small>: channelID, name</small>
+: {{api|t=e|CHANNEL_LEFT}}<small>: chatChannelID, name</small>
+: {{api|t=e|CHANNEL_PASSWORD_REQUEST}}<small>: channelID</small>
+: {{api|t=e|CHANNEL_ROSTER_UPDATE}}<small>: displayIndex, count</small>
+: {{api|t=e|CHANNEL_UI_UPDATE}}
+: {{api|t=e|CHAT_COMBAT_MSG_ARENA_POINTS_GAIN}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_LOGGING_CHANGED}}<small>: whichLog, isEnabled</small>
+: {{api|t=e|CHAT_MSG_ACHIEVEMENT}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_ADDON}}<small>: prefix, text, channel, sender, target, zoneChannelID, localID, name, instanceID</small>
+: {{api|t=e|CHAT_MSG_ADDON_LOGGED}}<small>: prefix, text, channel, sender, target, zoneChannelID, localID, name, instanceID</small>
+: {{api|t=e|CHAT_MSG_AFK}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BG_SYSTEM_ALLIANCE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BG_SYSTEM_HORDE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BG_SYSTEM_NEUTRAL}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BN}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BN_INLINE_TOAST_ALERT}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BN_INLINE_TOAST_BROADCAST}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BN_INLINE_TOAST_BROADCAST_INFORM}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BN_INLINE_TOAST_CONVERSATION}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BN_WHISPER}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BN_WHISPER_INFORM}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_BN_WHISPER_PLAYER_OFFLINE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_CHANNEL}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_CHANNEL_JOIN}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_CHANNEL_LEAVE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_CHANNEL_LEAVE_PREVENTED}}<small>: channelName</small>
+: {{api|t=e|CHAT_MSG_CHANNEL_LIST}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_CHANNEL_NOTICE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_CHANNEL_NOTICE_USER}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_COMBAT_FACTION_CHANGE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_COMBAT_HONOR_GAIN}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_COMBAT_MISC_INFO}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_COMBAT_XP_GAIN}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_COMMUNITIES_CHANNEL}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_CURRENCY}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_DND}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_EMOTE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_FILTERED}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_GUILD}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_GUILD_ACHIEVEMENT}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_GUILD_DISCORD}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_GUILD_ITEM_LOOTED}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_IGNORED}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_INSTANCE_CHAT}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_INSTANCE_CHAT_LEADER}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_LOOT}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_MONEY}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_MONSTER_EMOTE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_MONSTER_PARTY}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_MONSTER_SAY}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_MONSTER_WHISPER}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_MONSTER_YELL}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_OFFICER}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_OPENING}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_PARTY}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_PARTY_LEADER}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_PET_BATTLE_COMBAT_LOG}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_PET_BATTLE_INFO}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_PET_INFO}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_PING}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_RAID}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_RAID_BOSS_EMOTE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_RAID_BOSS_WHISPER}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_RAID_LEADER}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_RAID_WARNING}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_RESTRICTED}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_SAY}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_SKILL}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_SYSTEM}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_TARGETICONS}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_TEXT_EMOTE}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_TRADESKILLS}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_VOICE_TEXT}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_WHISPER}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_WHISPER_INFORM}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_MSG_YELL}}<small>: ''CHAT_MSG''</small>
+: {{api|t=e|CHAT_REGIONAL_SEND_FAILED}}
+: {{api|t=e|CHAT_REGIONAL_STATUS_CHANGED}}<small>: isServiceAvailable</small>
+: {{api|t=e|CHAT_SERVER_DISCONNECTED}}<small>: isInitialMessage</small>
+: {{api|t=e|CHAT_SERVER_RECONNECTED}}
+: {{api|t=e|CLEAR_BOSS_EMOTES}}
+: {{api|t=e|DAILY_RESET_INSTANCE_WELCOME}}<small>: mapname, timeLeft</small>
+: {{api|t=e|INSTANCE_RESET_WARNING}}<small>: warningMessage, timeLeft</small>
+: {{api|t=e|LANGUAGE_LIST_CHANGED}}
+: {{api|t=e|NOTIFY_CHAT_SUPPRESSED}}
+: {{api|t=e|QUEST_BOSS_EMOTE}}<small>: text, playerName, displayTime, enableBossEmoteWarningSound</small>
+: {{api|t=e|RAID_BOSS_EMOTE}}<small>: text, playerName, displayTime, enableBossEmoteWarningSound</small>
+: {{api|t=e|RAID_BOSS_WHISPER}}<small>: text, playerName, displayTime, enableBossEmoteWarningSound</small>
+: {{api|t=e|RAID_INSTANCE_WELCOME}}<small>: mapname, timeLeft, locked, extended</small>
+: {{api|t=e|UPDATE_CHAT_COLOR}}<small>: name, r, g, b</small>
+: {{api|t=e|UPDATE_CHAT_COLOR_NAME_BY_CLASS}}<small>: name, colorNameByClass</small>
+: {{api|t=e|UPDATE_CHAT_WINDOWS}}
+: {{api|t=e|UPDATE_FLOATING_CHAT_WINDOWS}}
+
+=={{api.system|Cinematic}}==
+: {{api|t=e|CINEMATIC_START}}<small>: canBeCancelled, forcedAspectRatio</small>
+: {{api|t=e|CINEMATIC_STOP}}
+: {{api|t=e|HIDE_SUBTITLE}}
+: {{api|t=e|PLAY_MOVIE}}<small>: movieID</small>
+: {{api|t=e|SHOW_SUBTITLE}}<small>: subtitle, sender</small>
+: {{api|t=e|STOP_MOVIE}}
+
+=={{api.system|ClassTalents}}==
+: {{api|t=e|ACTIVE_COMBAT_CONFIG_CHANGED}}<small>: configID</small>
+: {{api|t=e|CLASS_TALENTS_SWITCH_TO_LOADOUT_BY_INDEX}}<small>: loadoutIndex</small>
+: {{api|t=e|CLASS_TALENTS_SWITCH_TO_LOADOUT_BY_NAME}}<small>: loadoutName</small>
+: {{api|t=e|CLASS_TALENTS_SWITCH_TO_SPECIALIZATION_BY_INDEX}}<small>: specIndex</small>
+: {{api|t=e|CLASS_TALENTS_SWITCH_TO_SPECIALIZATION_BY_NAME}}<small>: specName</small>
+: {{api|t=e|SELECTED_LOADOUT_CHANGED}}
+: {{api|t=e|SPECIALIZATION_CHANGE_CAST_FAILED}}
+: {{api|t=e|STARTER_BUILD_ACTIVATION_FAILED}}
+
+=={{api.system|ClassTrial}}==
+: {{api|t=e|CLASS_TRIAL_TIMER_START}}
+: {{api|t=e|CLASS_TRIAL_UPGRADE_COMPLETE}}
+
+=={{api.system|ClickBindings}}==
+: {{api|t=e|CLICKBINDINGS_SET_HIGHLIGHTS_SHOWN}}<small>: showHighlights</small>
+
+=={{api.system|ClientScene}}==
+: {{api|t=e|CLIENT_SCENE_CLOSED}}
+: {{api|t=e|CLIENT_SCENE_OPENED}}<small>: sceneType</small>
+
+=={{api.system|Club}}==
+: {{api|t=e|AVATAR_LIST_UPDATED}}<small>: clubType</small>
+: {{api|t=e|CLUB_ADDED}}<small>: clubId</small>
+: {{api|t=e|CLUB_ERROR}}<small>: action, error, clubType</small>
+: {{api|t=e|CLUB_INVITATION_ADDED_FOR_SELF}}<small>: invitation</small>
+: {{api|t=e|CLUB_INVITATION_REMOVED_FOR_SELF}}<small>: invitationId</small>
+: {{api|t=e|CLUB_INVITATIONS_RECEIVED_FOR_CLUB}}<small>: clubId</small>
+: {{api|t=e|CLUB_MEMBER_ADDED}}<small>: clubId, memberId</small>
+: {{api|t=e|CLUB_MEMBER_PRESENCE_UPDATED}}<small>: clubId, memberId, presence</small>
+: {{api|t=e|CLUB_MEMBER_REMOVED}}<small>: clubId, memberId</small>
+: {{api|t=e|CLUB_MEMBER_ROLE_UPDATED}}<small>: clubId, memberId, roleId</small>
+: {{api|t=e|CLUB_MEMBER_UPDATED}}<small>: clubId, memberId</small>
+: {{api|t=e|CLUB_MEMBERS_UPDATED}}<small>: clubId</small>
+: {{api|t=e|CLUB_MESSAGE_ADDED}}<small>: clubId, streamId, messageId</small>
+: {{api|t=e|CLUB_MESSAGE_HISTORY_RECEIVED}}<small>: clubId, streamId, downloadedRange, contiguousRange</small>
+: {{api|t=e|CLUB_MESSAGE_UPDATED}}<small>: clubId, streamId, messageId</small>
+: {{api|t=e|CLUB_REMOVED}}<small>: clubId</small>
+: {{api|t=e|CLUB_REMOVED_MESSAGE}}<small>: clubName, clubRemovedReason</small>
+: {{api|t=e|CLUB_SELF_MEMBER_ROLE_UPDATED}}<small>: clubId, roleId</small>
+: {{api|t=e|CLUB_STREAM_ADDED}}<small>: clubId, streamId</small>
+: {{api|t=e|CLUB_STREAM_REMOVED}}<small>: clubId, streamId</small>
+: {{api|t=e|CLUB_STREAM_SUBSCRIBED}}<small>: clubId, streamId</small>
+: {{api|t=e|CLUB_STREAM_UNSUBSCRIBED}}<small>: clubId, streamId</small>
+: {{api|t=e|CLUB_STREAM_UPDATED}}<small>: clubId, streamId</small>
+: {{api|t=e|CLUB_STREAMS_LOADED}}<small>: clubId</small>
+: {{api|t=e|CLUB_TICKET_CREATED}}<small>: clubId, ticketInfo</small>
+: {{api|t=e|CLUB_TICKET_RECEIVED}}<small>: ticket</small>
+: {{api|t=e|CLUB_TICKETS_RECEIVED}}<small>: clubId</small>
+: {{api|t=e|CLUB_UPDATED}}<small>: clubId</small>
+: {{api|t=e|INITIAL_CLUBS_LOADED}}
+: {{api|t=e|STREAM_VIEW_MARKER_UPDATED}}<small>: clubId, streamId, lastReadTime</small>
+
+=={{api.system|ClubFinderInfo}}==
+: {{api|t=e|CLUB_FINDER_APPLICANT_INVITE_RECIEVED}}<small>: clubFinderGUIDs</small>
+: {{api|t=e|CLUB_FINDER_APPLICATIONS_UPDATED}}<small>: type, clubFinderGUIDs</small>
+: {{api|t=e|CLUB_FINDER_CAN_WHISPER_APPLICANT}}<small>: applicant</small>
+: {{api|t=e|CLUB_FINDER_CLUB_LIST_RETURNED}}<small>: type</small>
+: {{api|t=e|CLUB_FINDER_CLUB_REPORTED}}<small>: type, clubFinderGUID</small>
+: {{api|t=e|CLUB_FINDER_COMMUNITY_OFFLINE_JOIN}}<small>: clubId</small>
+: {{api|t=e|CLUB_FINDER_ENABLED_OR_DISABLED}}
+: {{api|t=e|CLUB_FINDER_GUILD_REALM_NAME_UPDATED}}<small>: clubFinderGUID, realmName</small>
+: {{api|t=e|CLUB_FINDER_LINKED_CLUB_RETURNED}}<small>: clubInfo</small>
+: {{api|t=e|CLUB_FINDER_MEMBERSHIP_LIST_CHANGED}}
+: {{api|t=e|CLUB_FINDER_PLAYER_PENDING_LIST_RECIEVED}}<small>: type</small>
+: {{api|t=e|CLUB_FINDER_POST_UPDATED}}<small>: clubFinderGUIDs</small>
+: {{api|t=e|CLUB_FINDER_RECRUIT_LIST_CHANGED}}
+: {{api|t=e|CLUB_FINDER_RECRUITMENT_POST_RETURNED}}<small>: type</small>
+: {{api|t=e|CLUB_FINDER_RECRUITS_UPDATED}}<small>: type</small>
+
+=={{api.system|ColorOverrides}}==
+: {{api|t=e|COLOR_OVERRIDE_UPDATED}}<small>: overrideType</small>
+: {{api|t=e|COLOR_OVERRIDES_RESET}}
+
+=={{api.system|CombatLog}}==
+: {{api|t=e|COMBAT_LOG_ENTRIES_CLEARED}}
+: {{api|t=e|COMBAT_LOG_EVENT}}
+: {{api|t=e|COMBAT_LOG_EVENT_UNFILTERED}}
+: {{api|t=e|COMBAT_LOG_MESSAGE_LIMIT_CHANGED}}<small>: messageLimit</small>
+
+=={{api.system|CombatLogInternal}}==
+: {{api|t=e|COMBAT_LOG_EVENT_INTERNAL_UNFILTERED}}
+
+=={{api.system|CombatLogSecure}}==
+: {{api|t=e|COMBAT_LOG_APPLY_FILTER_SETTINGS}}<small>: filterSettings</small>
+: {{api|t=e|COMBAT_LOG_MESSAGE}}<small>: message, colorR, colorG, colorB, order</small>
+: {{api|t=e|COMBAT_LOG_REFILTER_ENTRIES}}
+
+=={{api.system|CombatText}}==
+: {{api|t=e|COMBAT_TEXT_UPDATE}}<small>: combatTextType</small>
+
+=={{api.system|CommentatorFrame}}==
+: {{api|t=e|COMMENTATOR_COMBAT_EVENT}}
+: {{api|t=e|COMMENTATOR_ENTER_WORLD}}
+: {{api|t=e|COMMENTATOR_HISTORY_FLUSHED}}
+: {{api|t=e|COMMENTATOR_IMMEDIATE_FOV_UPDATE}}<small>: fov</small>
+: {{api|t=e|COMMENTATOR_MAP_UPDATE}}
+: {{api|t=e|COMMENTATOR_PLAYER_NAME_OVERRIDE_UPDATE}}<small>: nameToOverride, overrideName</small>
+: {{api|t=e|COMMENTATOR_PLAYER_UPDATE}}
+: {{api|t=e|COMMENTATOR_RESET_SETTINGS}}
+: {{api|t=e|COMMENTATOR_TEAM_NAME_UPDATE}}<small>: teamName</small>
+: {{api|t=e|COMMENTATOR_TEAMS_SWAPPED}}<small>: swapped</small>
+
+=={{api.system|CompactUnitFrames}}==
+: {{api|t=e|COMPACT_UNIT_FRAME_PROFILES_LOADED}}
+
+=={{api.system|Console}}==
+: {{api|t=e|CONSOLE_CLEAR}}
+: {{api|t=e|CONSOLE_COLORS_CHANGED}}
+: {{api|t=e|CONSOLE_FONT_SIZE_CHANGED}}
+: {{api|t=e|CONSOLE_LOG}}<small>: message</small>
+: {{api|t=e|CONSOLE_MESSAGE}}<small>: message, colorType</small>
+: {{api|t=e|CVAR_UPDATE}}<small>: eventName, value</small>
+: {{api|t=e|TOGGLE_CONSOLE}}<small>: showConsole</small>
+
+=={{api.system|Container}}==
+: {{api|t=e|BAG_CLOSED}}<small>: bagID</small>
+: {{api|t=e|BAG_CONTAINER_UPDATE}}
+: {{api|t=e|BAG_NEW_ITEMS_UPDATED}}
+: {{api|t=e|BAG_OPEN}}<small>: bagID</small>
+: {{api|t=e|BAG_OVERFLOW_WITH_FULL_INVENTORY}}
+: {{api|t=e|BAG_SLOT_FLAGS_UPDATED}}<small>: slot</small>
+: {{api|t=e|BAG_UPDATE}}<small>: bagID</small>
+: {{api|t=e|BAG_UPDATE_COOLDOWN}}
+: {{api|t=e|BAG_UPDATE_DELAYED}}
+: {{api|t=e|EQUIP_BIND_REFUNDABLE_CONFIRM}}<small>: slot, itemLocation</small>
+: {{api|t=e|EQUIP_BIND_TRADEABLE_CONFIRM}}<small>: slot, itemLocation</small>
+: {{api|t=e|EXPAND_BAG_BAR_CHANGED}}<small>: expandBagBar</small>
+: {{api|t=e|INVENTORY_SEARCH_UPDATE}}
+: {{api|t=e|ITEM_LOCK_CHANGED}}<small>: bagOrSlotIndex, slotIndex</small>
+: {{api|t=e|ITEM_LOCKED}}<small>: bagOrSlotIndex, slotIndex</small>
+: {{api|t=e|ITEM_UNLOCKED}}<small>: bagOrSlotIndex, slotIndex</small>
+: {{api|t=e|USE_COMBINED_BAGS_CHANGED}}<small>: useCombinedBags</small>
+
+=={{api.system|ContentTracking}}==
+: {{api|t=e|CONTENT_TRACKING_IS_ENABLED_UPDATE}}<small>: isEnabled</small>
+: {{api|t=e|CONTENT_TRACKING_LIST_UPDATE}}
+: {{api|t=e|CONTENT_TRACKING_UPDATE}}<small>: type, id, isTracked</small>
+: {{api|t=e|TRACKABLE_INFO_UPDATE}}<small>: type, id</small>
+: {{api|t=e|TRACKING_TARGET_INFO_UPDATE}}<small>: targetType, targetID</small>
+
+=={{api.system|ContributionCollector}}==
+: {{api|t=e|CONTRIBUTION_CHANGED}}<small>: state, result, name, ...contributionID</small>
+: {{api|t=e|CONTRIBUTION_COLLECTOR_PENDING}}<small>: contributionID, isPending, result</small>
+: {{api|t=e|CONTRIBUTION_COLLECTOR_UPDATE}}
+: {{api|t=e|CONTRIBUTION_COLLECTOR_UPDATE_SINGLE}}<small>: contributionID</small>
+
+=={{api.system|CooldownViewer}}==
+: {{api|t=e|COOLDOWN_VIEWER_DATA_LOADED}}
+: {{api|t=e|COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED}}<small>: baseSpellID, overrideSpellID</small>
+: {{api|t=e|COOLDOWN_VIEWER_TABLE_HOTFIXED}}
+
+=={{api.system|Covenant}}==
+: {{api|t=e|COVENANT_CHOSEN}}<small>: covenantID</small>
+
+=={{api.system|CovenantCallings}}==
+: {{api|t=e|COVENANT_CALLINGS_UPDATED}}<small>: callings</small>
+
+=={{api.system|CovenantPreview}}==
+: {{api|t=e|COVENANT_PREVIEW_CLOSE}}
+: {{api|t=e|COVENANT_PREVIEW_OPEN}}<small>: previewInfo</small>
+
+=={{api.system|CovenantSanctumUI}}==
+: {{api|t=e|COVENANT_RENOWN_CATCH_UP_STATE_UPDATE}}
+: {{api|t=e|COVENANT_SANCTUM_RENOWN_LEVEL_CHANGED}}<small>: newRenownLevel, oldRenownLevel</small>
+
+=={{api.system|CraftingOrderUI}}==
+: {{api|t=e|CRAFTING_HOUSE_DISABLED}}
+: {{api|t=e|CRAFTINGORDERS_CAN_REQUEST}}
+: {{api|t=e|CRAFTINGORDERS_CLAIM_ORDER_RESPONSE}}<small>: result, orderID</small>
+: {{api|t=e|CRAFTINGORDERS_CLAIMED_ORDER_ADDED}}
+: {{api|t=e|CRAFTINGORDERS_CLAIMED_ORDER_REMOVED}}
+: {{api|t=e|CRAFTINGORDERS_CLAIMED_ORDER_UPDATED}}<small>: orderID</small>
+: {{api|t=e|CRAFTINGORDERS_CRAFT_ORDER_RESPONSE}}<small>: result, orderID</small>
+: {{api|t=e|CRAFTINGORDERS_CUSTOMER_FAVORITES_CHANGED}}
+: {{api|t=e|CRAFTINGORDERS_CUSTOMER_OPTIONS_PARSED}}
+: {{api|t=e|CRAFTINGORDERS_DISPLAY_CRAFTER_FULFILLED_MSG}}<small>: orderTypeString, itemNameString, playerNameString, tipAmount, quantityCrafted</small>
+: {{api|t=e|CRAFTINGORDERS_FULFILL_ORDER_RESPONSE}}<small>: result, orderID</small>
+: {{api|t=e|CRAFTINGORDERS_HIDE_CRAFTER}}
+: {{api|t=e|CRAFTINGORDERS_HIDE_CUSTOMER}}
+: {{api|t=e|CRAFTINGORDERS_ORDER_CANCEL_RESPONSE}}<small>: result</small>
+: {{api|t=e|CRAFTINGORDERS_ORDER_PLACEMENT_RESPONSE}}<small>: result</small>
+: {{api|t=e|CRAFTINGORDERS_REJECT_ORDER_RESPONSE}}<small>: result, orderID</small>
+: {{api|t=e|CRAFTINGORDERS_RELEASE_ORDER_RESPONSE}}<small>: result, orderID</small>
+: {{api|t=e|CRAFTINGORDERS_SHOW_CRAFTER}}
+: {{api|t=e|CRAFTINGORDERS_SHOW_CUSTOMER}}
+: {{api|t=e|CRAFTINGORDERS_UNEXPECTED_ERROR}}
+: {{api|t=e|CRAFTINGORDERS_UPDATE_CUSTOMER_NAME}}<small>: customerName, orderID</small>
+: {{api|t=e|CRAFTINGORDERS_UPDATE_ORDER_COUNT}}<small>: orderType, numOrders</small>
+: {{api|t=e|CRAFTINGORDERS_UPDATE_PERSONAL_ORDER_COUNTS}}
+: {{api|t=e|CRAFTINGORDERS_UPDATE_REWARDS}}<small>: npcOrderRewards, orderID</small>
+
+=={{api.system|CurrencySystem}}==
+: {{api|t=e|ACCOUNT_CHARACTER_CURRENCY_DATA_RECEIVED}}
+: {{api|t=e|ACCOUNT_MONEY}}
+: {{api|t=e|CURRENCY_DISPLAY_UPDATE}}<small>: currencyType, quantity, quantityChange, quantityGainSource, destroyReason</small>
+: {{api|t=e|CURRENCY_TRANSFER_FAILED}}<small>: failureReason</small>
+: {{api|t=e|CURRENCY_TRANSFER_INITIATED}}
+: {{api|t=e|CURRENCY_TRANSFER_LOG_UPDATE}}
+: {{api|t=e|CURRENCY_TRANSFER_SUCCESS}}
+: {{api|t=e|PLAYER_MONEY}}
+
+=={{api.system|Cursor}}==
+: {{api|t=e|BATTLE_PET_CURSOR_CLEAR}}
+: {{api|t=e|CURSOR_CHANGED}}<small>: isDefault, newCursorType, oldCursorType, oldCursorVirtualID</small>
+: {{api|t=e|MOUNT_CURSOR_CLEAR}}
+: {{api|t=e|WORLD_CURSOR_TOOLTIP_UPDATE}}<small>: anchorType</small>
+
+=={{api.system|DamageMeter}}==
+: {{api|t=e|DAMAGE_METER_COMBAT_SESSION_UPDATED}}<small>: type, sessionID</small>
+: {{api|t=e|DAMAGE_METER_CURRENT_SESSION_UPDATED}}
+: {{api|t=e|DAMAGE_METER_RESET}}
+
+=={{api.system|DeathAlert}}==
+: {{api|t=e|HARDCORE_DEATHS}}<small>: memberName</small>
+
+=={{api.system|DeathInfo}}==
+: {{api|t=e|AREA_SPIRIT_HEALER_IN_RANGE}}
+: {{api|t=e|AREA_SPIRIT_HEALER_OUT_OF_RANGE}}
+: {{api|t=e|CEMETERY_PREFERENCE_UPDATED}}
+: {{api|t=e|CONFIRM_XP_LOSS}}
+: {{api|t=e|CORPSE_IN_INSTANCE}}
+: {{api|t=e|CORPSE_IN_RANGE}}
+: {{api|t=e|CORPSE_OUT_OF_RANGE}}
+: {{api|t=e|PLAYER_ALIVE}}
+: {{api|t=e|PLAYER_DEAD}}
+: {{api|t=e|PLAYER_SKINNED}}<small>: hasFreeRepop</small>
+: {{api|t=e|PLAYER_UNGHOST}}
+: {{api|t=e|REQUEST_CEMETERY_LIST_RESPONSE}}<small>: isGossipTriggered</small>
+: {{api|t=e|RESURRECT_REQUEST}}<small>: inviter</small>
+: {{api|t=e|SELF_RES_SPELL_CHANGED}}
+
+=={{api.system|DelvesUI}}==
+: {{api|t=e|ACTIVE_DELVE_DATA_UPDATE}}
+: {{api|t=e|DELVE_ASSIST_ACTION}}<small>: data</small>
+: {{api|t=e|DELVES_ACCOUNT_DATA_ELEMENT_CHANGED}}
+: {{api|t=e|PARTY_ELIGIBILITY_FOR_DELVE_TIERS_CHANGED}}<small>: playerName, maxEligibleLevel</small>
+: {{api|t=e|SHOW_DELVES_COMPANION_CONFIGURATION_UI}}
+: {{api|t=e|WALK_IN_DATA_UPDATE}}
+
+=={{api.system|Discord}}==
+: {{api|t=e|DISCORD_GUILD_ACHIEVEMENT}}<small>: achievementID</small>
+: {{api|t=e|DISCORD_GUILD_LOBBY_UPDATE}}
+: {{api|t=e|DISCORD_GUILD_SETTINGS_UPDATE}}
+: {{api|t=e|DISCORD_LINK_UPDATE}}
+: {{api|t=e|DISCORD_SERVER_LIST_UPDATE}}
+: {{api|t=e|DISCORD_STATUS_UPDATE}}
+
+=={{api.system|DuelInfo}}==
+: {{api|t=e|DUEL_FINISHED}}
+: {{api|t=e|DUEL_INBOUNDS}}
+: {{api|t=e|DUEL_OUTOFBOUNDS}}
+: {{api|t=e|DUEL_REQUESTED}}<small>: playerName</small>
+: {{api|t=e|DUEL_TO_THE_DEATH_REQUESTED}}<small>: playerName</small>
+
+=={{api.system|DyeColorInfo}}==
+: {{api|t=e|DYE_COLOR_CATEGORY_UPDATED}}<small>: dyeColorCategoryID</small>
+: {{api|t=e|DYE_COLOR_UPDATED}}<small>: dyeColorID</small>
+
+=={{api.system|EditModeManager}}==
+: {{api|t=e|EDIT_MODE_LAYOUTS_UPDATED}}<small>: layoutInfo, reconcileLayouts</small>
+
+=={{api.system|EncounterInfo}}==
+: {{api|t=e|BOSS_KILL}}<small>: encounterID, encounterName</small>
+: {{api|t=e|DISABLE_LOW_LEVEL_RAID}}
+: {{api|t=e|ENABLE_LOW_LEVEL_RAID}}
+: {{api|t=e|ENCOUNTER_END}}<small>: encounterID, encounterName, difficultyID, groupSize, success, encounterUnitStatus</small>
+: {{api|t=e|ENCOUNTER_START}}<small>: encounterID, encounterName, difficultyID, groupSize</small>
+: {{api|t=e|INSTANCE_LOCK_START}}
+: {{api|t=e|INSTANCE_LOCK_STOP}}
+: {{api|t=e|INSTANCE_LOCK_WARNING}}
+: {{api|t=e|RAID_TARGET_UPDATE}}
+: {{api|t=e|UPDATE_INSTANCE_INFO}}
+
+=={{api.system|EncounterJournal}}==
+: {{api|t=e|EJ_DIFFICULTY_UPDATE}}<small>: difficultyID</small>
+: {{api|t=e|EJ_LOOT_DATA_RECIEVED}}<small>: itemID</small>
+: {{api|t=e|SHOW_JOURNEYS_UI}}<small>: factionID</small>
+
+=={{api.system|EncounterTimeline}}==
+: {{api|t=e|ENCOUNTER_TIMELINE_EVENT_ADDED}}<small>: eventInfo</small>
+: {{api|t=e|ENCOUNTER_TIMELINE_EVENT_BLOCK_STATE_CHANGED}}<small>: eventID</small>
+: {{api|t=e|ENCOUNTER_TIMELINE_EVENT_COLOR_CHANGED}}<small>: eventID</small>
+: {{api|t=e|ENCOUNTER_TIMELINE_EVENT_HIGHLIGHT}}<small>: eventID</small>
+: {{api|t=e|ENCOUNTER_TIMELINE_EVENT_REMOVED}}<small>: eventID</small>
+: {{api|t=e|ENCOUNTER_TIMELINE_EVENT_STATE_CHANGED}}<small>: eventID</small>
+: {{api|t=e|ENCOUNTER_TIMELINE_EVENT_TRACK_CHANGED}}<small>: eventID</small>
+: {{api|t=e|ENCOUNTER_TIMELINE_LAYOUT_UPDATED}}
+: {{api|t=e|ENCOUNTER_TIMELINE_STATE_UPDATED}}
+: {{api|t=e|ENCOUNTER_TIMELINE_VIEW_ACTIVATED}}<small>: viewType</small>
+: {{api|t=e|ENCOUNTER_TIMELINE_VIEW_DEACTIVATED}}<small>: viewType</small>
+
+=={{api.system|EncounterWarnings}}==
+: {{api|t=e|ENCOUNTER_WARNING}}<small>: encounterWarningInfo</small>
+
+=={{api.system|EndOfMatchUI}}==
+: {{api|t=e|SHOW_END_OF_MATCH_UI}}
+
+=={{api.system|EquipmentSet}}==
+: {{api|t=e|EQUIPMENT_SETS_CHANGED}}
+: {{api|t=e|EQUIPMENT_SWAP_FINISHED}}<small>: result, setID</small>
+: {{api|t=e|EQUIPMENT_SWAP_PENDING}}
+: {{api|t=e|TRANSMOG_CUSTOM_SETS_CHANGED}}
+
+=={{api.system|EventSchedulerUI}}==
+: {{api|t=e|EVENT_SCHEDULER_UPDATE}}
+
+=={{api.system|Expansion}}==
+: {{api|t=e|MAX_EXPANSION_LEVEL_UPDATED}}
+: {{api|t=e|MIN_EXPANSION_LEVEL_UPDATED}}
+: {{api|t=e|SHOW_SUBSCRIPTION_INTERSTITIAL}}<small>: type</small>
+
+=={{api.system|ExternalEventURL}}==
+: {{api|t=e|EXTERNAL_EVENT_LAUNCH_URL_FAILED}}
+
+=={{api.system|FogOfWar}}==
+: {{api|t=e|FOG_OF_WAR_UPDATED}}
+
+=={{api.system|FriendList}}==
+: {{api|t=e|BATTLE_NET_FRIEND_TAG_ENABLED_STATUS_UPDATED}}
+: {{api|t=e|BATTLE_NET_TITLE_FRIEND_CUSTOM_NAME_ENABLED_STATUS_UPDATED}}
+: {{api|t=e|BN_BLOCK_FAILED_TOO_MANY}}<small>: blockType</small>
+: {{api|t=e|BN_BLOCK_LIST_UPDATED}}
+: {{api|t=e|BN_CHAT_WHISPER_UNDELIVERABLE}}<small>: senderID</small>
+: {{api|t=e|BN_CONNECTED}}<small>: suppressNotification</small>
+: {{api|t=e|BN_CUSTOM_MESSAGE_CHANGED}}<small>: id</small>
+: {{api|t=e|BN_CUSTOM_MESSAGE_LOADED}}
+: {{api|t=e|BN_DISCONNECTED}}<small>: result, suppressNotification</small>
+: {{api|t=e|BN_FRIEND_ACCOUNT_OFFLINE}}<small>: friendId, isCompanionApp</small>
+: {{api|t=e|BN_FRIEND_ACCOUNT_ONLINE}}<small>: friendId, isCompanionApp</small>
+: {{api|t=e|BN_FRIEND_INFO_CHANGED}}<small>: friendIndex</small>
+: {{api|t=e|BN_FRIEND_INVITE_ADDED}}<small>: accountID</small>
+: {{api|t=e|BN_FRIEND_INVITE_LIST_INITIALIZED}}<small>: listSize</small>
+: {{api|t=e|BN_FRIEND_INVITE_REMOVED}}
+: {{api|t=e|BN_FRIEND_LIST_SIZE_CHANGED}}<small>: accountID</small>
+: {{api|t=e|BN_INFO_CHANGED}}
+: {{api|t=e|BN_REQUEST_FOF_SUCCEEDED}}
+: {{api|t=e|CONFIRM_BATTLE_NET_FRIEND_INVITE_SHOW}}<small>: name, friendLevel</small>
+: {{api|t=e|FRIENDLIST_UPDATE}}
+: {{api|t=e|IGNORELIST_UPDATE}}
+: {{api|t=e|LEGACY_FRIEND_SYSTEM_STATUS_UPDATED}}
+: {{api|t=e|MUTELIST_UPDATE}}
+: {{api|t=e|NEW_MATCHMAKING_PARTY_INVITE}}
+: {{api|t=e|REJECTED_MATCHMAKING_PARTY_INVITE}}<small>: name</small>
+: {{api|t=e|SOCIAL_UI_FRIENDS_LIST_SYSTEM_STATUS_UPDATED}}
+: {{api|t=e|WHO_LIST_UPDATE}}
+
+=={{api.system|GMTicketInfo}}==
+: {{api|t=e|GM_PLAYER_INFO}}<small>: name, info</small>
+: {{api|t=e|ITEM_RESTORATION_BUTTON_STATUS}}
+: {{api|t=e|PETITION_CLOSED}}
+: {{api|t=e|PETITION_SHOW}}
+: {{api|t=e|PLAYER_REPORT_SUBMITTED}}<small>: invitedByGUID</small>
+: {{api|t=e|QUICK_TICKET_SYSTEM_STATUS}}
+: {{api|t=e|QUICK_TICKET_THROTTLE_CHANGED}}
+: {{api|t=e|UPDATE_WEB_TICKET}}<small>: hasTicket, numTickets, ticketStatus, caseIndex, waitTimeMinutes, waitMessage, caseTitle, caseDescription</small>
+
+=={{api.system|GamePad}}==
+: {{api|t=e|GAME_PAD_ACTIVE_CHANGED}}<small>: isActive</small>
+: {{api|t=e|GAME_PAD_CONFIGS_CHANGED}}
+: {{api|t=e|GAME_PAD_CONNECTED}}
+: {{api|t=e|GAME_PAD_DISCONNECTED}}
+: {{api|t=e|GAME_PAD_POWER_CHANGED}}<small>: powerLevel</small>
+
+=={{api.system|GameRules}}==
+: {{api|t=e|ACTIVE_GAME_MODE_UPDATED}}<small>: gameMode</small>
+: {{api|t=e|AVAILABLE_GAME_MODES_UPDATED}}
+: {{api|t=e|EVENT_REALM_QUEUES_UPDATED}}<small>: eventRealmQueues</small>
+: {{api|t=e|GAME_MODE_DISPLAY_INFO_UPDATED}}
+: {{api|t=e|GAME_MODE_DISPLAY_MODE_TOGGLE_DISABLED}}<small>: gameModeRecordID, disabled</small>
+
+=={{api.system|GarrisonInfo}}==
+: {{api|t=e|GARRISON_ARCHITECT_CLOSED}}
+: {{api|t=e|GARRISON_ARCHITECT_OPENED}}<small>: followerTypeID</small>
+: {{api|t=e|GARRISON_BUILDING_ACTIVATABLE}}<small>: buildingName, garrisonType</small>
+: {{api|t=e|GARRISON_BUILDING_ACTIVATED}}<small>: garrisonPlotInstanceID, garrisonBuildingID</small>
+: {{api|t=e|GARRISON_BUILDING_ERROR}}
+: {{api|t=e|GARRISON_BUILDING_LIST_UPDATE}}<small>: categoryID</small>
+: {{api|t=e|GARRISON_BUILDING_PLACED}}<small>: garrisonPlotInstanceID, newPlacement</small>
+: {{api|t=e|GARRISON_BUILDING_REMOVED}}<small>: garrPlotInstanceID, garrBuildingID</small>
+: {{api|t=e|GARRISON_BUILDING_UPDATE}}<small>: garrisonBuildingID, garrPlotInstanceID</small>
+: {{api|t=e|GARRISON_FOLLOWER_ADDED}}<small>: followerDbID, followerName, followerClassName, followerLevel, followerQuality, isUpgraded, textureKit, followerTypeID</small>
+: {{api|t=e|GARRISON_FOLLOWER_CATEGORIES_UPDATED}}
+: {{api|t=e|GARRISON_FOLLOWER_DURABILITY_CHANGED}}<small>: garrFollowerTypeID, followerDbID, followerDurability</small>
+: {{api|t=e|GARRISON_FOLLOWER_HEALED}}<small>: followerID</small>
+: {{api|t=e|GARRISON_FOLLOWER_LIST_UPDATE}}<small>: followerTypeID</small>
+: {{api|t=e|GARRISON_FOLLOWER_REMOVED}}<small>: followerTypeID</small>
+: {{api|t=e|GARRISON_FOLLOWER_UPGRADED}}<small>: followerDbID</small>
+: {{api|t=e|GARRISON_FOLLOWER_XP_CHANGED}}<small>: garrFollowerTypeID, followerDbID, xpChange, oldFollowerXp, oldFollowerLevel, oldFollowerQuality</small>
+: {{api|t=e|GARRISON_HIDE_LANDING_PAGE}}
+: {{api|t=e|GARRISON_INVASION_AVAILABLE}}
+: {{api|t=e|GARRISON_INVASION_UNAVAILABLE}}
+: {{api|t=e|GARRISON_LANDINGPAGE_SHIPMENTS}}
+: {{api|t=e|GARRISON_MISSION_AREA_BONUS_ADDED}}<small>: garrisonMissonBonusAbilityID</small>
+: {{api|t=e|GARRISON_MISSION_BONUS_ROLL_COMPLETE}}<small>: missionID, success</small>
+: {{api|t=e|GARRISON_MISSION_COMPLETE_RESPONSE}}<small>: missionID, canComplete, success, bonusRollSuccess, followerDeaths, autoCombatResult</small>
+: {{api|t=e|GARRISON_MISSION_FINISHED}}<small>: followerTypeID, missionID</small>
+: {{api|t=e|GARRISON_MISSION_LIST_UPDATE}}<small>: garrFollowerTypeID</small>
+: {{api|t=e|GARRISON_MISSION_NPC_CLOSED}}
+: {{api|t=e|GARRISON_MISSION_NPC_OPENED}}<small>: followerTypeID</small>
+: {{api|t=e|GARRISON_MISSION_REWARD_INFO}}<small>: missionID, followerDbID</small>
+: {{api|t=e|GARRISON_MISSION_STARTED}}<small>: garrFollowerTypeID, missionID</small>
+: {{api|t=e|GARRISON_MONUMENT_CLOSE_UI}}
+: {{api|t=e|GARRISON_MONUMENT_LIST_LOADED}}<small>: success</small>
+: {{api|t=e|GARRISON_MONUMENT_REPLACED}}<small>: success</small>
+: {{api|t=e|GARRISON_MONUMENT_SELECTED_TROPHY_ID_LOADED}}<small>: success</small>
+: {{api|t=e|GARRISON_MONUMENT_SHOW_UI}}
+: {{api|t=e|GARRISON_RANDOM_MISSION_ADDED}}<small>: followerTypeID, missionID</small>
+: {{api|t=e|GARRISON_RECALL_PORTAL_LAST_USED_TIME}}<small>: success, recallPortalLastUsedTime</small>
+: {{api|t=e|GARRISON_RECALL_PORTAL_USED}}<small>: success</small>
+: {{api|t=e|GARRISON_RECRUIT_FOLLOWER_RESULT}}
+: {{api|t=e|GARRISON_RECRUITMENT_FOLLOWERS_GENERATED}}
+: {{api|t=e|GARRISON_RECRUITMENT_NPC_CLOSED}}
+: {{api|t=e|GARRISON_RECRUITMENT_NPC_OPENED}}<small>: followerTypeID</small>
+: {{api|t=e|GARRISON_RECRUITMENT_READY}}
+: {{api|t=e|GARRISON_SHIPMENT_RECEIVED}}
+: {{api|t=e|GARRISON_SHIPYARD_NPC_CLOSED}}
+: {{api|t=e|GARRISON_SHIPYARD_NPC_OPENED}}<small>: followerTypeID</small>
+: {{api|t=e|GARRISON_SHOW_LANDING_PAGE}}
+: {{api|t=e|GARRISON_SPEC_GROUP_UPDATED}}<small>: garrTypeID, specID</small>
+: {{api|t=e|GARRISON_SPEC_GROUPS_CLEARED}}<small>: garrTypeID</small>
+: {{api|t=e|GARRISON_TALENT_COMPLETE}}<small>: garrTypeID, doAlert</small>
+: {{api|t=e|GARRISON_TALENT_EVENT_UPDATE}}<small>: eventType, eventID</small>
+: {{api|t=e|GARRISON_TALENT_NPC_CLOSED}}
+: {{api|t=e|GARRISON_TALENT_NPC_OPENED}}<small>: garrisonTypeID, garrisonTalentTreeID</small>
+: {{api|t=e|GARRISON_TALENT_RESEARCH_STARTED}}<small>: garrTypeID, garrisonTalentTreeID, garrTalentID</small>
+: {{api|t=e|GARRISON_TALENT_UNLOCKS_RESULT}}
+: {{api|t=e|GARRISON_TALENT_UPDATE}}<small>: garrTypeID</small>
+: {{api|t=e|GARRISON_TRADESKILL_NPC_CLOSED}}
+: {{api|t=e|GARRISON_UPDATE}}
+: {{api|t=e|GARRISON_UPGRADEABLE_RESULT}}<small>: garrisonUpgradeable</small>
+: {{api|t=e|GARRISON_USE_PARTY_GARRISON_CHANGED}}
+: {{api|t=e|SHIPMENT_CRAFTER_CLOSED}}
+: {{api|t=e|SHIPMENT_CRAFTER_INFO}}<small>: success, shipmentCount, maxShipments, ownedShipments, plotInstanceID</small>
+: {{api|t=e|SHIPMENT_CRAFTER_OPENED}}<small>: charShipmentContainerID</small>
+: {{api|t=e|SHIPMENT_CRAFTER_REAGENT_UPDATE}}
+: {{api|t=e|SHIPMENT_UPDATE}}<small>: shipmentStarted, hasAttachedFollower</small>
+
+=={{api.system|GenericWidgetDisplay}}==
+: {{api|t=e|GENERIC_WIDGET_DISPLAY_SHOW}}<small>: info</small>
+
+=={{api.system|Glue}}==
+: {{api|t=e|ACCOUNT_CVARS_LOADED}}
+
+=={{api.system|GlyphInfo}}==
+: {{api|t=e|ACTIVATE_GLYPH}}<small>: spellID</small>
+: {{api|t=e|CANCEL_GLYPH_CAST}}
+: {{api|t=e|USE_GLYPH}}<small>: spellID</small>
+
+=={{api.system|GossipInfo}}==
+: {{api|t=e|DYNAMIC_GOSSIP_POI_UPDATED}}
+: {{api|t=e|GOSSIP_CLOSED}}<small>: interactionIsContinuing</small>
+: {{api|t=e|GOSSIP_CONFIRM}}<small>: gossipID, text, cost</small>
+: {{api|t=e|GOSSIP_CONFIRM_CANCEL}}
+: {{api|t=e|GOSSIP_ENTER_CODE}}<small>: gossipID</small>
+: {{api|t=e|GOSSIP_OPTIONS_REFRESHED}}
+: {{api|t=e|GOSSIP_SHOW}}<small>: uiTextureKit</small>
+
+=={{api.system|GuildBank}}==
+: {{api|t=e|GUILDBANK_ITEM_LOCK_CHANGED}}
+: {{api|t=e|GUILDBANK_TEXT_CHANGED}}<small>: guildBankTab</small>
+: {{api|t=e|GUILDBANK_UPDATE_MONEY}}
+: {{api|t=e|GUILDBANK_UPDATE_TABS}}
+: {{api|t=e|GUILDBANK_UPDATE_TEXT}}<small>: guildBankTab</small>
+: {{api|t=e|GUILDBANK_UPDATE_WITHDRAWMONEY}}
+: {{api|t=e|GUILDBANKBAGSLOTS_CHANGED}}
+: {{api|t=e|GUILDBANKFRAME_CLOSED}}
+: {{api|t=e|GUILDBANKFRAME_OPENED}}
+: {{api|t=e|GUILDBANKLOG_UPDATE}}
+
+=={{api.system|GuildInfo}}==
+: {{api|t=e|CLOSE_TABARD_FRAME}}
+: {{api|t=e|DISABLE_DECLINE_GUILD_INVITE}}
+: {{api|t=e|ENABLE_DECLINE_GUILD_INVITE}}
+: {{api|t=e|GUILD_CHALLENGE_COMPLETED}}<small>: challengeType, currentCount, maxCount, goldAwarded</small>
+: {{api|t=e|GUILD_CHALLENGE_UPDATED}}
+: {{api|t=e|GUILD_EVENT_LOG_UPDATE}}
+: {{api|t=e|GUILD_INVITE_CANCEL}}
+: {{api|t=e|GUILD_INVITE_REQUEST}}<small>: inviter, guildName, guildAchievementPoints, oldGuildName, isNewGuild, tabardInfo</small>
+: {{api|t=e|GUILD_MOTD}}<small>: motdText</small>
+: {{api|t=e|GUILD_NEWS_UPDATE}}
+: {{api|t=e|GUILD_PARTY_STATE_UPDATED}}<small>: inGuildParty</small>
+: {{api|t=e|GUILD_RANKS_UPDATE}}
+: {{api|t=e|GUILD_RANKS_UPDATE_ACTIVE_PLAYER}}
+: {{api|t=e|GUILD_RECIPE_KNOWN_BY_MEMBERS}}
+: {{api|t=e|GUILD_REGISTRAR_CLOSED}}
+: {{api|t=e|GUILD_REGISTRAR_SHOW}}
+: {{api|t=e|GUILD_RENAME_NAME_CHECK}}<small>: desiredName, status, nameErrorToken</small>
+: {{api|t=e|GUILD_RENAME_REFUND_RESULT}}<small>: guildName, status</small>
+: {{api|t=e|GUILD_RENAME_REQUIRED}}<small>: flagSet</small>
+: {{api|t=e|GUILD_RENAME_STATUS_UPDATE}}<small>: status</small>
+: {{api|t=e|GUILD_REWARDS_LIST}}
+: {{api|t=e|GUILD_REWARDS_LIST_UPDATE}}
+: {{api|t=e|GUILD_ROSTER_UPDATE}}<small>: canRequestRosterUpdate</small>
+: {{api|t=e|GUILD_TRADESKILL_UPDATE}}
+: {{api|t=e|GUILDTABARD_UPDATE}}
+: {{api|t=e|OPEN_TABARD_FRAME}}
+: {{api|t=e|PLAYER_GUILD_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|REQUESTED_GUILD_RENAME_RESULT}}<small>: newName, status</small>
+: {{api|t=e|REQUIRED_GUILD_RENAME_RESULT}}<small>: success</small>
+: {{api|t=e|TABARD_CANSAVE_CHANGED}}
+: {{api|t=e|TABARD_SAVE_PENDING}}
+: {{api|t=e|UNIT_GUILD_LEVEL}}<small>: newLevel</small>
+
+=={{api.system|HeirloomInfo}}==
+: {{api|t=e|HEIRLOOM_UPGRADE_TARGETING_CHANGED}}<small>: pendingHeirloomUpgradeSpellcast</small>
+: {{api|t=e|HEIRLOOMS_UPDATED}}<small>: itemID, updateReason, hideUntilLearned</small>
+
+=={{api.system|HouseEditorUI}}==
+: {{api|t=e|HOUSE_EDITOR_AVAILABILITY_CHANGED}}
+: {{api|t=e|HOUSE_EDITOR_MODE_CHANGE_FAILURE}}<small>: result</small>
+: {{api|t=e|HOUSE_EDITOR_MODE_CHANGED}}<small>: currentEditMode</small>
+
+=={{api.system|HouseExteriorUI}}==
+: {{api|t=e|HOUSE_EXTERIOR_DECOR_HIDDEN_CHANGED}}<small>: isDecorHidden</small>
+: {{api|t=e|HOUSE_EXTERIOR_TYPE_UNLOCKED}}<small>: fixtureID</small>
+: {{api|t=e|HOUSING_CORE_FIXTURE_CHANGED}}<small>: coreFixtureType</small>
+: {{api|t=e|HOUSING_FIXTURE_HOVER_CHANGED}}<small>: anyHovered</small>
+: {{api|t=e|HOUSING_FIXTURE_POINT_FRAME_ADDED}}<small>: pointFrame</small>
+: {{api|t=e|HOUSING_FIXTURE_POINT_FRAME_RELEASED}}<small>: pointFrame</small>
+: {{api|t=e|HOUSING_FIXTURE_POINT_FRAMES_RELEASED}}
+: {{api|t=e|HOUSING_FIXTURE_POINT_SELECTION_CHANGED}}<small>: hasSelection</small>
+: {{api|t=e|HOUSING_FIXTURE_UNLOCKED}}<small>: fixtureID</small>
+: {{api|t=e|HOUSING_SET_EXTERIOR_HOUSE_SIZE_RESPONSE}}<small>: result</small>
+: {{api|t=e|HOUSING_SET_EXTERIOR_HOUSE_TYPE_RESPONSE}}<small>: result</small>
+: {{api|t=e|HOUSING_SET_FIXTURE_RESPONSE}}<small>: result</small>
+
+=={{api.system|HousingBasicModeUI}}==
+: {{api|t=e|HOUSING_BASIC_MODE_HOVERED_TARGET_CHANGED}}<small>: hasHoveredTarget, targetType</small>
+: {{api|t=e|HOUSING_BASIC_MODE_PLACEMENT_FLAGS_UPDATED}}<small>: targetType, activeFlags</small>
+: {{api|t=e|HOUSING_BASIC_MODE_SELECTED_TARGET_CHANGED}}<small>: hasSelectedTarget, targetType, isPreview</small>
+: {{api|t=e|HOUSING_DECOR_FREE_PLACE_STATUS_CHANGED}}<small>: isFreePlaceEnabled</small>
+: {{api|t=e|HOUSING_DECOR_GRID_SNAP_OCCURRED}}
+: {{api|t=e|HOUSING_DECOR_GRID_SNAP_STATUS_CHANGED}}<small>: isGridSnapEnabled</small>
+
+=={{api.system|HousingBlueprintUI}}==
+: {{api|t=e|HOUSING_BLUEPRINT_COLLECTION_FAILURE}}<small>: result</small>
+: {{api|t=e|HOUSING_BLUEPRINT_COLLECTION_RECEIVED}}<small>: collection</small>
+: {{api|t=e|HOUSING_BLUEPRINT_CONTENTS_FAILURE}}<small>: blueprintShareCode, result</small>
+: {{api|t=e|HOUSING_BLUEPRINT_CONTENTS_RECEIVED}}<small>: contentInfo</small>
+: {{api|t=e|HOUSING_BLUEPRINT_DELETE_FAILURE}}<small>: blueprintID, result</small>
+: {{api|t=e|HOUSING_BLUEPRINT_DELETE_SUCCESS}}<small>: blueprintID</small>
+: {{api|t=e|HOUSING_BLUEPRINT_EXPORT_FAILURE}}<small>: result</small>
+: {{api|t=e|HOUSING_BLUEPRINT_EXPORT_SUCCESS}}<small>: blueprintShareCode</small>
+: {{api|t=e|HOUSING_BLUEPRINT_IMPORT_FAILURE}}<small>: result</small>
+: {{api|t=e|HOUSING_BLUEPRINT_IMPORT_STARTED}}
+: {{api|t=e|HOUSING_BLUEPRINT_IMPORT_SUCCESS}}
+: {{api|t=e|HOUSING_BLUEPRINT_RENAME_FAILURE}}<small>: blueprintID, result</small>
+: {{api|t=e|HOUSING_BLUEPRINT_RENAME_SUCCESS}}<small>: blueprintID, name</small>
+: {{api|t=e|HOUSING_BLUEPRINTS_AVAILABILITY_CHANGED}}
+
+=={{api.system|HousingCatalogUI}}==
+: {{api|t=e|HOUSING_CATALOG_CATEGORY_UPDATED}}<small>: categoryID</small>
+: {{api|t=e|HOUSING_CATALOG_SUBCATEGORY_UPDATED}}<small>: subcategoryID</small>
+: {{api|t=e|HOUSING_DECOR_ADD_TO_PREVIEW_LIST}}<small>: previewItemData</small>
+: {{api|t=e|HOUSING_DECOR_PREVIEW_LIST_REMOVE_FROM_WORLD}}<small>: decorGUID</small>
+: {{api|t=e|HOUSING_DECOR_PREVIEW_LIST_UPDATED}}
+: {{api|t=e|HOUSING_REFUND_LIST_UPDATED}}
+: {{api|t=e|HOUSING_STORAGE_ENTRY_UPDATED}}<small>: entryVariantID</small>
+: {{api|t=e|HOUSING_STORAGE_UPDATED}}
+
+=={{api.system|HousingCleanupModeUI}}==
+: {{api|t=e|HOUSING_CLEANUP_MODE_HOVERED_TARGET_CHANGED}}<small>: hasHoveredTarget, targetType</small>
+: {{api|t=e|HOUSING_CLEANUP_MODE_TARGET_SELECTED}}
+
+=={{api.system|HousingCustomizeModeUI}}==
+: {{api|t=e|HOUSING_CUSTOMIZE_MODE_HOVERED_TARGET_CHANGED}}<small>: hasHoveredTarget, targetType</small>
+: {{api|t=e|HOUSING_CUSTOMIZE_MODE_SELECTED_TARGET_CHANGED}}<small>: hasSelectedTarget, targetType</small>
+: {{api|t=e|HOUSING_DECOR_CUSTOMIZATION_CHANGED}}<small>: decorGUID</small>
+: {{api|t=e|HOUSING_DECOR_DYE_FAILURE}}<small>: decorGUID, housingResult</small>
+: {{api|t=e|HOUSING_ROOM_COMPONENT_CUSTOMIZATION_CHANGE_FAILED}}<small>: roomGUID, componentID, housingResult</small>
+: {{api|t=e|HOUSING_ROOM_COMPONENT_CUSTOMIZATION_CHANGED}}<small>: roomGUID, componentID</small>
+
+=={{api.system|HousingDecorUI}}==
+: {{api|t=e|HOUSE_DECOR_ADDED_TO_CHEST}}<small>: decorGUID, decorID</small>
+: {{api|t=e|HOUSE_EXTERIOR_POSITION_FAILURE}}<small>: housingResult</small>
+: {{api|t=e|HOUSE_EXTERIOR_POSITION_SUCCESS}}
+: {{api|t=e|HOUSING_DECOR_GRID_VISIBILITY_STATUS_CHANGED}}<small>: isGridVisible</small>
+: {{api|t=e|HOUSING_DECOR_PLACE_FAILURE}}<small>: housingResult</small>
+: {{api|t=e|HOUSING_DECOR_PLACE_SUCCESS}}<small>: decorGUID, size, isNew, isPreview</small>
+: {{api|t=e|HOUSING_DECOR_PREVIEW_STATE_CHANGED}}<small>: isPreviewState</small>
+: {{api|t=e|HOUSING_DECOR_REMOVED}}<small>: decorGUID</small>
+: {{api|t=e|HOUSING_DECOR_SELECT_RESPONSE}}<small>: result</small>
+: {{api|t=e|HOUSING_NEW_DECOR_PLACE_COMPLETE}}<small>: decorGUID</small>
+: {{api|t=e|HOUSING_NUM_DECOR_PLACED_CHANGED}}
+
+=={{api.system|HousingExpertModeUI}}==
+: {{api|t=e|HOUSING_DECOR_PRECISION_MANIPULATION_EVENT}}<small>: event</small>
+: {{api|t=e|HOUSING_DECOR_PRECISION_MANIPULATION_STATUS_CHANGED}}<small>: isManipulatingSelection</small>
+: {{api|t=e|HOUSING_DECOR_PRECISION_SUBMODE_CHANGED}}<small>: activeSubmode</small>
+: {{api|t=e|HOUSING_EXPERT_MODE_HOVERED_TARGET_CHANGED}}<small>: hasHoveredTarget, targetType</small>
+: {{api|t=e|HOUSING_EXPERT_MODE_PLACEMENT_FLAGS_UPDATED}}<small>: targetType, activeFlags</small>
+: {{api|t=e|HOUSING_EXPERT_MODE_SELECTED_TARGET_CHANGED}}<small>: hasSelectedTarget, targetType</small>
+
+=={{api.system|HousingInspectModeUI}}==
+: {{api|t=e|HOUSING_INSPECT_MODE_DECOR_HOVERED_CHANGED}}
+: {{api|t=e|HOUSING_INSPECT_MODE_STATE_UPDATED}}
+
+=={{api.system|HousingLayoutUI}}==
+: {{api|t=e|HOUSING_LAYOUT_DOOR_SELECTED}}<small>: roomGUID, componentID</small>
+: {{api|t=e|HOUSING_LAYOUT_DOOR_SELECTION_CHANGED}}<small>: hasSelection</small>
+: {{api|t=e|HOUSING_LAYOUT_DRAG_TARGET_CHANGED}}<small>: isDraggingRoom</small>
+: {{api|t=e|HOUSING_LAYOUT_FLOORPLAN_SELECTION_CHANGED}}<small>: hasSelection, roomID, blueprintShareCode</small>
+: {{api|t=e|HOUSING_LAYOUT_OCCUPIED_FLOOR_RANGE_CHANGED}}<small>: lowestFloor, highestFloor</small>
+: {{api|t=e|HOUSING_LAYOUT_PIN_FRAME_ADDED}}<small>: pinFrame</small>
+: {{api|t=e|HOUSING_LAYOUT_PIN_FRAME_RELEASED}}<small>: pinFrame</small>
+: {{api|t=e|HOUSING_LAYOUT_PIN_FRAMES_RELEASED}}
+: {{api|t=e|HOUSING_LAYOUT_ROOM_COMPONENT_THEME_SET_CHANGED}}<small>: roomGUID, componentID, newThemeSet, result</small>
+: {{api|t=e|HOUSING_LAYOUT_ROOM_MOVE_INVALID}}
+: {{api|t=e|HOUSING_LAYOUT_ROOM_MOVED}}
+: {{api|t=e|HOUSING_LAYOUT_ROOM_RECEIVED}}<small>: playAddedSound</small>
+: {{api|t=e|HOUSING_LAYOUT_ROOM_REMOVED}}
+: {{api|t=e|HOUSING_LAYOUT_ROOM_RETURNED}}
+: {{api|t=e|HOUSING_LAYOUT_ROOM_SELECTION_CHANGED}}<small>: hasSelection</small>
+: {{api|t=e|HOUSING_LAYOUT_ROOM_SNAPPED}}
+: {{api|t=e|HOUSING_LAYOUT_VIEWED_FLOOR_CHANGED}}<small>: floor</small>
+: {{api|t=e|SHOW_STAIR_DIRECTION_CONFIRMATION}}
+
+=={{api.system|HousingNeighborhoodUI}}==
+: {{api|t=e|CANCEL_NEIGHBORHOOD_INVITE_RESPONSE}}<small>: result, playerName</small>
+: {{api|t=e|CLOSE_PLOT_CORNERSTONE}}
+: {{api|t=e|NEIGHBORHOOD_INFO_UPDATED}}<small>: neighborhoodInfo</small>
+: {{api|t=e|NEIGHBORHOOD_INVITE_RESPONSE}}<small>: result</small>
+: {{api|t=e|NEIGHBORHOOD_MAP_DATA_UPDATED}}
+: {{api|t=e|NEIGHBORHOOD_NAME_UPDATED}}<small>: neighborhoodGuid, neighborhoodName</small>
+: {{api|t=e|OPEN_PLOT_CORNERSTONE}}
+: {{api|t=e|PENDING_NEIGHBORHOOD_INVITES_RECIEVED}}<small>: result, pendingInviteList</small>
+: {{api|t=e|PURCHASE_PLOT_RESULT}}<small>: result</small>
+: {{api|t=e|SHOW_PLAYER_EVICTED_DIALOG}}
+: {{api|t=e|UPDATE_BULLETIN_BOARD_MEMBER_TYPE}}<small>: player, residentType</small>
+: {{api|t=e|UPDATE_BULLETIN_BOARD_ROSTER}}<small>: neighborhoodInfo, rosterMemberList</small>
+: {{api|t=e|UPDATE_BULLETIN_BOARD_ROSTER_STATUSES}}<small>: rosterMemberList</small>
+
+=={{api.system|HousingUI}}==
+: {{api|t=e|ADD_NEIGHBORHOOD_CHARTER_SIGNATURE}}<small>: signature</small>
+: {{api|t=e|B_NET_NEIGHBORHOOD_LIST_UPDATED}}<small>: result, neighborhoodInfos</small>
+: {{api|t=e|CLOSE_CHARTER_CONFIRMATION_UI}}
+: {{api|t=e|CLOSE_CREATE_CHARTER_NEIGHBORHOOD_UI}}
+: {{api|t=e|CLOSE_CREATE_GUILD_NEIGHBORHOOD_UI}}
+: {{api|t=e|CREATE_NEIGHBORHOOD_RESULT}}<small>: result, neighborhoodName</small>
+: {{api|t=e|CURRENT_HOUSE_INFO_RECIEVED}}<small>: houseInfo</small>
+: {{api|t=e|CURRENT_HOUSE_INFO_UPDATED}}<small>: houseInfo</small>
+: {{api|t=e|DECLINE_NEIGHBORHOOD_INVITATION_RESPONSE}}<small>: success</small>
+: {{api|t=e|FORCE_REFRESH_HOUSE_FINDER}}
+: {{api|t=e|HOUSE_FINDER_NEIGHBORHOOD_DATA_RECIEVED}}<small>: neighborhoodPlots</small>
+: {{api|t=e|HOUSE_INFO_UPDATED}}
+: {{api|t=e|HOUSE_LEVEL_CHANGED}}<small>: newHouseLevelInfo</small>
+: {{api|t=e|HOUSE_LEVEL_FAVOR_UPDATED}}<small>: houseLevelFavor</small>
+: {{api|t=e|HOUSE_PLOT_ENTERED}}
+: {{api|t=e|HOUSE_PLOT_EXITED}}
+: {{api|t=e|HOUSE_RESERVATION_RESPONSE_RECIEVED}}<small>: result</small>
+: {{api|t=e|HOUSE_RESET_COMPLETED}}
+: {{api|t=e|HOUSE_RESET_FAILED}}<small>: result</small>
+: {{api|t=e|HOUSING_MARKET_AVAILABILITY_UPDATED}}
+: {{api|t=e|HOUSING_SERVICES_AVAILABILITY_UPDATED}}
+: {{api|t=e|IGNORE_NEIGHBORHOOD_RESPONSE}}<small>: success, neighborhoodGuid</small>
+: {{api|t=e|MOVE_OUT_RESERVATION_UPDATED}}
+: {{api|t=e|NEIGHBORHOOD_GUILD_SIZE_VALIDATED}}<small>: approved</small>
+: {{api|t=e|NEIGHBORHOOD_LIST_UPDATED}}<small>: result, neighborhoodInfos</small>
+: {{api|t=e|NEIGHBORHOOD_NAME_VALIDATED}}<small>: approved</small>
+: {{api|t=e|NEW_HOUSING_ITEM_ACQUIRED}}<small>: itemType, itemName, icon</small>
+: {{api|t=e|OPEN_CHARTER_CONFIRMATION_UI}}<small>: neighborhoodName, locationName</small>
+: {{api|t=e|OPEN_CREATE_CHARTER_NEIGHBORHOOD_UI}}<small>: locationName</small>
+: {{api|t=e|OPEN_CREATE_GUILD_NEIGHBORHOOD_UI}}<small>: locationName</small>
+: {{api|t=e|OPEN_NEIGHBORHOOD_CHARTER}}<small>: neighborhoodInfo, signatures, requiredSignatures</small>
+: {{api|t=e|OPEN_NEIGHBORHOOD_CHARTER_SIGNATURE_REQUEST}}<small>: neighborhoodInfo</small>
+: {{api|t=e|PLAYER_CHARACTER_LIST_UPDATED}}<small>: characterInfos, ownerListIndex</small>
+: {{api|t=e|PLAYER_HOUSE_LIST_UPDATED}}<small>: houseInfos</small>
+: {{api|t=e|RECEIVED_HOUSE_LEVEL_REWARDS}}<small>: level, rewards</small>
+: {{api|t=e|REMOVE_NEIGHBORHOOD_CHARTER_SIGNATURE}}<small>: signature</small>
+: {{api|t=e|SHOW_NEIGHBORHOOD_OWNERSHIP_TRANSFER_DIALOG}}<small>: neighborhoodName, cosmeticOwnerName</small>
+: {{api|t=e|TRACKED_HOUSE_CHANGED}}<small>: trackedHouse</small>
+: {{api|t=e|VIEW_HOUSES_LIST_RECIEVED}}<small>: houseInfos</small>
+
+=={{api.system|ImmersiveInteraction}}==
+: {{api|t=e|IMMERSIVE_INTERACTION_BEGIN}}
+: {{api|t=e|IMMERSIVE_INTERACTION_END}}
+
+=={{api.system|InGameNavigation}}==
+: {{api|t=e|NAVIGATION_DESTINATION_REACHED}}<small>: isWaypoint</small>
+: {{api|t=e|NAVIGATION_FRAME_CREATED}}<small>: region</small>
+: {{api|t=e|NAVIGATION_FRAME_DESTROYED}}
+
+=={{api.system|InstanceEncounter}}==
+: {{api|t=e|ENCOUNTER_STATE_CHANGED}}<small>: isInProgress</small>
+: {{api|t=e|INSTANCE_ENCOUNTER_ADD_TIMER}}<small>: timeRemaining</small>
+: {{api|t=e|INSTANCE_ENCOUNTER_ENGAGE_UNIT}}
+: {{api|t=e|INSTANCE_ENCOUNTER_OBJECTIVE_COMPLETE}}<small>: objectiveID</small>
+: {{api|t=e|INSTANCE_ENCOUNTER_OBJECTIVE_START}}<small>: objectiveID, objectiveProgress</small>
+: {{api|t=e|INSTANCE_ENCOUNTER_OBJECTIVE_UPDATE}}<small>: objectiveID, objectiveProgress</small>
+
+=={{api.system|InstanceLeaverInfo}}==
+: {{api|t=e|INSTANCE_LEAVER_STATUS_CHANGED}}<small>: isLeaver</small>
+
+=={{api.system|IslandsInfo}}==
+: {{api|t=e|ISLAND_AZERITE_GAIN}}<small>: amount, gainedByPlayer, factionIndex, gainedBy, gainedFrom</small>
+
+=={{api.system|IslandsQueue}}==
+: {{api|t=e|ISLANDS_QUEUE_CLOSE}}
+: {{api|t=e|ISLANDS_QUEUE_OPEN}}
+
+=={{api.system|Item}}==
+: {{api|t=e|ACTION_WILL_BIND_ITEM}}
+: {{api|t=e|BIND_ENCHANT}}
+: {{api|t=e|CHARACTER_ITEM_FIXUP_NOTIFICATION}}<small>: fixupVersion</small>
+: {{api|t=e|CONFIRM_BEFORE_USE}}
+: {{api|t=e|CONVERT_TO_BIND_TO_ACCOUNT_CONFIRM}}
+: {{api|t=e|DELETE_ITEM_CONFIRM}}<small>: itemName, qualityID, bonding, questWarn</small>
+: {{api|t=e|END_BOUND_TRADEABLE}}<small>: reason</small>
+: {{api|t=e|GET_ITEM_INFO_RECEIVED}}<small>: itemID, success</small>
+: {{api|t=e|ITEM_CHANGED}}<small>: previousHyperlink, newHyperlink</small>
+: {{api|t=e|ITEM_CONVERSION_DATA_READY}}<small>: itemGUID</small>
+: {{api|t=e|ITEM_COUNT_CHANGED}}<small>: itemID</small>
+: {{api|t=e|ITEM_DATA_LOAD_RESULT}}<small>: itemID, success</small>
+: {{api|t=e|MERCHANT_CONFIRM_TRADE_TIMER_REMOVAL}}<small>: itemLink</small>
+: {{api|t=e|REPLACE_ENCHANT}}<small>: existingStr, replacementStr</small>
+: {{api|t=e|REPLACE_TRADESKILL_ENCHANT}}<small>: existing, replacement</small>
+: {{api|t=e|TRADE_REPLACE_ENCHANT}}<small>: existing, replacement</small>
+: {{api|t=e|USE_BIND_CONFIRM}}
+: {{api|t=e|USE_NO_REFUND_CONFIRM}}
+: {{api|t=e|WEAPON_ENCHANT_CHANGED}}
+
+=={{api.system|ItemInteractionUI}}==
+: {{api|t=e|ITEM_INTERACTION_CHARGE_INFO_UPDATED}}
+: {{api|t=e|ITEM_INTERACTION_ITEM_SELECTION_UPDATED}}<small>: itemLocation</small>
+
+=={{api.system|ItemSocketInfo}}==
+: {{api|t=e|SOCKET_INFO_ACCEPT}}
+: {{api|t=e|SOCKET_INFO_BIND_CONFIRM}}
+: {{api|t=e|SOCKET_INFO_CLOSE}}
+: {{api|t=e|SOCKET_INFO_FAILURE}}
+: {{api|t=e|SOCKET_INFO_REFUNDABLE_CONFIRM}}
+: {{api|t=e|SOCKET_INFO_SUCCESS}}
+: {{api|t=e|SOCKET_INFO_UI_EVENT_REGISTRATION_UPDATE}}<small>: uiType</small>
+: {{api|t=e|SOCKET_INFO_UPDATE}}
+
+=={{api.system|ItemText}}==
+: {{api|t=e|ITEM_TEXT_BEGIN}}
+: {{api|t=e|ITEM_TEXT_CLOSED}}
+: {{api|t=e|ITEM_TEXT_READY}}
+: {{api|t=e|ITEM_TEXT_TRANSLATION}}<small>: delay</small>
+
+=={{api.system|ItemUpgrade}}==
+: {{api|t=e|ITEM_UPGRADE_FAILED}}
+: {{api|t=e|ITEM_UPGRADE_MASTER_SET_ITEM}}
+: {{api|t=e|ITEM_UPGRADE_MASTER_UPDATE}}
+
+=={{api.system|KeyBindings}}==
+: {{api|t=e|BINDINGS_LOADED}}
+: {{api|t=e|MODIFIER_STATE_CHANGED}}<small>: key, down</small>
+: {{api|t=e|NOTIFY_TURN_STRAFE_CHANGE}}
+: {{api|t=e|UPDATE_BINDINGS}}
+
+=={{api.system|LFGInfo}}==
+: {{api|t=e|ISLAND_COMPLETED}}<small>: mapID, winner</small>
+: {{api|t=e|LFG_BOOT_PROPOSAL_UPDATE}}
+: {{api|t=e|LFG_COMPLETION_REWARD}}
+: {{api|t=e|LFG_COOLDOWNS_UPDATED}}
+: {{api|t=e|LFG_ENABLED_STATE_CHANGED}}
+: {{api|t=e|LFG_INVALID_ERROR_MESSAGE}}<small>: reason, subReason1, subReason2</small>
+: {{api|t=e|LFG_LOCK_INFO_RECEIVED}}
+: {{api|t=e|LFG_OFFER_CONTINUE}}<small>: name, lfgDungeonsID, typeID</small>
+: {{api|t=e|LFG_OPEN_FROM_GOSSIP}}<small>: dungeonID</small>
+: {{api|t=e|LFG_PROPOSAL_DONE}}
+: {{api|t=e|LFG_PROPOSAL_FAILED}}
+: {{api|t=e|LFG_PROPOSAL_SHOW}}
+: {{api|t=e|LFG_PROPOSAL_SUCCEEDED}}
+: {{api|t=e|LFG_PROPOSAL_UPDATE}}
+: {{api|t=e|LFG_QUEUE_STATUS_UPDATE}}
+: {{api|t=e|LFG_READY_CHECK_DECLINED}}<small>: name</small>
+: {{api|t=e|LFG_READY_CHECK_HIDE}}
+: {{api|t=e|LFG_READY_CHECK_PLAYER_IS_READY}}<small>: name</small>
+: {{api|t=e|LFG_READY_CHECK_SHOW}}<small>: isRequeue</small>
+: {{api|t=e|LFG_READY_CHECK_UPDATE}}
+: {{api|t=e|LFG_ROLE_CHECK_DECLINED}}
+: {{api|t=e|LFG_ROLE_CHECK_HIDE}}
+: {{api|t=e|LFG_ROLE_CHECK_ROLE_CHOSEN}}<small>: name, isTank, isHealer, isDamage</small>
+: {{api|t=e|LFG_ROLE_CHECK_SHOW}}<small>: isRequeue</small>
+: {{api|t=e|LFG_ROLE_CHECK_UPDATE}}
+: {{api|t=e|LFG_ROLE_UPDATE}}
+: {{api|t=e|LFG_UPDATE}}
+: {{api|t=e|LFG_UPDATE_RANDOM_INFO}}
+: {{api|t=e|SHOW_LFG_EXPAND_SEARCH_PROMPT}}
+: {{api|t=e|UPDATE_LFG_LIST}}
+: {{api|t=e|WARFRONT_COMPLETED}}<small>: mapID, winner</small>
+
+=={{api.system|LFGList}}==
+: {{api|t=e|LFG_GROUP_DELISTED_LEADERSHIP_CHANGE}}<small>: listingName, automaticDelistTimeRemaining</small>
+: {{api|t=e|LFG_LIST_ACTIVE_ENTRY_UPDATE}}<small>: created</small>
+: {{api|t=e|LFG_LIST_APPLICANT_LIST_UPDATED}}<small>: newPendingEntry, newPendingEntryWithData</small>
+: {{api|t=e|LFG_LIST_APPLICANT_UPDATED}}<small>: applicantID</small>
+: {{api|t=e|LFG_LIST_APPLICATION_STATUS_UPDATED}}<small>: searchResultID, newStatus, oldStatus, groupName</small>
+: {{api|t=e|LFG_LIST_AVAILABILITY_UPDATE}}
+: {{api|t=e|LFG_LIST_CENSORED_ACTIVE_ENTRY_UPDATE}}<small>: isCensored</small>
+: {{api|t=e|LFG_LIST_ENTRY_CREATION_FAILED}}
+: {{api|t=e|LFG_LIST_ENTRY_EXPIRED_TIMEOUT}}
+: {{api|t=e|LFG_LIST_ENTRY_EXPIRED_TOO_MANY_PLAYERS}}
+: {{api|t=e|LFG_LIST_JOINED_GROUP}}<small>: searchResultID, groupName</small>
+: {{api|t=e|LFG_LIST_REVEALED_CENSORED_ACTIVE_ENTRY}}
+: {{api|t=e|LFG_LIST_SEARCH_FAILED}}<small>: reason</small>
+: {{api|t=e|LFG_LIST_SEARCH_RESULT_UPDATED}}<small>: searchResultID</small>
+: {{api|t=e|LFG_LIST_SEARCH_RESULTS_RECEIVED}}
+: {{api|t=e|LFG_LIST_UPDATE_SEARCH_RESULTS}}
+
+=={{api.system|LegendaryCrafting}}==
+: {{api|t=e|NEW_RUNEFORGE_POWER_ADDED}}<small>: powerID</small>
+: {{api|t=e|RUNEFORGE_LEGENDARY_CRAFTING_CLOSED}}
+: {{api|t=e|RUNEFORGE_LEGENDARY_CRAFTING_OPENED}}<small>: isUpgrade</small>
+: {{api|t=e|RUNEFORGE_POWER_INFO_UPDATED}}<small>: powerID</small>
+
+=={{api.system|LoadingScreen}}==
+: {{api|t=e|LOADING_SCREEN_DISABLED}}
+: {{api|t=e|LOADING_SCREEN_ENABLED}}
+
+=={{api.system|LobbyMatchmakerInfo}}==
+: {{api|t=e|LOBBY_MATCHMAKER_QUEUE_ABANDONED}}
+: {{api|t=e|LOBBY_MATCHMAKER_QUEUE_ERROR}}
+: {{api|t=e|LOBBY_MATCHMAKER_QUEUE_EXPIRED}}
+: {{api|t=e|LOBBY_MATCHMAKER_QUEUE_POPPED}}
+: {{api|t=e|LOBBY_MATCHMAKER_QUEUE_STATUS_UPDATE}}
+
+=={{api.system|Loot}}==
+: {{api|t=e|AZERITE_EMPOWERED_ITEM_LOOTED}}<small>: itemLink</small>
+: {{api|t=e|BONUS_ROLL_ACTIVATE}}
+: {{api|t=e|BONUS_ROLL_DEACTIVATE}}
+: {{api|t=e|BONUS_ROLL_FAILED}}
+: {{api|t=e|BONUS_ROLL_RESULT}}<small>: typeIdentifier, itemLink, quantity, specID, sex, personalLootToast, currencyID, isSecondaryResult, corrupted</small>
+: {{api|t=e|BONUS_ROLL_STARTED}}
+: {{api|t=e|CANCEL_ALL_LOOT_ROLLS}}
+: {{api|t=e|CANCEL_LOOT_ROLL}}<small>: rollID</small>
+: {{api|t=e|CONFIRM_DISENCHANT_ROLL}}<small>: rollID, rollType</small>
+: {{api|t=e|CONFIRM_LOOT_ROLL}}<small>: rollID, rollType, confirmReason</small>
+: {{api|t=e|ENCOUNTER_LOOT_RECEIVED}}<small>: encounterID, itemID, itemLink, quantity, itemName, fileName</small>
+: {{api|t=e|GARRISON_MISSION_BONUS_ROLL_LOOT}}<small>: itemID, quantity</small>
+: {{api|t=e|ITEM_PUSH}}<small>: bagSlot, iconFileID</small>
+: {{api|t=e|LEGACY_LOOT_RULES_CHANGED}}<small>: isLegacyLootModeEnabled</small>
+: {{api|t=e|LOOT_BIND_CONFIRM}}<small>: lootSlot</small>
+: {{api|t=e|LOOT_CLOSED}}
+: {{api|t=e|LOOT_ITEM_AVAILABLE}}<small>: itemTooltip, lootHandle</small>
+: {{api|t=e|LOOT_ITEM_ROLL_WON}}<small>: itemLink, rollQuantity, rollType, roll, upgraded</small>
+: {{api|t=e|LOOT_OPENED}}<small>: autoLoot, isFromItem</small>
+: {{api|t=e|LOOT_READY}}<small>: autoloot</small>
+: {{api|t=e|LOOT_ROLLS_COMPLETE}}<small>: lootHandle</small>
+: {{api|t=e|LOOT_SLOT_CHANGED}}<small>: lootSlot</small>
+: {{api|t=e|LOOT_SLOT_CLEARED}}<small>: lootSlot</small>
+: {{api|t=e|MAIN_SPEC_NEED_ROLL}}<small>: rollID, roll, isWinning</small>
+: {{api|t=e|OPEN_MASTER_LOOT_LIST}}
+: {{api|t=e|PET_BATTLE_LOOT_RECEIVED}}<small>: typeIdentifier, itemLink, quantity</small>
+: {{api|t=e|PLAYER_LOOT_SPEC_UPDATED}}
+: {{api|t=e|QUEST_CURRENCY_LOOT_RECEIVED}}<small>: questID, currencyId, quantity</small>
+: {{api|t=e|QUEST_LOOT_RECEIVED}}<small>: questID, itemLink, quantity</small>
+: {{api|t=e|SHOW_LOOT_TOAST}}<small>: typeIdentifier, itemLink, quantity, specID, sex, personalLootToast, toastMethod, lessAwesome, upgraded, corrupted</small>
+: {{api|t=e|SHOW_LOOT_TOAST_LEGENDARY_LOOTED}}<small>: itemLink</small>
+: {{api|t=e|SHOW_LOOT_TOAST_UPGRADE}}<small>: itemLink, quantity, specID, sex, baseQuality, personalLootToast, lessAwesome</small>
+: {{api|t=e|SHOW_PVP_FACTION_LOOT_TOAST}}<small>: typeIdentifier, itemLink, quantity, specID, sex, personalLootToast, lessAwesome</small>
+: {{api|t=e|SHOW_RATED_PVP_REWARD_TOAST}}<small>: typeIdentifier, itemLink, quantity, specID, sex, personalLootToast, lessAwesome</small>
+: {{api|t=e|START_LOOT_ROLL}}<small>: rollID, rollTime, lootHandle</small>
+: {{api|t=e|TRIAL_CAP_REACHED_MONEY}}
+: {{api|t=e|UPDATE_MASTER_LOOT_LIST}}
+
+=={{api.system|LootHistory}}==
+: {{api|t=e|LOOT_HISTORY_CLEAR_HISTORY}}
+: {{api|t=e|LOOT_HISTORY_GO_TO_ENCOUNTER}}<small>: encounterID</small>
+: {{api|t=e|LOOT_HISTORY_ONE_HUNDRED_ROLL}}<small>: encounterID, lootListID</small>
+: {{api|t=e|LOOT_HISTORY_UPDATE_DROP}}<small>: encounterID, lootListID</small>
+: {{api|t=e|LOOT_HISTORY_UPDATE_ENCOUNTER}}<small>: encounterID</small>
+
+=={{api.system|LootJournal}}==
+: {{api|t=e|LOOT_JOURNAL_ITEM_UPDATE}}
+
+=={{api.system|LoreText}}==
+: {{api|t=e|LORE_TEXT_UPDATED_CAMPAIGN}}<small>: campaignID, textEntries</small>
+
+=={{api.system|LossOfControl}}==
+: {{api|t=e|LOSS_OF_CONTROL_ADDED}}<small>: unitTarget, effectIndex</small>
+: {{api|t=e|LOSS_OF_CONTROL_COMMENTATOR_ADDED}}<small>: victim, effectIndex</small>
+: {{api|t=e|LOSS_OF_CONTROL_COMMENTATOR_UPDATE}}<small>: victim</small>
+: {{api|t=e|LOSS_OF_CONTROL_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|PLAYER_CONTROL_GAINED}}
+: {{api|t=e|PLAYER_CONTROL_LOST}}
+
+=={{api.system|MailInfo}}==
+: {{api|t=e|CLOSE_INBOX_ITEM}}<small>: mailIndex</small>
+: {{api|t=e|MAIL_CLOSED}}
+: {{api|t=e|MAIL_FAILED}}<small>: itemID</small>
+: {{api|t=e|MAIL_INBOX_UPDATE}}
+: {{api|t=e|MAIL_LOCK_SEND_ITEMS}}<small>: attachSlot, itemLink</small>
+: {{api|t=e|MAIL_SEND_INFO_UPDATE}}
+: {{api|t=e|MAIL_SEND_SUCCESS}}
+: {{api|t=e|MAIL_SHOW}}
+: {{api|t=e|MAIL_SUCCESS}}<small>: itemID</small>
+: {{api|t=e|MAIL_UNLOCK_SEND_ITEMS}}
+: {{api|t=e|SEND_MAIL_COD_CHANGED}}
+: {{api|t=e|SEND_MAIL_MONEY_CHANGED}}
+: {{api|t=e|UPDATE_PENDING_MAIL}}
+
+=={{api.system|MajorFactionsUI}}==
+: {{api|t=e|MAJOR_FACTION_INTERACTION_ENDED}}
+: {{api|t=e|MAJOR_FACTION_INTERACTION_STARTED}}
+: {{api|t=e|MAJOR_FACTION_RENOWN_LEVEL_CHANGED}}<small>: majorFactionID, newRenownLevel, oldRenownLevel</small>
+: {{api|t=e|MAJOR_FACTION_UNLOCKED}}<small>: majorFactionID</small>
+
+=={{api.system|MapExplorationInfo}}==
+: {{api|t=e|MAP_EXPLORATION_UPDATED}}
+
+=={{api.system|MapUI}}==
+: {{api|t=e|NEW_WMO_CHUNK}}
+: {{api|t=e|PLAYER_MAP_CHANGED}}<small>: oldMapID, newMapID</small>
+: {{api|t=e|USER_WAYPOINT_UPDATED}}
+: {{api|t=e|WORLD_MAP_OPEN}}<small>: uiMapID</small>
+: {{api|t=e|ZONE_CHANGED}}
+: {{api|t=e|ZONE_CHANGED_INDOORS}}
+: {{api|t=e|ZONE_CHANGED_NEW_AREA}}
+
+=={{api.system|MerchantFrame}}==
+: {{api|t=e|MERCHANT_CLOSED}}
+: {{api|t=e|MERCHANT_FILTER_ITEM_UPDATE}}<small>: itemID</small>
+: {{api|t=e|MERCHANT_SHOW}}
+: {{api|t=e|MERCHANT_UPDATE}}
+
+=={{api.system|Minimap}}==
+: {{api|t=e|MINIMAP_PING}}<small>: unitTarget, y, x</small>
+: {{api|t=e|MINIMAP_UPDATE_TRACKING}}
+: {{api|t=e|MINIMAP_UPDATE_ZOOM}}
+: {{api|t=e|PLAYER_INSIDE_QUEST_BLOB_STATE_CHANGED}}<small>: questID, isInside</small>
+
+=={{api.system|ModelInfo}}==
+: {{api|t=e|UI_MODEL_SCENE_INFO_UPDATED}}
+
+=={{api.system|MountJournal}}==
+: {{api|t=e|MOUNT_EQUIPMENT_APPLY_RESULT}}<small>: success</small>
+: {{api|t=e|MOUNT_JOURNAL_SEARCH_UPDATED}}
+: {{api|t=e|MOUNT_JOURNAL_USABILITY_CHANGED}}
+: {{api|t=e|NEW_MOUNT_ADDED}}<small>: mountID</small>
+
+=={{api.system|MythicPlusInfo}}==
+: {{api|t=e|MYTHIC_PLUS_CURRENT_AFFIX_UPDATE}}
+: {{api|t=e|MYTHIC_PLUS_NEW_WEEKLY_RECORD}}<small>: mapChallengeModeID, completionMilliseconds, level</small>
+
+=={{api.system|NamePlateManager}}==
+: {{api|t=e|FORBIDDEN_NAME_PLATE_CREATED}}<small>: namePlateFrame</small>
+: {{api|t=e|FORBIDDEN_NAME_PLATE_UNIT_ADDED}}<small>: unitToken</small>
+: {{api|t=e|FORBIDDEN_NAME_PLATE_UNIT_REMOVED}}<small>: unitToken</small>
+: {{api|t=e|NAME_PLATE_CREATED}}<small>: namePlateFrame</small>
+: {{api|t=e|NAME_PLATE_UNIT_ADDED}}<small>: unitToken</small>
+: {{api|t=e|NAME_PLATE_UNIT_BEHIND_CAMERA_CHANGED}}<small>: unitTarget, isBehindCamera</small>
+: {{api|t=e|NAME_PLATE_UNIT_REMOVED}}<small>: unitToken</small>
+
+=={{api.system|NeighborhoodInitiative}}==
+: {{api|t=e|INITIATIVE_ACTIVITY_LOG_UPDATED}}
+: {{api|t=e|INITIATIVE_COMPLETED}}<small>: initiativeTitle</small>
+: {{api|t=e|INITIATIVE_TASK_COMPLETED}}<small>: taskName</small>
+: {{api|t=e|INITIATIVE_TASKS_TRACKED_LIST_CHANGED}}<small>: initiativeTaskID, added</small>
+: {{api|t=e|INITIATIVE_TASKS_TRACKED_UPDATED}}
+: {{api|t=e|NEIGHBORHOOD_INITIATIVE_UPDATED}}
+
+=={{api.system|PaperDollInfo}}==
+: {{api|t=e|AVOIDANCE_UPDATE}}
+: {{api|t=e|CHARACTER_POINTS_CHANGED}}<small>: change</small>
+: {{api|t=e|CHARACTER_UPGRADE_SPELL_TIER_SET}}<small>: tierIndex</small>
+: {{api|t=e|COMBAT_RATING_UPDATE}}
+: {{api|t=e|DISABLE_XP_GAIN}}
+: {{api|t=e|ENABLE_XP_GAIN}}
+: {{api|t=e|EQUIP_BIND_CONFIRM}}<small>: slot, itemLocation</small>
+: {{api|t=e|INSPECT_HONOR_UPDATE}}
+: {{api|t=e|INSPECT_READY}}<small>: inspecteeGUID</small>
+: {{api|t=e|LIFESTEAL_UPDATE}}
+: {{api|t=e|MASTERY_UPDATE}}
+: {{api|t=e|PET_SPELL_POWER_UPDATE}}
+: {{api|t=e|PLAYER_AVG_ITEM_LEVEL_UPDATE}}
+: {{api|t=e|PLAYER_EQUIPMENT_CHANGED}}<small>: equipmentSlot, hasCurrent</small>
+: {{api|t=e|PROFESSION_EQUIPMENT_CHANGED}}<small>: skillLineID, isTool</small>
+: {{api|t=e|PVP_POWER_UPDATE}}
+: {{api|t=e|SPEED_UPDATE}}
+: {{api|t=e|SPELL_POWER_CHANGED}}
+: {{api|t=e|STURDINESS_UPDATE}}
+: {{api|t=e|UPDATE_FACTION}}
+: {{api|t=e|UPDATE_INVENTORY_ALERTS}}
+: {{api|t=e|UPDATE_INVENTORY_DURABILITY}}
+: {{api|t=e|WEAPON_SLOT_CHANGED}}
+
+=={{api.system|PartyInfo}}==
+: {{api|t=e|BNET_REQUEST_INVITE_CONFIRMATION}}<small>: gameAccountID, questSessionActive, tank, healer, dps</small>
+: {{api|t=e|CONVERT_TO_RAID_CONFIRMATION}}
+: {{api|t=e|ENTERED_DIFFERENT_INSTANCE_FROM_PARTY}}
+: {{api|t=e|GROUP_FORMED}}<small>: category, partyGUID</small>
+: {{api|t=e|GROUP_INVITE_CONFIRMATION}}
+: {{api|t=e|GROUP_JOINED}}<small>: category, partyGUID</small>
+: {{api|t=e|GROUP_LEFT}}<small>: category, partyGUID</small>
+: {{api|t=e|GROUP_ROSTER_UPDATE}}
+: {{api|t=e|INSTANCE_ABANDON_VOTE_FINISHED}}<small>: votePassed</small>
+: {{api|t=e|INSTANCE_ABANDON_VOTE_STARTED}}
+: {{api|t=e|INSTANCE_ABANDON_VOTE_UPDATED}}
+: {{api|t=e|INSTANCE_BOOT_START}}
+: {{api|t=e|INSTANCE_BOOT_STOP}}
+: {{api|t=e|INSTANCE_GROUP_SIZE_CHANGED}}
+: {{api|t=e|INVITE_TO_PARTY_CONFIRMATION}}<small>: targetName, willConvertToRaid, questSessionActive</small>
+: {{api|t=e|INVITE_TRAVEL_PASS_CONFIRMATION}}<small>: targetName, targetGUID, willConvertToRaid, questSessionActive</small>
+: {{api|t=e|LEAVE_PARTY_CONFIRMATION}}<small>: reason</small>
+: {{api|t=e|PARTY_INVITE_CANCEL}}
+: {{api|t=e|PARTY_INVITE_REQUEST}}<small>: name, isTank, isHealer, isDamage, isNativeRealm, allowMultipleRoles, inviterGUID, questSessionActive</small>
+: {{api|t=e|PARTY_LEADER_CHANGED}}
+: {{api|t=e|PARTY_LFG_RESTRICTED}}
+: {{api|t=e|PARTY_LOOT_METHOD_CHANGED}}
+: {{api|t=e|PARTY_MEMBER_DISABLE}}<small>: unitTarget</small>
+: {{api|t=e|PARTY_MEMBER_ENABLE}}<small>: unitTarget</small>
+: {{api|t=e|PLAYER_DIFFICULTY_CHANGED}}
+: {{api|t=e|PLAYER_ROLES_ASSIGNED}}
+: {{api|t=e|RAID_ROSTER_UPDATE}}
+: {{api|t=e|READY_CHECK}}<small>: initiatorName, readyCheckTimeLeft</small>
+: {{api|t=e|READY_CHECK_CONFIRM}}<small>: unitTarget, isReady</small>
+: {{api|t=e|READY_CHECK_FINISHED}}<small>: preempted</small>
+: {{api|t=e|REQUEST_INVITE_CONFIRMATION}}<small>: targetName, partyLevelLink, questSessionActive, tank, healer, dps</small>
+: {{api|t=e|VOTE_KICK_REASON_NEEDED}}<small>: name, resultGUID</small>
+
+=={{api.system|PartyPose}}==
+: {{api|t=e|SHOW_PARTY_POSE_UI}}<small>: mapID, won</small>
+
+=={{api.system|PerksActivities}}==
+: {{api|t=e|PERKS_ACTIVITIES_TRACKED_LIST_CHANGED}}<small>: perksActivityID, added</small>
+: {{api|t=e|PERKS_ACTIVITIES_TRACKED_UPDATED}}
+: {{api|t=e|PERKS_ACTIVITIES_UPDATED}}
+: {{api|t=e|PERKS_ACTIVITY_COMPLETED}}<small>: perksActivityID</small>
+
+=={{api.system|PerksProgram}}==
+: {{api|t=e|CHEST_REWARDS_UPDATED_FROM_SERVER}}
+: {{api|t=e|PERKS_PROGRAM_ADD_PENDING_SHOP_ITEM}}<small>: vendorItemID</small>
+: {{api|t=e|PERKS_PROGRAM_CLOSE}}
+: {{api|t=e|PERKS_PROGRAM_CURRENCY_AWARDED}}<small>: value</small>
+: {{api|t=e|PERKS_PROGRAM_CURRENCY_REFRESH}}<small>: oldValue, newValue</small>
+: {{api|t=e|PERKS_PROGRAM_DATA_REFRESH}}
+: {{api|t=e|PERKS_PROGRAM_DATA_SPECIFIC_ITEM_REFRESH}}<small>: vendorItemID</small>
+: {{api|t=e|PERKS_PROGRAM_DISABLED}}
+: {{api|t=e|PERKS_PROGRAM_OPEN}}
+: {{api|t=e|PERKS_PROGRAM_PURCHASE_CART_SUCCESS}}<small>: vendorItemIDs</small>
+: {{api|t=e|PERKS_PROGRAM_PURCHASE_SUCCESS}}<small>: vendorItemID</small>
+: {{api|t=e|PERKS_PROGRAM_REFUND_SUCCESS}}<small>: vendorItemID</small>
+: {{api|t=e|PERKS_PROGRAM_REMOVE_PENDING_SHOP_ITEM}}<small>: vendorItemID</small>
+: {{api|t=e|PERKS_PROGRAM_RESULT_ERROR}}
+: {{api|t=e|PERKS_PROGRAM_SET_FROZEN_ITEM}}<small>: vendorItemID</small>
+
+=={{api.system|PetInfo}}==
+: {{api|t=e|PET_ATTACK_START}}
+: {{api|t=e|PET_ATTACK_STOP}}
+: {{api|t=e|PET_BAR_HIDEGRID}}
+: {{api|t=e|PET_BAR_SHOWGRID}}
+: {{api|t=e|PET_BAR_UPDATE_COOLDOWN}}
+: {{api|t=e|PET_DISMISS_START}}<small>: delay</small>
+: {{api|t=e|PET_FORCE_NAME_DECLENSION}}<small>: name, petNumber, declinedName1, declinedName2, declinedName3, declinedName4, declinedName5</small>
+: {{api|t=e|PET_UI_CLOSE}}
+: {{api|t=e|RAISED_AS_GHOUL}}
+: {{api|t=e|UPDATE_POSSESS_BAR}}
+: {{api|t=e|UPDATE_VEHICLE_ACTIONBAR}}
+
+=={{api.system|PetJournalInfo}}==
+: {{api|t=e|BATTLEPET_FORCE_NAME_DECLENSION}}<small>: name, battlePetGUID</small>
+: {{api|t=e|COMPANION_LEARNED}}
+: {{api|t=e|COMPANION_UNLEARNED}}
+: {{api|t=e|COMPANION_UPDATE}}<small>: companionType</small>
+: {{api|t=e|NEW_PET_ADDED}}<small>: battlePetGUID</small>
+: {{api|t=e|PET_JOURNAL_AUTO_SLOTTED_PET}}<small>: slotIndex, battlePetGUID</small>
+: {{api|t=e|PET_JOURNAL_CAGE_FAILED}}
+: {{api|t=e|PET_JOURNAL_LIST_UPDATE}}
+: {{api|t=e|PET_JOURNAL_NEW_BATTLE_SLOT}}
+: {{api|t=e|PET_JOURNAL_PET_DELETED}}<small>: battlePetGUID</small>
+: {{api|t=e|PET_JOURNAL_PET_RESTORED}}<small>: battlePetGUID</small>
+: {{api|t=e|PET_JOURNAL_PET_REVOKED}}<small>: battlePetGUID</small>
+: {{api|t=e|PET_JOURNAL_PETS_HEALED}}
+: {{api|t=e|PET_JOURNAL_TRAP_LEVEL_SET}}<small>: trapLevel</small>
+: {{api|t=e|UPDATE_SUMMONPETS_ACTION}}
+
+=={{api.system|PhotoSharingUI}}==
+: {{api|t=e|PHOTO_SHARING_AUTHORIZATION_NEEDED}}
+: {{api|t=e|PHOTO_SHARING_AUTHORIZATION_UPDATED}}<small>: showNotification</small>
+: {{api|t=e|PHOTO_SHARING_PHOTO_UPLOAD_STATUS}}<small>: uploadStatus</small>
+: {{api|t=e|PHOTO_SHARING_SCREENSHOT_READY}}
+: {{api|t=e|PHOTO_SHARING_THIRD_PARTY_AUTHORIZATION_NEEDED}}<small>: authUrl</small>
+
+=={{api.system|PingManager}}==
+: {{api|t=e|PING_SYSTEM_ERROR}}<small>: error</small>
+
+=={{api.system|PingManagerSecure}}==
+: {{api|t=e|UNIT_PING_PIN_ADDED}}<small>: guid, uiTextureKit</small>
+: {{api|t=e|UNIT_PING_PIN_REMOVED}}<small>: guid</small>
+
+=={{api.system|PlayerChoice}}==
+: {{api|t=e|PLAYER_CHOICE_CLOSE}}
+: {{api|t=e|PLAYER_CHOICE_UPDATE}}
+
+=={{api.system|PlayerInteractionManager}}==
+: {{api|t=e|PLAYER_INTERACTION_MANAGER_FRAME_HIDE}}<small>: type</small>
+: {{api|t=e|PLAYER_INTERACTION_MANAGER_FRAME_SHOW}}<small>: type</small>
+
+=={{api.system|PlayerMentorship}}==
+: {{api|t=e|MENTORSHIP_STATUS_CHANGED}}
+: {{api|t=e|NEWCOMER_GRADUATION}}
+
+=={{api.system|PlayerScript}}==
+: {{api|t=e|PLAYER_IN_COMBAT_CHANGED}}<small>: inCombat</small>
+: {{api|t=e|PLAYER_TARGET_DIED}}
+
+=={{api.system|ProfessionSpecUI}}==
+: {{api|t=e|SKILL_LINE_SPECS_RANKS_CHANGED}}
+: {{api|t=e|SKILL_LINE_SPECS_UNLOCKED}}<small>: skillLineID, tradeSkillID</small>
+
+=={{api.system|PvpInfo}}==
+: {{api|t=e|ARENA_OPPONENT_UPDATE}}<small>: unitToken, updateReason</small>
+: {{api|t=e|ARENA_PREP_OPPONENT_SPECIALIZATIONS}}
+: {{api|t=e|ARENA_SEASON_WORLD_STATE}}
+: {{api|t=e|BATTLEFIELD_AUTO_QUEUE}}
+: {{api|t=e|BATTLEFIELD_AUTO_QUEUE_EJECT}}
+: {{api|t=e|BATTLEFIELD_QUEUE_TIMEOUT}}
+: {{api|t=e|BATTLEFIELDS_CLOSED}}
+: {{api|t=e|BATTLEFIELDS_SHOW}}<small>: isArena, battleMasterListID</small>
+: {{api|t=e|BATTLEGROUND_OBJECTIVES_UPDATE}}
+: {{api|t=e|BATTLEGROUND_POINTS_UPDATE}}
+: {{api|t=e|GDF_SIM_COMPLETE}}
+: {{api|t=e|HONOR_LEVEL_UPDATE}}<small>: isHigherLevel</small>
+: {{api|t=e|NOTIFY_PVP_AFK_RESULT}}<small>: offender, numBlackMarksOnOffender, numPlayersIHaveReported</small>
+: {{api|t=e|PLAYER_ENTERING_BATTLEGROUND}}
+: {{api|t=e|PLAYER_JOINED_PVP_MATCH}}
+: {{api|t=e|POST_MATCH_CURRENCY_REWARD_UPDATE}}<small>: reward</small>
+: {{api|t=e|POST_MATCH_ITEM_REWARD_UPDATE}}
+: {{api|t=e|PVP_BRAWL_INFO_UPDATED}}
+: {{api|t=e|PVP_MATCH_ACTIVE}}
+: {{api|t=e|PVP_MATCH_COMPLETE}}<small>: winner, duration</small>
+: {{api|t=e|PVP_MATCH_INACTIVE}}
+: {{api|t=e|PVP_MATCH_STATE_CHANGED}}
+: {{api|t=e|PVP_RATED_STATS_UPDATE}}
+: {{api|t=e|PVP_REWARDS_UPDATE}}
+: {{api|t=e|PVP_ROLE_POPUP_HIDE}}<small>: readyCheckInfo</small>
+: {{api|t=e|PVP_ROLE_POPUP_SHOW}}<small>: readyCheckInfo</small>
+: {{api|t=e|PVP_ROLE_UPDATE}}
+: {{api|t=e|PVP_SPECIAL_EVENT_INFO_UPDATED}}
+: {{api|t=e|PVP_TYPES_ENABLED}}<small>: wargameBattlegrounds, ratedBattlegrounds, ratedArenas, ratedSoloShuffle, ratedBGBlitz</small>
+: {{api|t=e|PVP_VEHICLE_INFO_UPDATED}}
+: {{api|t=e|PVP_WORLDSTATE_UPDATE}}
+: {{api|t=e|PVPQUEUE_ANYWHERE_SHOW}}
+: {{api|t=e|PVPQUEUE_ANYWHERE_UPDATE_AVAILABLE}}
+: {{api|t=e|TRAINING_GROUNDS_ENABLED_STATUS_UPDATED}}
+: {{api|t=e|UPDATE_ACTIVE_BATTLEFIELD}}
+: {{api|t=e|UPDATE_BATTLEFIELD_SCORE}}
+: {{api|t=e|UPDATE_BATTLEFIELD_STATUS}}<small>: battleFieldIndex</small>
+: {{api|t=e|WAR_MODE_STATUS_UPDATE}}<small>: warModeEnabled</small>
+: {{api|t=e|WARGAME_INVITE_SENT}}
+: {{api|t=e|WARGAME_REQUEST_RESPONSE}}<small>: responderGUID, responderName, accepted</small>
+: {{api|t=e|WARGAME_REQUESTED}}<small>: opposingPartyMemberName, battlegroundName, timeoutSeconds, tournamentRules</small>
+: {{api|t=e|WORLD_PVP_QUEUE}}
+
+=={{api.system|QuestLog}}==
+: {{api|t=e|QUEST_ACCEPTED}}<small>: questId</small>
+: {{api|t=e|QUEST_AUTOCOMPLETE}}<small>: questId</small>
+: {{api|t=e|QUEST_COMPLETE}}
+: {{api|t=e|QUEST_DATA_LOAD_RESULT}}<small>: questID, success</small>
+: {{api|t=e|QUEST_DETAIL}}<small>: questStartItemID</small>
+: {{api|t=e|QUEST_LOG_CRITERIA_UPDATE}}<small>: questID, specificTreeID, description, numFulfilled, numRequired</small>
+: {{api|t=e|QUEST_LOG_UPDATE}}
+: {{api|t=e|QUEST_POI_UPDATE}}
+: {{api|t=e|QUEST_REMOVED}}<small>: questID, wasReplayQuest</small>
+: {{api|t=e|QUEST_TURNED_IN}}<small>: questID, xpReward, moneyReward</small>
+: {{api|t=e|QUEST_WATCH_LIST_CHANGED}}<small>: questID, added</small>
+: {{api|t=e|QUEST_WATCH_UPDATE}}<small>: questID</small>
+: {{api|t=e|QUESTLINE_UPDATE}}<small>: requestRequired</small>
+: {{api|t=e|TASK_PROGRESS_UPDATE}}
+: {{api|t=e|TREASURE_PICKER_CACHE_FLUSH}}
+: {{api|t=e|WAYPOINT_UPDATE}}
+: {{api|t=e|WORLD_QUEST_COMPLETED_BY_SPELL}}<small>: questID</small>
+
+=={{api.system|QuestOffer}}==
+: {{api|t=e|QUEST_ACCEPT_CONFIRM}}<small>: name, questTitle, questID</small>
+: {{api|t=e|QUEST_FINISHED}}
+: {{api|t=e|QUEST_GREETING}}
+: {{api|t=e|QUEST_ITEM_UPDATE}}
+: {{api|t=e|QUEST_PROGRESS}}
+
+=={{api.system|QuestSession}}==
+: {{api|t=e|QUEST_SESSION_CREATED}}
+: {{api|t=e|QUEST_SESSION_DESTROYED}}
+: {{api|t=e|QUEST_SESSION_ENABLED_STATE_CHANGED}}<small>: enabled</small>
+: {{api|t=e|QUEST_SESSION_JOINED}}
+: {{api|t=e|QUEST_SESSION_LEFT}}
+: {{api|t=e|QUEST_SESSION_MEMBER_CONFIRM}}
+: {{api|t=e|QUEST_SESSION_MEMBER_START_RESPONSE}}<small>: guid, response</small>
+: {{api|t=e|QUEST_SESSION_NOTIFICATION}}<small>: result, guid</small>
+
+=={{api.system|RecentAllies}}==
+: {{api|t=e|LET_RECENT_ALLIES_SEE_LOCATION_SETTING_UPDATED}}
+: {{api|t=e|RECENT_ALLIES_CACHE_UPDATE}}
+: {{api|t=e|RECENT_ALLIES_DATA_READY}}
+: {{api|t=e|RECENT_ALLIES_SYSTEM_STATUS_UPDATED}}
+: {{api|t=e|RECENT_ALLY_DATA_UPDATED}}<small>: characterGUID</small>
+
+=={{api.system|RecruitAFriend}}==
+: {{api|t=e|RAF_INFO_UPDATED}}<small>: info</small>
+: {{api|t=e|RAF_RECRUITING_ENABLED_STATUS}}<small>: enabled</small>
+: {{api|t=e|RAF_REWARD_CLAIM_FAILED}}
+: {{api|t=e|RAF_SYSTEM_ENABLED_STATUS}}<small>: enabled</small>
+: {{api|t=e|RAF_SYSTEM_INFO_UPDATED}}<small>: systemInfo</small>
+
+=={{api.system|RemixArtifactUI}}==
+: {{api|t=e|REMIX_ARTIFACT_ITEM_SPECS_LOADED}}<small>: success</small>
+: {{api|t=e|REMIX_ARTIFACT_UPDATE}}
+
+=={{api.system|ReportSystem}}==
+: {{api|t=e|REPORT_PLAYER_RESULT}}<small>: result, reportType</small>
+: {{api|t=e|REPORT_SCREENSHOT_READY}}
+
+=={{api.system|ReputationInfo}}==
+: {{api|t=e|FACTION_STANDING_CHANGED}}<small>: factionID, updatedStanding</small>
+
+=={{api.system|ResearchInfo}}==
+: {{api|t=e|ARCHAEOLOGY_CLOSED}}
+: {{api|t=e|ARCHAEOLOGY_FIND_COMPLETE}}<small>: numFindsCompleted, totalFinds, researchBranchID</small>
+: {{api|t=e|ARCHAEOLOGY_SURVEY_CAST}}<small>: numFindsCompleted, totalFinds, researchBranchID, successfulFind</small>
+: {{api|t=e|ARCHAEOLOGY_TOGGLE}}
+: {{api|t=e|ARTIFACT_DIGSITE_COMPLETE}}<small>: researchBranchID</small>
+: {{api|t=e|RESEARCH_ARTIFACT_COMPLETE}}<small>: name</small>
+: {{api|t=e|RESEARCH_ARTIFACT_DIG_SITE_UPDATED}}
+: {{api|t=e|RESEARCH_ARTIFACT_UPDATE}}
+
+=={{api.system|RestrictedActions}}==
+: {{api|t=e|ADDON_ACTION_BLOCKED}}<small>: isTainted, function</small>
+: {{api|t=e|ADDON_ACTION_FORBIDDEN}}<small>: isTainted, function</small>
+: {{api|t=e|ADDON_RESTRICTION_STATE_CHANGED}}<small>: type, state</small>
+: {{api|t=e|MACRO_ACTION_BLOCKED}}<small>: function</small>
+: {{api|t=e|MACRO_ACTION_FORBIDDEN}}<small>: function</small>
+
+=={{api.system|ScenarioInfo}}==
+: {{api|t=e|JAILERS_TOWER_LEVEL_UPDATE}}<small>: level, type</small>
+: {{api|t=e|SCENARIO_BONUS_OBJECTIVE_COMPLETE}}<small>: bonusObjectiveID</small>
+: {{api|t=e|SCENARIO_BONUS_VISIBILITY_UPDATE}}
+: {{api|t=e|SCENARIO_COMPLETED}}<small>: questID, xp, money</small>
+: {{api|t=e|SCENARIO_CRITERIA_SHOW_STATE_UPDATE}}<small>: show</small>
+: {{api|t=e|SCENARIO_CRITERIA_UPDATE}}<small>: criteriaID</small>
+: {{api|t=e|SCENARIO_POI_UPDATE}}
+: {{api|t=e|SCENARIO_SPELL_UPDATE}}
+: {{api|t=e|SCENARIO_UPDATE}}<small>: newStep</small>
+
+=={{api.system|ScrappingMachineUI}}==
+: {{api|t=e|SCRAPPING_MACHINE_ITEM_ADDED}}<small>: index</small>
+: {{api|t=e|SCRAPPING_MACHINE_ITEM_REMOVED}}<small>: index</small>
+: {{api|t=e|SCRAPPING_MACHINE_PENDING_ITEM_CHANGED}}
+: {{api|t=e|SCRAPPING_MACHINE_SCRAPPING_FINISHED}}
+
+=={{api.system|ScriptWarnings}}==
+: {{api|t=e|LUA_WARNING}}<small>: warningText</small>
+
+=={{api.system|ScriptedAnimations}}==
+: {{api|t=e|SCRIPTED_ANIMATIONS_UPDATE}}
+
+=={{api.system|SecureTransfer}}==
+: {{api|t=e|SECURE_TRANSFER_CANCEL}}
+: {{api|t=e|SECURE_TRANSFER_CONFIRM_HOUSING_PURCHASE}}
+: {{api|t=e|SECURE_TRANSFER_CONFIRM_SEND_MAIL}}
+: {{api|t=e|SECURE_TRANSFER_CONFIRM_TRADE_ACCEPT}}
+: {{api|t=e|SECURE_TRANSFER_HOUSING_CURRENCY_PURCHASE_CONFIRMATION}}
+
+=={{api.system|SettingsUtil}}==
+: {{api|t=e|SETTINGS_LOADED}}
+: {{api|t=e|SETTINGS_PANEL_OPEN}}<small>: openToCategoryID, scrollToElementName</small>
+
+=={{api.system|SharedTraits}}==
+: {{api|t=e|CONFIG_COMMIT_FAILED}}<small>: configID</small>
+: {{api|t=e|TRAIT_COND_INFO_CHANGED}}<small>: condID</small>
+: {{api|t=e|TRAIT_CONFIG_CREATED}}<small>: configInfo</small>
+: {{api|t=e|TRAIT_CONFIG_DELETED}}<small>: configID</small>
+: {{api|t=e|TRAIT_CONFIG_LIST_UPDATED}}
+: {{api|t=e|TRAIT_CONFIG_UPDATED}}<small>: configID</small>
+: {{api|t=e|TRAIT_NODE_CHANGED}}<small>: nodeID</small>
+: {{api|t=e|TRAIT_NODE_CHANGED_PARTIAL}}<small>: ID, info</small>
+: {{api|t=e|TRAIT_NODE_ENTRY_UPDATED}}<small>: nodeEntryID</small>
+: {{api|t=e|TRAIT_SUB_TREE_CHANGED}}<small>: subTreeID</small>
+: {{api|t=e|TRAIT_SYSTEM_INTERACTION_STARTED}}<small>: treeID</small>
+: {{api|t=e|TRAIT_SYSTEM_NPC_CLOSED}}
+: {{api|t=e|TRAIT_TREE_CHANGED}}<small>: treeID</small>
+: {{api|t=e|TRAIT_TREE_CURRENCY_INFO_UPDATED}}<small>: treeID</small>
+: {{api|t=e|TRY_PURCHASE_TO_NODE_PARTIAL_SUCCESS}}<small>: nodeFinishedOn</small>
+
+=={{api.system|SkillInfo}}==
+: {{api|t=e|SKILL_LINES_CHANGED}}
+
+=={{api.system|SocialQueue}}==
+: {{api|t=e|SOCIAL_QUEUE_CONFIG_UPDATED}}
+: {{api|t=e|SOCIAL_QUEUE_UPDATE}}<small>: groupGUID, numAddedItems</small>
+
+=={{api.system|SocialQueueSystemStatus}}==
+: {{api|t=e|SOCIAL_UI_SOCIAL_QUEUE_SYSTEM_STATUS_UPDATED}}
+
+=={{api.system|SocialRestrictions}}==
+: {{api|t=e|ALERT_REGIONAL_CHAT_DISABLED}}
+: {{api|t=e|CHAT_DISABLED_CHANGE_FAILED}}<small>: disabled</small>
+: {{api|t=e|CHAT_DISABLED_CHANGED}}<small>: disabled</small>
+
+=={{api.system|SocialUI}}==
+: {{api|t=e|SOCIAL_UI_SYSTEM_STATUS_UPDATED}}
+
+=={{api.system|Soulbinds}}==
+: {{api|t=e|SOULBIND_ACTIVATED}}<small>: soulbindID</small>
+: {{api|t=e|SOULBIND_CONDUIT_COLLECTION_CLEARED}}
+: {{api|t=e|SOULBIND_CONDUIT_COLLECTION_REMOVED}}<small>: conduitID</small>
+: {{api|t=e|SOULBIND_CONDUIT_COLLECTION_UPDATED}}<small>: collectionData</small>
+: {{api|t=e|SOULBIND_CONDUIT_INSTALLED}}<small>: nodeID, data</small>
+: {{api|t=e|SOULBIND_CONDUIT_UNINSTALLED}}<small>: nodeID, data</small>
+: {{api|t=e|SOULBIND_FORGE_INTERACTION_ENDED}}
+: {{api|t=e|SOULBIND_FORGE_INTERACTION_STARTED}}
+: {{api|t=e|SOULBIND_NODE_LEARNED}}<small>: nodeID</small>
+: {{api|t=e|SOULBIND_NODE_UNLEARNED}}<small>: nodeID</small>
+: {{api|t=e|SOULBIND_NODE_UPDATED}}<small>: nodeID</small>
+: {{api|t=e|SOULBIND_PATH_CHANGED}}
+: {{api|t=e|SOULBIND_PENDING_CONDUIT_CHANGED}}<small>: nodeID, conduitID</small>
+
+=={{api.system|Sound}}==
+: {{api|t=e|SOUND_DEVICE_UPDATE}}
+: {{api|t=e|SOUNDKIT_FINISHED}}<small>: soundHandle</small>
+
+=={{api.system|SpecializationInfo}}==
+: {{api|t=e|ACTIVE_TALENT_GROUP_CHANGED}}<small>: curr, prev</small>
+: {{api|t=e|CONFIRM_PET_UNLEARN}}<small>: cost</small>
+: {{api|t=e|CONFIRM_TALENT_WIPE}}<small>: cost, respecType</small>
+: {{api|t=e|PET_SPECIALIZATION_CHANGED}}
+: {{api|t=e|PLAYER_LEARN_PVP_TALENT_FAILED}}
+: {{api|t=e|PLAYER_LEARN_TALENT_FAILED}}
+: {{api|t=e|PLAYER_PVP_TALENT_UPDATE}}
+: {{api|t=e|PLAYER_TALENT_UPDATE}}
+: {{api|t=e|SPEC_INVOLUNTARILY_CHANGED}}<small>: isPet</small>
+: {{api|t=e|TALENTS_INVOLUNTARILY_RESET}}<small>: isPetTalents</small>
+
+=={{api.system|Spell}}==
+: {{api|t=e|ENCHANT_SPELL_COMPLETED}}<small>: successful, enchantedItem</small>
+: {{api|t=e|ENCHANT_SPELL_SELECTED}}
+: {{api|t=e|SPELL_DATA_LOAD_RESULT}}<small>: spellID, success</small>
+: {{api|t=e|SPELL_RANGE_CHECK_UPDATE}}<small>: spellIdentifier, isInRange, checksRange</small>
+: {{api|t=e|SPELL_TEXT_UPDATE}}<small>: spellID</small>
+: {{api|t=e|UPDATE_SPELL_TARGET_ITEM_CONTEXT}}
+
+=={{api.system|SpellActivationOverlay}}==
+: {{api|t=e|SPELL_ACTIVATION_OVERLAY_GLOW_HIDE}}<small>: spellID</small>
+: {{api|t=e|SPELL_ACTIVATION_OVERLAY_GLOW_SHOW}}<small>: spellID</small>
+: {{api|t=e|SPELL_ACTIVATION_OVERLAY_HIDE}}<small>: spellID</small>
+: {{api|t=e|SPELL_ACTIVATION_OVERLAY_SHOW}}<small>: spellID, overlayFileDataID, locationType, scale, r, g, b</small>
+
+=={{api.system|SpellBook}}==
+: {{api|t=e|CURRENT_SPELL_CAST_CHANGED}}<small>: cancelledCast</small>
+: {{api|t=e|LEARNED_SPELL_IN_SKILL_LINE}}<small>: spellID, skillLineIndex, isGuildPerkSpell</small>
+: {{api|t=e|MAX_SPELL_START_RECOVERY_OFFSET_CHANGED}}<small>: clampedNewQueueWindowMs</small>
+: {{api|t=e|PLAYER_TOTEM_UPDATE}}<small>: totemSlot</small>
+: {{api|t=e|SPELL_FLYOUT_UPDATE}}<small>: flyoutID, spellID, isLearned</small>
+: {{api|t=e|SPELL_PUSHED_TO_ACTIONBAR}}<small>: spellID, slot, page</small>
+: {{api|t=e|SPELL_PUSHED_TO_FLYOUT_ON_ACTIONBAR}}<small>: spellID, flyoutSlot, flyoutPage</small>
+: {{api|t=e|SPELL_UPDATE_CHARGES}}
+: {{api|t=e|SPELL_UPDATE_COOLDOWN}}<small>: spellID, baseSpellID, category, startRecoveryCategory, itemID</small>
+: {{api|t=e|SPELL_UPDATE_ICON}}<small>: spellID</small>
+: {{api|t=e|SPELL_UPDATE_USABLE}}
+: {{api|t=e|SPELL_UPDATE_USES}}<small>: spellID, baseSpellID</small>
+: {{api|t=e|SPELLS_CHANGED}}
+: {{api|t=e|START_AUTOREPEAT_SPELL}}
+: {{api|t=e|STOP_AUTOREPEAT_SPELL}}
+: {{api|t=e|UPDATE_SHAPESHIFT_COOLDOWN}}
+: {{api|t=e|UPDATE_SHAPESHIFT_FORM}}
+: {{api|t=e|UPDATE_SHAPESHIFT_FORMS}}
+: {{api|t=e|UPDATE_SHAPESHIFT_USABLE}}
+
+=={{api.system|SpellDiminishUI}}==
+: {{api|t=e|UNIT_SPELL_DIMINISH_CATEGORY_STATE_UPDATED}}<small>: unitTarget, trackerInfo</small>
+
+=={{api.system|SplashScreen}}==
+: {{api|t=e|OPEN_SPLASH_SCREEN}}<small>: info</small>
+
+=={{api.system|StableInfo}}==
+: {{api|t=e|PET_INFO_UPDATE}}
+: {{api|t=e|PET_STABLE_CLOSED}}
+: {{api|t=e|PET_STABLE_FAVORITES_UPDATED}}
+: {{api|t=e|PET_STABLE_SHOW}}
+: {{api|t=e|PET_STABLE_UPDATE}}
+
+=={{api.system|SuperTrackManager}}==
+: {{api|t=e|SUPER_TRACKING_CHANGED}}
+: {{api|t=e|SUPER_TRACKING_PATH_UPDATED}}
+
+=={{api.system|SystemInfo}}==
+: {{api|t=e|CAPTUREFRAMES_FAILED}}
+: {{api|t=e|CAPTUREFRAMES_SUCCEEDED}}
+: {{api|t=e|DISABLE_TAXI_BENCHMARK}}
+: {{api|t=e|ENABLE_TAXI_BENCHMARK}}
+: {{api|t=e|FIRST_FRAME_RENDERED}}
+: {{api|t=e|GENERIC_ERROR}}<small>: errorMessage</small>
+: {{api|t=e|GLOBAL_MOUSE_DOWN}}<small>: button</small>
+: {{api|t=e|GLOBAL_MOUSE_UP}}<small>: button</small>
+: {{api|t=e|INITIAL_HOTFIXES_APPLIED}}
+: {{api|t=e|LOC_RESULT}}<small>: result</small>
+: {{api|t=e|LOGOUT_CANCEL}}
+: {{api|t=e|PLAYER_CAMPING}}
+: {{api|t=e|PLAYER_ENTERING_WORLD}}<small>: isInitialLogin, isReloadingUi</small>
+: {{api|t=e|PLAYER_LEAVING_WORLD}}
+: {{api|t=e|PLAYER_LOGIN}}
+: {{api|t=e|PLAYER_LOGOUT}}
+: {{api|t=e|PLAYER_QUITING}}
+: {{api|t=e|SEARCH_DB_LOADED}}
+: {{api|t=e|STREAMING_ICON}}<small>: streamingStatus</small>
+: {{api|t=e|SYSMSG}}<small>: string, r, g, b</small>
+: {{api|t=e|TIME_PLAYED_MSG}}<small>: totalTimePlayed, timePlayedThisLevel</small>
+: {{api|t=e|UI_ERROR_MESSAGE}}<small>: errorType, message</small>
+: {{api|t=e|UI_ERROR_POPUP}}<small>: errorType, message</small>
+: {{api|t=e|UI_INFO_MESSAGE}}<small>: errorType, message</small>
+: {{api|t=e|VARIABLES_LOADED}}
+: {{api|t=e|WOW_MOUSE_NOT_FOUND}}
+
+=={{api.system|TalkingHead}}==
+: {{api|t=e|TALKINGHEAD_CLOSE}}
+: {{api|t=e|TALKINGHEAD_REQUESTED}}
+
+=={{api.system|TaxiMap}}==
+: {{api|t=e|TAXI_NODE_STATUS_CHANGED}}
+: {{api|t=e|TAXIMAP_CLOSED}}
+: {{api|t=e|TAXIMAP_OPENED}}<small>: system</small>
+
+=={{api.system|TextureUtils}}==
+: {{api|t=e|URL_TEXTURE_REQUEST_RESULT}}<small>: texture, result</small>
+
+=={{api.system|TimerunningUI}}==
+: {{api|t=e|REMIX_END_OF_EVENT}}
+
+=={{api.system|TooltipComparison}}==
+: {{api|t=e|TOOLTIP_SHOW_ITEM_COMPARISON}}<small>: comparisonItem, tooltip, anchorFrame</small>
+
+=={{api.system|TooltipInfo}}==
+: {{api|t=e|HIDE_HYPERLINK_TOOLTIP}}
+: {{api|t=e|SHOW_HYPERLINK_TOOLTIP}}<small>: hyperlink</small>
+: {{api|t=e|TOOLTIP_DATA_UPDATE}}<small>: dataInstanceID</small>
+
+=={{api.system|ToyBoxInfo}}==
+: {{api|t=e|NEW_TOY_ADDED}}<small>: itemID</small>
+: {{api|t=e|TOYS_UPDATED}}<small>: itemID, isNew, hasFanfare</small>
+
+=={{api.system|TradeInfo}}==
+: {{api|t=e|PLAYER_TRADE_CURRENCY}}
+: {{api|t=e|PLAYER_TRADE_MONEY}}
+: {{api|t=e|TRADE_ACCEPT_UPDATE}}<small>: playerAccepted, targetAccepted</small>
+: {{api|t=e|TRADE_CLOSED}}
+: {{api|t=e|TRADE_CURRENCY_CHANGED}}
+: {{api|t=e|TRADE_MONEY_CHANGED}}
+: {{api|t=e|TRADE_PLAYER_ITEM_CHANGED}}<small>: tradeSlotIndex</small>
+: {{api|t=e|TRADE_POTENTIAL_BIND_ENCHANT}}<small>: canBecomeBoundForTrade</small>
+: {{api|t=e|TRADE_POTENTIAL_REMOVE_TRANSMOG}}<small>: itemLink, tradeSlotIndex</small>
+: {{api|t=e|TRADE_REQUEST}}<small>: name</small>
+: {{api|t=e|TRADE_REQUEST_CANCEL}}
+: {{api|t=e|TRADE_SHOW}}
+: {{api|t=e|TRADE_TARGET_ITEM_CHANGED}}<small>: tradeSlotIndex</small>
+: {{api|t=e|TRADE_UPDATE}}
+: {{api|t=e|TRADE_UPDATE_WARNINGS}}
+
+=={{api.system|TradeSkillUI}}==
+: {{api|t=e|CRAFTING_DETAILS_UPDATE}}
+: {{api|t=e|NEW_RECIPE_LEARNED}}<small>: recipeID, recipeLevel, baseRecipeID</small>
+: {{api|t=e|OBLITERUM_FORGE_PENDING_ITEM_CHANGED}}
+: {{api|t=e|OPEN_RECIPE_RESPONSE}}<small>: recipeID, skillLineID, expansionSkillLineID</small>
+: {{api|t=e|PROFESSION_RESPEC_CONFIRMATION}}<small>: skillName</small>
+: {{api|t=e|TRACKED_RECIPE_UPDATE}}<small>: recipeID, tracked</small>
+: {{api|t=e|TRADE_SKILL_CLOSE}}
+: {{api|t=e|TRADE_SKILL_CRAFT_BEGIN}}<small>: recipeSpellID</small>
+: {{api|t=e|TRADE_SKILL_CRAFTING_REAGENT_BONUS_TEXT_UPDATED}}<small>: itemID</small>
+: {{api|t=e|TRADE_SKILL_CURRENCY_REWARD_RESULT}}<small>: data</small>
+: {{api|t=e|TRADE_SKILL_DATA_SOURCE_CHANGED}}
+: {{api|t=e|TRADE_SKILL_DATA_SOURCE_CHANGING}}
+: {{api|t=e|TRADE_SKILL_DETAILS_UPDATE}}
+: {{api|t=e|TRADE_SKILL_FAVORITES_CHANGED}}<small>: isFavorite, recipeSpellID</small>
+: {{api|t=e|TRADE_SKILL_ITEM_CRAFTED_RESULT}}<small>: data</small>
+: {{api|t=e|TRADE_SKILL_ITEM_UPDATE}}<small>: itemGUID</small>
+: {{api|t=e|TRADE_SKILL_LIST_UPDATE}}
+: {{api|t=e|TRADE_SKILL_NAME_UPDATE}}
+: {{api|t=e|TRADE_SKILL_SHOW}}
+: {{api|t=e|UPDATE_TRADESKILL_CAST_STOPPED}}<small>: isScrapping</small>
+
+=={{api.system|Trainer}}==
+: {{api|t=e|TRAINER_CLOSED}}
+: {{api|t=e|TRAINER_DESCRIPTION_UPDATE}}
+: {{api|t=e|TRAINER_SERVICE_INFO_NAME_UPDATE}}
+: {{api|t=e|TRAINER_SHOW}}
+: {{api|t=e|TRAINER_UPDATE}}
+
+=={{api.system|TransmogOutfitInfo}}==
+: {{api|t=e|TRANSMOG_DISPLAYED_OUTFIT_CHANGED}}
+: {{api|t=e|TRANSMOG_OUTFITS_CHANGED}}<small>: newOutfitID</small>
+: {{api|t=e|VIEWED_TRANSMOG_OUTFIT_CHANGED}}
+: {{api|t=e|VIEWED_TRANSMOG_OUTFIT_SECONDARY_SLOTS_CHANGED}}
+: {{api|t=e|VIEWED_TRANSMOG_OUTFIT_SITUATIONS_CHANGED}}
+: {{api|t=e|VIEWED_TRANSMOG_OUTFIT_SLOT_REFRESH}}
+: {{api|t=e|VIEWED_TRANSMOG_OUTFIT_SLOT_SAVE_SUCCESS}}<small>: slot, type, option</small>
+: {{api|t=e|VIEWED_TRANSMOG_OUTFIT_SLOT_WEAPON_OPTION_CHANGED}}<small>: slot, weaponOption</small>
+
+=={{api.system|Transmogrify}}==
+: {{api|t=e|TRANSMOG_COLLECTION_CAMERA_UPDATE}}
+: {{api|t=e|TRANSMOG_COLLECTION_ITEM_FAVORITE_UPDATE}}<small>: itemAppearanceID, isFavorite</small>
+: {{api|t=e|TRANSMOG_COLLECTION_ITEM_UPDATE}}
+: {{api|t=e|TRANSMOG_COLLECTION_SOURCE_ADDED}}<small>: itemModifiedAppearanceID</small>
+: {{api|t=e|TRANSMOG_COLLECTION_SOURCE_REMOVED}}<small>: itemModifiedAppearanceID</small>
+: {{api|t=e|TRANSMOG_COLLECTION_UPDATED}}<small>: collectionIndex, modID, itemAppearanceID, reason</small>
+: {{api|t=e|TRANSMOG_COSMETIC_COLLECTION_SOURCE_ADDED}}<small>: itemModifiedAppearanceID</small>
+: {{api|t=e|TRANSMOG_SEARCH_UPDATED}}<small>: searchType, collectionType</small>
+: {{api|t=e|TRANSMOG_SETS_UPDATE_FAVORITE}}
+: {{api|t=e|TRANSMOG_SOURCE_COLLECTABILITY_UPDATE}}<small>: itemModifiedAppearanceID, collectable</small>
+: {{api|t=e|TRANSMOGRIFY_CLOSE}}
+: {{api|t=e|TRANSMOGRIFY_ITEM_UPDATE}}
+: {{api|t=e|TRANSMOGRIFY_OPEN}}
+: {{api|t=e|TRANSMOGRIFY_SUCCESS}}<small>: transmogLocation</small>
+: {{api|t=e|TRANSMOGRIFY_UPDATE}}<small>: transmogLocation, action</small>
+
+=={{api.system|Tutorial}}==
+: {{api|t=e|LEAVING_TUTORIAL_AREA}}
+: {{api|t=e|NPE_TUTORIAL_UPDATE}}
+: {{api|t=e|TUTORIAL_COMBAT_EVENT}}
+: {{api|t=e|TUTORIAL_HIGHLIGHT_SPELL}}<small>: spellID, tutorialGlobalStringTag</small>
+: {{api|t=e|TUTORIAL_TRIGGER}}<small>: tutorialIndex, forceShow</small>
+: {{api|t=e|TUTORIAL_UNHIGHLIGHT_SPELL}}
+
+=={{api.system|UI}}==
+: {{api|t=e|NOTCHED_DISPLAY_MODE_CHANGED}}
+: {{api|t=e|UI_SCALE_CHANGED}}
+
+=={{api.system|UIActionHandlerSystem}}==
+: {{api|t=e|HANDLE_UI_ACTION}}<small>: actionType</small>
+
+=={{api.system|UIEventToastManagerInfo}}==
+: {{api|t=e|DISPLAY_EVENT_TOAST_LINK}}<small>: link</small>
+: {{api|t=e|DISPLAY_EVENT_TOASTS}}
+
+=={{api.system|UIFrameManager}}==
+: {{api|t=e|FRAME_MANAGER_UPDATE_ALL}}
+: {{api|t=e|FRAME_MANAGER_UPDATE_FRAME}}<small>: type, show</small>
+
+=={{api.system|UIMacros}}==
+: {{api|t=e|UPDATE_MACROS}}
+
+=={{api.system|UISystemVisibilityManager}}==
+: {{api|t=e|SYSTEM_VISIBILITY_CHANGED}}
+
+=={{api.system|UIWidgetManager}}==
+: {{api|t=e|UPDATE_ALL_UI_WIDGETS}}
+: {{api|t=e|UPDATE_UI_WIDGET}}<small>: widgetInfo</small>
+
+=={{api.system|Unit}}==
+: {{api|t=e|ACTIVE_PLAYER_SPECIALIZATION_CHANGED}}
+: {{api|t=e|ARENA_COOLDOWNS_UPDATE}}
+: {{api|t=e|ARENA_CROWD_CONTROL_SPELL_UPDATE}}<small>: unitTarget, spellID</small>
+: {{api|t=e|AUTOFOLLOW_BEGIN}}<small>: name</small>
+: {{api|t=e|AUTOFOLLOW_END}}
+: {{api|t=e|CANCEL_SUMMON}}
+: {{api|t=e|COMBO_TARGET_CHANGED}}
+: {{api|t=e|CONFIRM_BINDER}}<small>: areaName</small>
+: {{api|t=e|CONFIRM_SUMMON}}<small>: summonReason, skippingStartExperience</small>
+: {{api|t=e|ECLIPSE_DIRECTION_CHANGE}}<small>: direction</small>
+: {{api|t=e|HEARTHSTONE_BOUND}}
+: {{api|t=e|HONOR_XP_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|INCOMING_RESURRECT_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|INCOMING_SUMMON_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|KNOWN_TITLES_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|LOCALPLAYER_PET_RENAMED}}
+: {{api|t=e|MIRROR_TIMER_PAUSE}}<small>: timerName, paused</small>
+: {{api|t=e|MIRROR_TIMER_START}}<small>: timerName, value, maxValue, scale, paused, timerLabel</small>
+: {{api|t=e|MIRROR_TIMER_STOP}}<small>: timerName</small>
+: {{api|t=e|NEUTRAL_FACTION_SELECT_RESULT}}<small>: success</small>
+: {{api|t=e|OBJECT_ENTERED_AOI}}<small>: guid</small>
+: {{api|t=e|OBJECT_LEFT_AOI}}<small>: guid</small>
+: {{api|t=e|PARTY_KILL}}<small>: attackerGUID, targetGUID</small>
+: {{api|t=e|PET_BAR_UPDATE_USABLE}}
+: {{api|t=e|PET_UI_UPDATE}}
+: {{api|t=e|PLAYER_CAN_GLIDE_CHANGED}}<small>: canGlide</small>
+: {{api|t=e|PLAYER_DAMAGE_DONE_MODS}}<small>: unitTarget</small>
+: {{api|t=e|PLAYER_ENTER_COMBAT}}
+: {{api|t=e|PLAYER_FARSIGHT_FOCUS_CHANGED}}
+: {{api|t=e|PLAYER_FLAGS_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|PLAYER_FOCUS_CHANGED}}
+: {{api|t=e|PLAYER_IMPULSE_APPLIED}}
+: {{api|t=e|PLAYER_IS_GLIDING_CHANGED}}<small>: isGliding</small>
+: {{api|t=e|PLAYER_LEAVE_COMBAT}}
+: {{api|t=e|PLAYER_LEVEL_CHANGED}}<small>: oldLevel, newLevel, real</small>
+: {{api|t=e|PLAYER_LEVEL_UP}}<small>: level, healthDelta, powerDelta, numNewTalents, numNewPvpTalentSlots, strengthDelta, agilityDelta, staminaDelta, intellectDelta</small>
+: {{api|t=e|PLAYER_MAX_LEVEL_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|PLAYER_MOUNT_DISPLAY_CHANGED}}
+: {{api|t=e|PLAYER_PVP_KILLS_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|PLAYER_PVP_RANK_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|PLAYER_REGEN_DISABLED}}
+: {{api|t=e|PLAYER_REGEN_ENABLED}}
+: {{api|t=e|PLAYER_SOFT_ENEMY_CHANGED}}
+: {{api|t=e|PLAYER_SOFT_FRIEND_CHANGED}}
+: {{api|t=e|PLAYER_SOFT_INTERACT_CHANGED}}<small>: oldTarget, newTarget</small>
+: {{api|t=e|PLAYER_SOFT_TARGET_INTERACTION}}
+: {{api|t=e|PLAYER_SPECIALIZATION_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|PLAYER_STARTED_LOOKING}}
+: {{api|t=e|PLAYER_STARTED_MOVING}}
+: {{api|t=e|PLAYER_STARTED_TURNING}}
+: {{api|t=e|PLAYER_STOPPED_LOOKING}}
+: {{api|t=e|PLAYER_STOPPED_MOVING}}
+: {{api|t=e|PLAYER_STOPPED_TURNING}}
+: {{api|t=e|PLAYER_TARGET_CHANGED}}
+: {{api|t=e|PLAYER_TRIAL_XP_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|PLAYER_UPDATE_RESTING}}
+: {{api|t=e|PLAYER_XP_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|PORTRAITS_UPDATED}}
+: {{api|t=e|PROVING_GROUNDS_SCORE_UPDATE}}<small>: points</small>
+: {{api|t=e|PVP_TIMER_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|RUNE_POWER_UPDATE}}<small>: runeIndex, added</small>
+: {{api|t=e|RUNE_TYPE_UPDATE}}<small>: runeIndex</small>
+: {{api|t=e|SHOW_FACTION_SELECT_UI}}
+: {{api|t=e|SPELL_CONFIRMATION_PROMPT}}<small>: spellID, effectValue, message, duration, currencyTypesID, currencyCost, currentDifficulty, displayItemID, itemContext, treasureContextLevel</small>
+: {{api|t=e|SPELL_CONFIRMATION_TIMEOUT}}<small>: spellID, effectValue</small>
+: {{api|t=e|UNIT_ABSORB_AMOUNT_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_AREA_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_ARENA_COOLDOWNS_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_ATTACK}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_ATTACK_POWER}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_ATTACK_SPEED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_CHEAT_TOGGLE_EVENT}}
+: {{api|t=e|UNIT_CLASSIFICATION_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_COMBAT}}<small>: unitTarget, event, flagText, amount, schoolMask</small>
+: {{api|t=e|UNIT_CONNECTION}}<small>: unitTarget, isConnected</small>
+: {{api|t=e|UNIT_CTR_OPTIONS}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_DAMAGE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_DEFENSE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_DIED}}<small>: unitGUID</small>
+: {{api|t=e|UNIT_DISPLAYPOWER}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_DISTANCE_CHECK_UPDATE}}<small>: unitTarget, isInDistance</small>
+: {{api|t=e|UNIT_FACTION}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_FLAGS}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_FORM_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_HEAL_ABSORB_AMOUNT_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_HEAL_PREDICTION}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_HEALTH}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_IN_RANGE_UPDATE}}<small>: unitTarget, isInRange</small>
+: {{api|t=e|UNIT_INVENTORY_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_LEVEL}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_LOOT}}<small>: unitGUID, hasLoot</small>
+: {{api|t=e|UNIT_MANA}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_MAX_HEALTH_MODIFIERS_CHANGED}}<small>: unitTarget, percentMaxHealthAdjusted</small>
+: {{api|t=e|UNIT_MAXHEALTH}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_MAXPOWER}}<small>: unitTarget, powerType</small>
+: {{api|t=e|UNIT_MODEL_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_NAME_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_OTHER_PARTY_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_PET}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_PET_EXPERIENCE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_PHASE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_PORTRAIT_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_POWER_BAR_HIDE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_POWER_BAR_SHOW}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_POWER_BAR_TIMER_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_POWER_FREQUENT}}<small>: unitTarget, powerType</small>
+: {{api|t=e|UNIT_POWER_POINT_CHARGE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_POWER_UPDATE}}<small>: unitTarget, powerType</small>
+: {{api|t=e|UNIT_QUEST_LOG_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_RANGED_ATTACK_POWER}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_RANGEDDAMAGE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_RESISTANCES}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_SPELL_HASTE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_SPELLCAST_CHANNEL_START}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_CHANNEL_STOP}}<small>: unitTarget, castGUID, spellID, interruptedBy, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_CHANNEL_UPDATE}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_DELAYED}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_EMPOWER_START}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_EMPOWER_STOP}}<small>: unitTarget, castGUID, spellID, complete, interruptedBy, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_EMPOWER_UPDATE}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_FAILED}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_FAILED_QUIET}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_INTERRUPTED}}<small>: unitTarget, castGUID, spellID, interruptedBy, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_INTERRUPTIBLE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_SPELLCAST_NOT_INTERRUPTIBLE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_SPELLCAST_RETICLE_CLEAR}}<small>: unitTarget, castGUID, spellID</small>
+: {{api|t=e|UNIT_SPELLCAST_RETICLE_TARGET}}<small>: unitTarget, castGUID, spellID</small>
+: {{api|t=e|UNIT_SPELLCAST_SENT}}<small>: unitTarget, target, castGUID, spellID</small>
+: {{api|t=e|UNIT_SPELLCAST_START}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_STOP}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_SPELLCAST_SUCCEEDED}}<small>: unitTarget, castGUID, spellID, castBarID</small>
+: {{api|t=e|UNIT_STATS}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_TARGET}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_TARGETABLE_CHANGED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_THREAT_LIST_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_THREAT_SITUATION_UPDATE}}<small>: unitTarget</small>
+: {{api|t=e|UPDATE_EXHAUSTION}}
+: {{api|t=e|UPDATE_MOUSEOVER_UNIT}}
+: {{api|t=e|UPDATE_STEALTH}}
+: {{api|t=e|VEHICLE_ANGLE_UPDATE}}<small>: normalizedPitch, radians</small>
+
+=={{api.system|UnitAuras}}==
+<section begin=UnitAuras/>
+: {{api|t=e|AURA_DATA_PROVIDER_SWITCH}}<small>: useRealDataProvider</small>
+: {{api|t=e|GROUP_BUFF_VISUAL_ALERTS_CHANGED}}<small>: visualAlerts</small>
+: {{api|t=e|HIDDEN_GROUP_BUFFS_CHANGED}}<small>: spellIDs</small>
+: {{api|t=e|UNIT_AURA}}<small>: unitTarget, updateInfo</small>
+: {{api|t=e|UNIT_AURA_BLOCK_LIST_CLEARED}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_AURA_BLOCKED}}<small>: unitTarget, auraInstanceID</small><section end=UnitAuras/>
+
+=={{api.system|UnitRole}}==
+: {{api|t=e|ROLE_CHANGED_INFORM}}<small>: changedName, fromName, oldRole, newRole</small>
+: {{api|t=e|ROLE_POLL_BEGIN}}<small>: fromName</small>
+
+=={{api.system|Vehicle}}==
+: {{api|t=e|PLAYER_GAINS_VEHICLE_DATA}}<small>: unitTarget, vehicleUIIndicatorID</small>
+: {{api|t=e|PLAYER_LOSES_VEHICLE_DATA}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_ENTERED_VEHICLE}}<small>: unitTarget, showVehicleFrame, isControlSeat, vehicleUIIndicatorID, vehicleGUID, mayChooseExit, hasPitch</small>
+: {{api|t=e|UNIT_ENTERING_VEHICLE}}<small>: unitTarget, showVehicleFrame, isControlSeat, vehicleUIIndicatorID, vehicleGUID, mayChooseExit, hasPitch</small>
+: {{api|t=e|UNIT_EXITED_VEHICLE}}<small>: unitTarget</small>
+: {{api|t=e|UNIT_EXITING_VEHICLE}}<small>: unitTarget</small>
+: {{api|t=e|VEHICLE_ANGLE_SHOW}}<small>: shouldShow</small>
+: {{api|t=e|VEHICLE_PASSENGERS_CHANGED}}
+: {{api|t=e|VEHICLE_POWER_SHOW}}<small>: shouldShow</small>
+: {{api|t=e|VEHICLE_UPDATE}}
+
+=={{api.system|Video}}==
+: {{api|t=e|ADAPTER_LIST_CHANGED}}
+: {{api|t=e|DISPLAY_SIZE_CHANGED}}
+: {{api|t=e|GLUE_SCREENSHOT_FAILED}}
+: {{api|t=e|GLUE_SCREENSHOT_STARTED}}
+: {{api|t=e|GLUE_SCREENSHOT_SUCCEEDED}}
+: {{api|t=e|GX_RESTARTED}}
+: {{api|t=e|SCREENSHOT_FAILED}}
+: {{api|t=e|SCREENSHOT_STARTED}}
+: {{api|t=e|SCREENSHOT_SUCCEEDED}}
+
+=={{api.system|Vignette}}==
+: {{api|t=e|VIGNETTE_MINIMAP_UPDATED}}<small>: vignetteGUID, onMinimap</small>
+: {{api|t=e|VIGNETTES_UPDATED}}
+
+=={{api.system|VoiceChat}}==
+: {{api|t=e|VOICE_CHAT_ACTIVE_INPUT_DEVICE_UPDATED}}
+: {{api|t=e|VOICE_CHAT_ACTIVE_OUTPUT_DEVICE_UPDATED}}
+: {{api|t=e|VOICE_CHAT_AUDIO_CAPTURE_ENERGY}}<small>: isSpeaking, energy</small>
+: {{api|t=e|VOICE_CHAT_AUDIO_CAPTURE_STARTED}}
+: {{api|t=e|VOICE_CHAT_AUDIO_CAPTURE_STOPPED}}
+: {{api|t=e|VOICE_CHAT_CHANNEL_ACTIVATED}}<small>: channelID</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_DEACTIVATED}}<small>: channelID</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_DISPLAY_NAME_CHANGED}}<small>: channelID, channelDisplayName</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_JOINED}}<small>: status, channelID, channelType, clubId, streamId</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_ACTIVE_STATE_CHANGED}}<small>: memberID, channelID, isActive</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_ADDED}}<small>: memberID, channelID</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_ENERGY_CHANGED}}<small>: memberID, channelID, speakingEnergy</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_GUID_UPDATED}}<small>: memberID, channelID</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_MUTE_FOR_ALL_CHANGED}}<small>: memberID, channelID, isMutedForAll</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_MUTE_FOR_ME_CHANGED}}<small>: memberID, channelID, isMutedForMe</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_REMOVED}}<small>: memberID, channelID</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_SILENCED_CHANGED}}<small>: memberID, channelID, isSilenced</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_SPEAKING_STATE_CHANGED}}<small>: memberID, channelID, isSpeaking</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_STT_MESSAGE}}<small>: memberID, channelID, message, language</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MEMBER_VOLUME_CHANGED}}<small>: memberID, channelID, volume</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_MUTE_STATE_CHANGED}}<small>: channelID, isMuted</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_PTT_CHANGED}}<small>: channelID, pushToTalkSetting</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_REMOVED}}<small>: channelID</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_TRANSCRIBING_CHANGED}}<small>: channelID, isTranscribing</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_TRANSMIT_CHANGED}}<small>: channelID, isTransmitting</small>
+: {{api|t=e|VOICE_CHAT_CHANNEL_VOLUME_CHANGED}}<small>: channelID, volume</small>
+: {{api|t=e|VOICE_CHAT_COMMUNICATION_MODE_CHANGED}}<small>: communicationMode</small>
+: {{api|t=e|VOICE_CHAT_CONNECTION_SUCCESS}}
+: {{api|t=e|VOICE_CHAT_DEAFENED_CHANGED}}<small>: isDeafened</small>
+: {{api|t=e|VOICE_CHAT_ERROR}}<small>: platformCode, statusCode</small>
+: {{api|t=e|VOICE_CHAT_INPUT_DEVICES_UPDATED}}
+: {{api|t=e|VOICE_CHAT_LOGIN}}<small>: status</small>
+: {{api|t=e|VOICE_CHAT_LOGOUT}}<small>: status</small>
+: {{api|t=e|VOICE_CHAT_MUTED_CHANGED}}<small>: isMuted</small>
+: {{api|t=e|VOICE_CHAT_OUTPUT_DEVICES_UPDATED}}
+: {{api|t=e|VOICE_CHAT_PENDING_CHANNEL_JOIN_STATE}}<small>: channelType, clubId, streamId, pendingJoin</small>
+: {{api|t=e|VOICE_CHAT_PTT_BUTTON_PRESSED_STATE_CHANGED}}<small>: isPressed</small>
+: {{api|t=e|VOICE_CHAT_SILENCED_CHANGED}}<small>: isSilenced</small>
+: {{api|t=e|VOICE_CHAT_SPEAK_FOR_ME_ACTIVE_STATUS_UPDATED}}
+: {{api|t=e|VOICE_CHAT_SPEAK_FOR_ME_FEATURE_STATUS_UPDATED}}
+: {{api|t=e|VOICE_CHAT_TTS_PLAYBACK_BOOKMARK}}<small>: utteranceID, bookmarkName</small>
+: {{api|t=e|VOICE_CHAT_TTS_PLAYBACK_FAILED}}<small>: utteranceID, status</small>
+: {{api|t=e|VOICE_CHAT_TTS_PLAYBACK_FINISHED}}<small>: utteranceID</small>
+: {{api|t=e|VOICE_CHAT_TTS_PLAYBACK_STARTED}}<small>: utteranceID</small>
+: {{api|t=e|VOICE_CHAT_TTS_SPEAK_TEXT_UPDATE}}<small>: status, utteranceID</small>
+: {{api|t=e|VOICE_CHAT_TTS_VOICES_UPDATE}}
+: {{api|t=e|VOICE_CHAT_VAD_SETTINGS_UPDATED}}
+
+=={{api.system|WarbandSceneInfo}}==
+: {{api|t=e|NEW_WARBAND_SCENE_ADDED}}<small>: warbandScenID</small>
+: {{api|t=e|WARBAND_SCENE_FAVORITES_UPDATED}}
+
+=={{api.system|WeatherScript}}==
+: {{api|t=e|WEATHER_CHANGED}}
+
+=={{api.system|WeeklyRewards}}==
+: {{api|t=e|WEEKLY_REWARDS_ITEM_CHANGED}}
+: {{api|t=e|WEEKLY_REWARDS_UPDATE}}
+
+=={{api.system|WorldLootObject}}==
+: {{api|t=e|WORLD_LOOT_OBJECT_INFO_UPDATED}}<small>: guid</small>
+
+=={{api.system|WorldStateInfo}}==
+: {{api|t=e|CANCEL_PLAYER_COUNTDOWN}}<small>: initiatedBy, informChat, initiatedByName</small>
+: {{api|t=e|START_PLAYER_COUNTDOWN}}<small>: initiatedBy, timeRemaining, totalTime, informChat, initiatedByName</small>
+: {{api|t=e|START_TIMER}}<small>: timerType, timeRemaining, totalTime</small>
+: {{api|t=e|STOP_TIMER_OF_TYPE}}<small>: timerType</small>
+: {{api|t=e|WORLD_STATE_TIMER_START}}<small>: timerID</small>
+: {{api|t=e|WORLD_STATE_TIMER_STOP}}<small>: timerID</small>
+
+=={{api.system|WowEntitlementInfo}}==
+: {{api|t=e|ENTITLEMENT_DELIVERED}}<small>: entitlementType, textureID, name, payloadID, showFancyToast</small>
+: {{api|t=e|RAF_ENTITLEMENT_DELIVERED}}<small>: entitlementType, textureID, name, payloadID, showFancyToast, rafVersion</small>
+
+=={{api.system|WowSurvey}}==
+: {{api|t=e|SURVEY_DELIVERED}}
+
+=={{api.system|WowTokenUI}}==
+: {{api|t=e|TOKEN_AUCTION_SOLD}}
+: {{api|t=e|TOKEN_BUY_CONFIRM_REQUIRED}}
+: {{api|t=e|TOKEN_BUY_RESULT}}<small>: result</small>
+: {{api|t=e|TOKEN_CAN_VETERAN_BUY_UPDATE}}<small>: result</small>
+: {{api|t=e|TOKEN_DISTRIBUTIONS_UPDATED}}<small>: result</small>
+: {{api|t=e|TOKEN_MARKET_PRICE_UPDATED}}<small>: result</small>
+: {{api|t=e|TOKEN_REDEEM_BALANCE_UPDATED}}
+: {{api|t=e|TOKEN_REDEEM_CONFIRM_REQUIRED}}<small>: choiceType</small>
+: {{api|t=e|TOKEN_REDEEM_FRAME_SHOW}}
+: {{api|t=e|TOKEN_REDEEM_GAME_TIME_UPDATED}}
+: {{api|t=e|TOKEN_REDEEM_RESULT}}<small>: result, choiceType</small>
+: {{api|t=e|TOKEN_SELL_CONFIRM_REQUIRED}}
+: {{api|t=e|TOKEN_SELL_CONFIRMED}}
+: {{api|t=e|TOKEN_SELL_RESULT}}<small>: result</small>
+: {{api|t=e|TOKEN_STATUS_CHANGED}}
+
+=Undocumented=
+Not all events are documented in [https://github.com/Gethe/wow-ui-source/tree/live/Interface/AddOns/Blizzard_APIDocumentation Blizzard API Documentation]
+: {{api|t=e|AUTH_CHALLENGE_FINISHED}}
+: {{api|t=e|AUTH_CHALLENGE_UI_INVALID}}
+: {{api|t=e|BILLING_NAG_DIALOG}}
+: {{api|t=e|DEBUG_MENU_TOGGLED}}
+: {{api|t=e|EVENT_CLASS_TRIAL_TIMER_START}}
+: {{api|t=e|EXPERIMENTAL_CVAR_CONFIRMATION_NEEDED}}
+: {{api|t=e|IGR_BILLING_NAG_DIALOG}}
+: {{api|t=e|PLAYTIME_CHANGED}}
+: {{api|t=e|PRODUCT_ASSIGN_TO_TARGET_FAILED}}
+: {{api|t=e|PRODUCT_CHOICE_UPDATE}}
+: {{api|t=e|PRODUCT_DISTRIBUTIONS_UPDATED}}
+: {{api|t=e|SESSION_TIME_ALERT}}
+: {{api|t=e|STORE_BOOST_AUTO_CONSUMED}}
+: {{api|t=e|STORE_CHARACTER_LIST_RECEIVED}}
+: {{api|t=e|STORE_CONFIRM_PURCHASE}}
+: {{api|t=e|STORE_OPEN_SIMPLE_CHECKOUT}}
+: {{api|t=e|STORE_ORDER_INITIATION_FAILED}}
+: {{api|t=e|STORE_PRODUCTS_UPDATED}}
+: {{api|t=e|STORE_PRODUCT_DELIVERED}}
+: {{api|t=e|STORE_PURCHASE_ERROR}}
+: {{api|t=e|STORE_PURCHASE_LIST_UPDATED}}
+: {{api|t=e|STORE_REFRESH}}
+: {{api|t=e|STORE_STATUS_CHANGED}}
+: {{api|t=e|STORE_VAS_PURCHASE_COMPLETE}}
+: {{api|t=e|STORE_VAS_PURCHASE_ERROR}}
+: {{api|t=e|SUBSCRIPTION_CHANGED_KICK_IMMINENT}}
+: {{api|t=e|TRIAL_CAP_REACHED_LEVEL}}
+: {{api|t=e|TRIAL_STATUS_UPDATE}}
+: {{api|t=e|UPDATE_EXPANSION_LEVEL}}
+: {{api|t=e|UPDATE_GM_STATUS}}

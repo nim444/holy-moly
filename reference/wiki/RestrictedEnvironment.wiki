@@ -1,0 +1,246 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/RestrictedEnvironment | revision 4270840 (2018-11-26T18:14:20Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{uitech}}
+'''Restricted environment''' refers to the environment in which restricted addon code ([[SecureHandlers|SecureHandler]] snippets) is executed. A limited subset of the WoW API is available within the environment.
+
+== Available API ==
+: {{api|SecureCmdOptionParse}}("conditionalString") : parses a macro conditional.
+: {{api|GetShapeshiftForm}}() : returns current shape shift form.
+: {{api|IsStealthed}}() : returns 1 if the player is stealthed
+: {{api|UnitExists}}("unit") : returns 1 if the unit exists.
+: {{api|UnitIsDead}}("unit") : returns 1 if the unit is dead.
+: {{api|UnitIsGhost}}("unit") : returns 1 if the unit is a ghost.
+: {{api|UnitPlayerOrPetInParty}}("unit") : returns 1 if the unit is a player or a pet in your party.
+: {{api|UnitPlayerOrPetInRaid}}("unit") : returns 1 if the unit is a player or a pet in your raid.
+: {{api|IsRightAltKeyDown}}(), {{api|IsLeftAltKeyDown}}(), {{api|IsAltKeyDown}}() : return 1 if the relevant key is held down.
+: {{api|IsRightControlKeyDown}}(), {{api|IsLeftControlKeyDown}}(), {{api|IsControlKeyDown}}() : return 1 if the relevant key is held down.
+: {{api|IsRightShiftKeyDown}}(), {{api|IsLeftShiftKeyDown}}(), {{api|IsShiftKeyDown}}() : return 1 if the relevant key is held down.
+: {{api|IsModifierKeyDown}}() : returns 1 if any alt, control or shift key is held down.
+: {{api|IsModifiedClick}}("modifierType") : returns 1 if the associated modifier is held down.
+: {{api|GetMouseButtonClicked}}() : returns the mouse button responsible for the hardware click.
+: {{api|GetActionBarPage}}() : returns the current action bar page.
+: {{api|GetBonusBarOffset}}() : returns the current action bar "bonus" offset (stance-specific bars).
+: {{api|IsMounted}}() : returns 1 if the player is mounted.
+: {{api|IsSwimming}}() : returns 1 if the player is swimming.
+: {{api|IsSubmerged}}() : returns 1 if the player is in a body of water.
+: {{api|IsFlying}}() : returns 1 if the player is flying.
+: {{api|IsFlyableArea}}() : returns 1 if the player is in a flyable area (Northrend, Outland).
+: {{api|IsIndoors}}() : returns 1 if the player is indoors.
+: {{api|IsOutdoors}}() : returns 1 if the player is outdoors.
+: {{api|GetBindingKey}}("key") : returns the action bound to a key.
+: {{api|HasAction}}(slot) : returns 1 if an action is placed in the specified action bar slot.
+: {{api|IsHarmfulSpell}}(slot[, bookType] or "spellName") : returns 1 if the spell can be cast on hostile targets.
+: {{api|IsHarmfulItem}}(slot[, bookType] or "spellName") : returns 1 if the item can be used on hostile targets.
+: {{api|IsHelpfulSpell}}(slot[, bookType] or "spellName") : returns 1 if the spell can be cast on friendly targets.
+: {{api|IsHelpfulItem}}(slot[, bookType] or "spellName") : returns 1 if the item can be used on friendly targets.
+: {{api|PlayerCanAttack}}("unit") : returns 1 if the player can attack the specified unit.
+: {{api|PlayerCanAssist}}("unit") : returns 1 if the player can assist the specified unit.
+: {{api|PlayerIsChanneling}}() : returns 1 if the player is channeling a spell.
+: {{api|PlayerPetSummary}}() : returns pet creature family and pet name.
+: {{api|PlayerInCombat}}() : returns 1 if the player or his pet is in combat.
+: {{api|PlayerInGroup}}() : returns "party" or "raid" if the player is in one of those group types.
+: {{api|UnitHasVehicleUI}}("unit") : returns 1 if the unit is in a vehicle that provides special UI.
+: {{api|RegisterStateDriver}}(frame, state, conditional) : registers a [[SecureStateDriver]] for a specific frame.
+: {{api|GetActionInfo}}(slot) : returns limited information about an action in a specific action slot.
+: {{api|HasVehicleActionBar}}()
+: {{api|HasOverrideActionBar}}()
+: {{api|HasTempShapeshiftActionBar}}()
+: {{api|HasOverrideUI}}()
+: {{api|GetVehicleBarIndex}}()
+: {{api|GetOverrideBarIndex}}()
+: {{api|HasExtraActionBar}}()
+: {{api|GetTempShapeshiftBarIndex}}()
+: {{api|CanExitVehicle}}()
+
+=== Restricted tables ===
+Only ''restricted'' tables are accessible within the restricted environment -- essentially, the real table instances are kept local to prevent unrestricted access to variables within the restricted environment.  Most table functions within the restricted environment have been replaced by restricted table-aware versions, with the exception of the {{api|gsub}} function (use the restricted table-aware {{api|rtgsub}} instead of table lookup functionality is desired).
+
+The following table-related functions are usable inside the restricted environment:
+{| class="darktable"
+| colspan="7" align="left" style="padding: 0.3em; background: #282828" | '''Restricted Table Library'''
+|-
+| width="14%" | rtable.next 
+| width="14%" | rtable.pairs 
+| width="14%" | rtable.ipairs 
+| width="14%" | rtable.unpack 
+| width="14%" | rtable.newtable 
+| width="14%" | rtable.maxn 
+| width="16%" | rtable.insert 
+|-
+| rtable.remove || rtable.sort || rtable.concat || rtable.wipe || rtable.type || rtable.rtgsub || &nbsp;
+|-
+| colspan="7" align="left" style="padding: 0.3em; background: #282828" | '''Table Library''' (restricted-table aware)
+|-
+| table.maxn || table.insert || table.remove || table.sort || table.concat || table.wipe || table.new
+|-
+| colspan="7" align="left" style="padding: 0.3em; background: #282828" | '''Global API'''
+|-
+| newtable || pairs || ipairs || next || unpack || wipe || tinsert
+|- 
+| tremove || type || rtgsub
+| colspan="4" | &nbsp;
+|}
+
+Note that as the restricted environment doesn't contain proper function references, table.sort's second argument (comparison function) may not be used from within the restricted environment.
+
+=== Other functions ===
+The math and string standard library tables are provided in their entirety. The following table lists additional global functions that are also available in the restricted environment
+{| class="darktable"
+|-
+| width="9%" | select 
+| width="9%" | tonumber 
+| width="9%" | tostring 
+| width="9%" | print 
+| width="9%" | format 
+| width="9%" | gmatch 
+| width="9%" | gsub 
+| width="9%" | strbyte 
+| width="9%" | strchar 
+| width="9%" | strconcat 
+| width="9%" | strfind
+|-
+| strjoin || strlen || strlower || strmatch || strrep || strrev || strsplit || strsub || strtrim || strupper || abs
+|-
+| acos || asin || atan || atan2 || ceil || cos || deg || exp || floor || frexp || ldexp
+|-
+| log || log10 || max || min || mod || rad || random || sin || tan || &nbsp;
+|}
+
+== Frame handle methods ==
+Real frame userdata values cannot exist within the restricted environment. Frame references called frame ''handles'' are used instead, supporting a limited number of methods listing below. Snippets initially have access to frame handles of the frame they're running for (as <code>self</code>) and the frame that owns the restricted environment the snippet is executing in (as <code>owner</code>). Additional frame handles may be introduced into the restricted environment via the frame:{{api|SecureHandlerSetFrameRef|SetFrameRef}}("name", frame) API from insecure code, and retrieved by the snippet using the handle:GetFrameRef("name") method. 
+
+Prior to [[Patch 4.0.1]], a special <code>control</code> handle existed to allow snippets to call other snippets. This functionality has since been migrated to general frame handles; the <code>control</code> handle remains as an alias for <code>owner</code>.
+
+Only methods marked with a star (*) may be called on references to non-protected frames.
+
+{| class="darktable"
+|-
+! * 
+! style="width: 12em"| Method !! Purpose
+|-
+| colspan="3" class="title" | Accessor methods
+|-
+| align="center" | * || handle:GetName() || Returns frame name.
+|-
+| align="center" | * || handle:GetObjectType() || Returns widget type.
+|-
+| align="center" | * || handle:IsObjectType("widgetType") || Returns 1 if the frame is of the specified widget type.
+|-
+| align="center" | * || handle:IsProtected() || Returns 1 if the frame is protected.
+|-
+| &nbsp; || handle:GetID() || Returns the ID value associated with the frame.
+|-
+| &nbsp; || handle:IsShown() || Returns 1 if the frame is shown (even if its ancestors are not).
+|-
+| &nbsp; || handle:IsVisible() || Returns 1 if the frame is visible (i.e. it and all its ancestors are shown).
+|-
+| &nbsp; || handle:GetWidth() || Returns frame width.
+|-
+| &nbsp; || handle:GetHeight() || Returns frame height.
+|-
+| &nbsp; || handle:GetRect() || Returns left, bottom, width, height specification of the frame's rectangle.
+|-
+| &nbsp; || handle:GetScale() || Returns frame scale.
+|-
+| &nbsp; || handle:GetEffectiveScale() || Returns effective frame scale (its own scale multiplied with that of all of its ancestors).
+|-
+| &nbsp; || handle:GetFrameLevel() || Returns frame level.
+|-
+| &nbsp; || handle:GetAttribute("name") || Returns the value of an attribute; name must not begin with an underscore.
+|-
+| &nbsp; || handle:GetFrameRef("name") || Retrieve a restricted handle to a frame set by SetFrameRef().
+|-
+| &nbsp; 
+| valign="top" style="text-align: left" | handle:GetEffectiveAttribute("name", "button", "prefix", "suffix") || Returns the effective value of a modified attribute. Attribute name must not begin with an underscore.
+|-
+| &nbsp; || handle:GetChildren() || Returns restricted references to the frame's children in a list(?).
+|-
+| &nbsp; || handle:GetChildList(tbl) || Returns restricted references to the frame's children in a table(?).
+|-
+| &nbsp; || handle:GetParent() || Returns a restricted reference to the frame's parent.
+|-
+| &nbsp; || handle:GetMousePosition() || Returns mouse position relative to the frame, where (0,0) is the bottom left corner.
+|-
+| &nbsp; 
+| valign="top"| handle:IsUnderMouse(recursive) || Returns 1 if the frame, or, if recursive is true, any of the frame's children (and their children) are under the mouse.
+|-
+| &nbsp; || handle:GetNumPoints() || Returns the number of anchoring points used by the frame.
+|-
+| &nbsp; || handle:GetPoint(i) || Returns information about an anchoring point.
+|-
+| colspan="3" class="title" | Setter methods
+|-
+| &nbsp; || handle:Show(skipAttr) || Shows a frame, and, unless skipAttr is true, set the "statehidden" attribute to nil.
+|-
+| &nbsp; || handle:Hide(skipAttr) || Hides a frame, and, unless skipAttr is true, set the "statehidden" attribute to true.
+|-
+| &nbsp; || handle:SetID(id) || Sets the ID value associated with the frame
+|-
+| &nbsp; || handle:SetWidth(width) || Sets frame width.
+|-
+| &nbsp; || handle:SetHeight(height) || Sets frame height.
+|-
+| &nbsp; || handle:SetScale(scale) || Sets frame scale
+|-
+| &nbsp; || handle:SetAlpha(alpha) || Sets frame alpha
+|-
+| &nbsp; || handle:ClearAllPoints() || Clears all anchoring points
+|-
+| &nbsp; || handle:SetPoint(point, relframe, relpoint, ofsx, ofsy) || Sets an anchoring point.
+|-
+| &nbsp; || handle:SetAllPoints([relframe]) || Sets points to fill relframe, or the frame's parent if relframe is not specified.
+|-
+| &nbsp; || handle:SetAttribute("name", value) || Sets an attribute on the frame. Name must not begin with an underscore.
+|-
+| &nbsp; || handle:ClearBindings() || Clears all override bindings the frame is registered as an owner of.
+|-
+| &nbsp; || handle:ClearBinding(key) || Clears a specific override binding this frame is the registered owner of.
+|-
+| &nbsp; 
+| valign="top" style="text-align: left" | handle:SetBindingClick(priority, key, name, button) || Creates an override click binding to click button specified by name (button name or reference), when key is pressed. The handle acts as the override binding's owner
+|-
+| &nbsp; 
+| style="text-align: left"| handle:SetBindingSpell(priority, key, spell) || Creates an override spell binding; the handle specifies the binding's owner.
+|-
+| &nbsp; 
+| style="text-align: left"| handle:SetBindingMacro(priority, key, macro) || Creates an override macro binding; the handle specifies the binding's owner.
+|-
+| &nbsp; 
+| style="text-align: left"| handle:SetBindingItem(priority, key, item) || Creates an override item binding; the handle specifies the binding's owner.
+|-
+| &nbsp; || handle:Raise() || Makes frame top-most.
+|-
+| &nbsp; || handle:Lower() || Lowers the frame's frame level.
+|-
+| &nbsp; || handle:SetFrameLevel(level) || Alters frame level.
+|-
+| &nbsp; || handle:SetParent(parent) || Changes frame's parent.
+|-
+| &nbsp; || handle:RegisterAutoHide(duration) || Registers the frame to be hidden after the mouse leaves the frame for duration seconds.
+|-
+| &nbsp; || handle:UnregisterAutoHide() || Unregisters the frame from automatic hiding.
+|-
+| &nbsp; 
+| valign="top"| handle:AddToAutoHide(childFrame) || Adds a child frame to this frame's automatic hiding. The duration now applies to the mouse being out of both the frame and the childFrame.
+|-
+| &nbsp; || handle:Disable() || Disables a button, disabling click handling.
+|-
+| &nbsp; || handle:Enable() || Enables a button, enabling click handling.
+
+|-
+| colspan="3" class="title" id="Control_methods" | Control flow methods
+|-
+| align="center" | * || handle:CallMethod("method", ...) || Insecurely calls frame:methodName(...).
+|-
+| &nbsp; || handle:Run("body", ...) || Executes snippet in body, with (handle, ...) as arguments in handle's environment.
+|-
+| &nbsp; || handle:RunFor(otherHandle, "body", ...) 
+| valign="top" | Executes snippet in body, with (otherHandle, ...) as arguments in handle's environment.
+|-
+| &nbsp; || handle:RunAttribute("snippetAttr", ...) 
+| valign="top" | Executes snippet in handle's snippetAttr attribute with (handle, ...) as arguments.
+|-
+| &nbsp; || handle:ChildUpdate("scriptid", message) 
+| valign="top" | Executes the contents of "_childupdate-scriptid" (or, if that attribute is nil/false, "_childupdate"), on all protected children (and children of children) of ''handle'' with (self, scriptid, message) arguments in handle's environment.
+|}
+
+{{API Trail Secure}}

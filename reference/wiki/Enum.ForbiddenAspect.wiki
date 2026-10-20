@@ -1,0 +1,36 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Enum.ForbiddenAspect | revision 6884525 (2026-09-23T03:13:15Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{wowapitype}}
+<onlyinclude>{| class="sortable darktable zebra col1-center"
+|+ {{apitable.captionstyle}} | {{#if:{{{nocaption|}}}||Enum.ForbiddenAspect}}
+! Value !! !! Field !! style="padding-right: 40px;" | !! Description
+|-
+| 0x1 || {{tlydocicon|s:ForbiddenAspect:SetToDefaults}} || {{apiname|SetToDefaults}} || || <section begin=SetToDefaults/>Restricts resetting this object to a default state. Implied automatically when any other forbidden aspect is set.<section end=SetToDefaults/>
+|-
+| 0x2 || {{tlydocicon|s:ForbiddenAspect:ScriptBindings}} || {{apiname|ScriptBindings}} || || <section begin=ScriptBindings/>Restricts querying, replacement, or hooks of scripts on this object.<section end=ScriptBindings/>
+|-
+| 0x4 || {{tlydocicon|s:ForbiddenAspect:UntrustedScriptExecution}} || {{apiname|UntrustedScriptExecution}} || || <section begin=UntrustedScriptExecution/>Restricts execution of all scripts for this object. Propagates to any children of this object.<section end=UntrustedScriptExecution/>
+|-
+| 0x8 || {{tlydocicon|s:ForbiddenAspect:UntrustedLayoutScriptExecution}} || {{apiname|UntrustedLayoutScriptExecution}} || || <section begin=UntrustedLayoutScriptExecution/>Restricts execution of layout scripts (eg. OnSizeChanged) for this object. Propagates to any children of this object, and anything anchored to to this object.<section end=UntrustedLayoutScriptExecution/>
+|-
+| 0x10 || {{tlydocicon|s:ForbiddenAspect:EventRegistrations}} || {{apiname|EventRegistrations}} || || <section begin=EventRegistrations/>Restricts querying or modifying registered script events for this object.<section end=EventRegistrations/>
+|-
+| 0x20 || {{tlydocicon|s:ForbiddenAspect:AlwaysPropagateInput}} || {{apiname|AlwaysPropagateInput}} || || <section begin=AlwaysPropagateInput/>Forces propagation of mouse and keypress input for this object. Propagates to any children.<section end=AlwaysPropagateInput/>
+|-
+| 0x40 || {{tlydocicon|s:ForbiddenAspect:ScriptedInput}} || {{apiname|ScriptedInput}} || || <section begin=ScriptedInput/>Restricts APIs that trigger synthetic input interactions on objects from Lua scripts.<section end=ScriptedInput/>
+|-
+| 0x80 || {{tlydocicon|s:ForbiddenAspect:QueryFocus}} || {{apiname|QueryFocus}} || || <section begin=QueryFocus/>Restricts APIs that query input focus state.<section end=QueryFocus/>
+|-
+| 0x100 || {{tlydocicon|s:ForbiddenAspect:ChangeAnimationTarget}} || {{apiname|ChangeAnimationTarget}} || || <section begin=ChangeAnimationTarget/>Restricts APIs that can change the target object of an animation.<section end=ChangeAnimationTarget/>
+|-
+| 0x200 || {{tlydocicon|s:ForbiddenAspect:RemoveSecretAspects}} || {{apiname|RemoveSecretAspects}} || || <section begin=RemoveSecretAspects/>Restricts APIs that clear secret aspects from objects.<section end=RemoveSecretAspects/>
+|-
+| 0x400 || {{tlydocicon|s:ForbiddenAspect:ChangeParent}} || {{apiname|ChangeParent}} || || <section begin=ChangeParent/>Restricts APIs that change the parent of an object.<section end=ChangeParent/>
+|-
+| 0x800 || {{tlydocicon|s:ForbiddenAspect:SetTexture}} || {{apiname|SetTexture}} || {{apiname.added|12.1.5}} || <section begin=SetTexture/>Restricts APIs that set the texture on a texture object.<section end=SetTexture/>
+|-
+| 0x1000 || {{tlydocicon|s:ForbiddenAspect:QueryRotation}} || {{apiname|QueryRotation}} || {{apiname.added|12.1.5}} || <section begin=QueryRotation/>Restricts APIs that query texture rotation.<section end=QueryRotation/>
+|-
+| 0x2000 || {{tlydocicon|s:ForbiddenAspect:QueryAnimationProgress}} || {{apiname|QueryAnimationProgress}} || {{apiname.added|12.1.5}} || <section begin=QueryAnimationProgress/>Restricts APIs that query the progress or state of animations.<section end=QueryAnimationProgress/>
+|-
+| 0x4000 || {{tlydocicon|s:ForbiddenAspect:AddAnimations}} || {{apiname|AddAnimations}} || {{apiname.added|12.1.5}} || <section begin=AddAnimations/>Restricts APIs that add animations to animation groups.<section end=AddAnimations/>
+|}</onlyinclude>

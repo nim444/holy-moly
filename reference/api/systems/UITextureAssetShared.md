@@ -1,0 +1,3 @@
+# UITextureAssetShared
+
+Type: None

@@ -1,0 +1,109 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/ScriptObject_ColorCurveObject | revision 6789707 (2026-07-31T03:34:55Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{widget}}
+The '''Color Curve''' object type allows various addon functionality with [[Secret Values|secrets]], that would otherwise not be possible, for example coloring the health bar based on the remaining health of the unit. The generic {{apitype|CurveObject}} handles other cases. Create one using {{api|C_CurveUtil.CreateColorCurve()}}.
+
+==Methods==
+{| class="darktable zebra"
+|
+<onlyinclude>: {{apilink|t=w|ColorCurveObject:AddPoint|arg=x, y}}
+: {{apilink|t=w|ColorCurveObject:ClearPoints}}
+: {{apilink|t=w|ColorCurveObject:Copy|ret=curve}}
+: {{apilink|t=w|ColorCurveObject:Evaluate|arg=x|ret=y}}
+: {{apilink|t=w|ColorCurveObject:EvaluateUnpacked|arg=x|ret=yR, yG, yB, yA}}
+: {{apilink|t=w|ColorCurveObject:GetPoint|arg=index|ret=point}}
+: {{apilink|t=w|ColorCurveObject:GetPointCount|ret=count}}
+: {{apilink|t=w|ColorCurveObject:GetPoints|ret=point}}
+: {{apilink|t=w|ColorCurveObject:RemovePoint|arg=index}}
+: {{apilink|t=w|ColorCurveObject:SetPoints|arg=point}}
+: {{apilink|t=w|ColorCurveObject:SetToDefaults}}</onlyinclude>
+|-
+| {{:ScriptObject_CurveObjectBase}}
+|}
+
+==Used by==
+{| class="darktable zebra"
+|
+''ColorCurveObject''
+: {{apilink|t=Function|C_CurveUtil.CreateColorCurve|ret=#curve}}
+: {{apilink|t=Function|C_UnitAuras.GetAuraDispelTypeColor|arg=auraInstanceUnit, auraInstanceID, #curve|ret=dispelTypeColor}}
+: {{apilink|t=Function|ColorCurveObject:Copy|ret=#curve}}
+|-
+|
+''CurveObjectBase''
+: {{apilink|t=Function|UnitHealthPercent|arg=unit [, usePredicted [, #curve]]|ret=result}}
+: {{apilink|t=Function|UnitPowerPercent|arg=unitToken [, powerType [, unmodified [, #curve]]]|ret=result}}
+: {{apilink|t=Function|DurationObject:EvaluateElapsedDuration|arg=#curve [, modifier]|ret=result}}
+: {{apilink|t=Function|DurationObject:EvaluateElapsedPercent|arg=#curve [, modifier]|ret=result}}
+: {{apilink|t=Function|DurationObject:EvaluateRemainingDuration|arg=#curve [, modifier]|ret=result}}
+: {{apilink|t=Function|DurationObject:EvaluateRemainingPercent|arg=#curve [, modifier]|ret=result}}
+: {{apilink|t=Function|DurationObject:EvaluateTotalDuration|arg=#curve [, modifier]|ret=result}}
+: {{apilink|t=Function|UnitHealPredictionCalculator:EvaluateCurrentHealthPercent|arg=#curve|ret=result}}
+: {{apilink|t=Function|UnitHealPredictionCalculator:EvaluateMissingHealthPercent|arg=#curve|ret=result}}
+|}
+
+==Example==
+The reference example.
+<syntaxhighlight lang="lua" line=1>
+-- The following example creates a color curve that when evaluated will
+-- produce a red color between [0 and 30%) health, yellow between [30 and 70%)
+-- health, and green above that.
+--
+-- We use a "Step" curve type here to disable interpolation between colors
+-- based on the percentage. If no type is explicitly configured, the default
+-- is to perform Linear interpolation (which is applied individually per color
+-- channel).
+--
+-- AddPoint takes an 'x' and 'y' value; the 'x' should be a percentage scaled
+-- between [0-1] and the 'y' should be a ColorMixin structure. Curves support
+-- a maximum of 256 points.
+
+local curve = C_CurveUtil.CreateColorCurve();
+curve:SetType(Enum.LuaCurveType.Step);
+curve:AddPoint(0.0, CreateColor(1, 0, 0, 1));
+curve:AddPoint(0.3, CreateColor(1, 1, 0, 1));
+curve:AddPoint(0.7, CreateColor(0, 1, 0, 1));
+
+-- Alternatively, there's a SetPoints API which takes a vector of point
+-- structures:
+
+-- curve:SetPoints({ { x = 0, y = CreateColor(...) }, ... });
+
+-- To evaluate the curve and get a unit health color out of it, use the new
+-- UnitHealthPercent API:
+
+local usePredicted = true;
+local color = UnitHealthPercent("target", usePredicted, curve);
+statusBar:GetStatusBarTexture():SetVertexColor(color:GetRGB());
+</syntaxhighlight>
+
+Full example with an updating statusbar for yourself; uses linear interpolation.
+<syntaxhighlight lang="lua" line=1>
+local curve = C_CurveUtil.CreateColorCurve()
+curve:SetType(Enum.LuaCurveType.Linear)
+curve:AddPoint(0.0, CreateColor(1, 0, 0))
+curve:AddPoint(0.3, CreateColor(1, 1, 0))
+curve:AddPoint(0.7, CreateColor(0, 1, 0))
+
+local statusBar = CreateFrame("StatusBar", nil, UIParent)
+statusBar:SetPoint("CENTER", -150, -50)
+statusBar:SetSize(144, 17)
+statusBar:SetStatusBarTexture("Interface/TargetingFrame/UI-StatusBar")
+statusBar:SetMinMaxValues(0, 1)
+
+local function OnEvent(self, event, unit)
+	local usePredicted = true
+	local color = UnitHealthPercent(unit, usePredicted, curve)
+	local value = UnitHealthPercent(unit, usePredicted, CurveConstants.ZeroToOne)
+	statusBar:GetStatusBarTexture():SetVertexColor(color:GetRGB())
+	statusBar:SetValue(value)
+	print(format("%s, health=%.2f, r=%.2f, g=%.2f, b=%.2f", unit, value, color:GetRGB()))
+end
+
+local f = CreateFrame("Frame")
+f:RegisterUnitEvent("UNIT_HEALTH", "player")
+f:SetScript("OnEvent", OnEvent)
+</syntaxhighlight>
+[[File:ScriptObject_ColorCurveObject_01.mp4|class=notpageimage]]
+
+==Patch changes==
+* {{Patch 12.0.0|note=Added.}}

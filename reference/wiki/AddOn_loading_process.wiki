@@ -1,0 +1,114 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/AddOn_loading_process | revision 6794291 (2026-08-04T10:18:53Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{Uitech}}
+This page details how AddOns load and unload, including the order when information becomes available such as SavedVariables and character details.
+
+==AddOn loading order==
+{{main|TOC format}}
+Blizzard's AddOns usually load first (the native UI), followed by custom AddOns in alphabetical order.  However, [[.toc]] directives can override this behaviour (e.g. <code>LoadOnDemand</code> or <code>LoadWith</code>).
+
+Within an AddOn:
+* [[XML]] and [[Lua]] files load sequentially as listed in the [[.toc]] file, and also when reaching {{api|t=x|Include}} or {{api|t=x|Script}} tags in XML.
+* By default, [[Saving variables between game sessions|Saved variables]] load after the last file listed in the TOC. This can be reconfigured by the [[TOC format#LoadSavedVariablesFirst|LoadSavedVariablesFirst]] directive to instead be loaded before all files in an addon.
+* Finally, {{api|t=e|ADDON_LOADED}} fires to indicate the AddOn has finished loading.  This is the earliest time for an AddOn to read its saved variables.
+
+==Events during login==
+AddOns load in parallel to the login screen, but can register for events to access information as it becomes available.  However, LoadOnDemand AddOns might trigger part-way or after all steps have finished:
+
+
+<strong class="apialt">Normal sequence:</strong>
+# {{api|t=e|ADDON_LOADED: addOnName}}
+#* Fires when each AddOn finishes loading, including all files and saved variables.
+#* Confirm which AddOn loaded using the first argument (in case a LoadOnDemand AddOn loaded in parallel), access saved variables, and deregister from ADDON_LOADED to avoid repeated callbacks.
+# {{api|t=e|PLAYER_LOGIN}}
+#* Fires during the loading screen when logging in or reloading, before the first {{api|t=e|PLAYER_ENTERING_WORLD}}. Most information about the game world is available to the UI.
+#* Finish any one-time initialization and frame placement, so they are in place when the load screen disappears.
+# {{api|t=e|PLAYER_ENTERING_WORLD: isInitialLogin, isReloadingUi}}
+#* Fires during any loading screen including logging in, reloading or entering an instance.  The first time happens after {{api|t=e|PLAYER_LOGIN}}.  If this is a reload, talent information is also available.
+#* Finish any reoccuring (ie, instance-dependent) initialization and frame placement, so they are in place when the load screen disappears.
+# {{api|t=e|PLAYER_REGEN_DISABLED}}
+#* Fires when the player is entering combat lockdown.  If the player is in combat while reloading, it will follow {{api|t=e|PLAYER_ENTERING_WORLD}}.
+#* Finish any outstanding modifications to secure frames, as they are unalterable during combat lockdown.
+# {{api|t=e|SPELLS_CHANGED}}
+#* Fires when spells in the spellbook is populated, and again when it changes.  Currently, this event fires after the preceeding events (but it was not always this way).
+#* Update any pertinent non-secure frames.
+
+
+;<span class="apialt">Error condition:</span>
+: {{api|t=e|SAVED_VARIABLES_TOO_LARGE: addOnName}}
+:* Fires when the client runs out of memory while attempting to load saved variables, after {{api|t=e|ADDON_LOADED}}.<ref name="SAVED_VARIABLES_TOO_LARGE">{{ref web|title=Patch 5.4 Addon Changes - Saved Variables|url=http://us.battle.net/wow/en/forum/topic/9362996672|archiveurl=https://web.archive.org/web/20131208192601/http://us.battle.net/wow/en/forum/topic/9362996672|date=20130624|author={{Blizz}}[[Crithto]]}}</ref>
+:* Usually there is no further action; the client displays a [https://www.townlong-yak.com/framexml/live/go/StaticPopupDialogs.SAVED_VARIABLES_TOO_LARGE popup] informing the user of the error.
+
+==Events during logout==
+#{{api|t=e|PLAYER_LEAVING_WORLD}}
+#* Does not imply logout, as it may preceed another loading screen (instances, continents, etc.).
+#{{api|t=e|PLAYER_LOGOUT}}
+#* Last chance to modify SavedVariables before AddOns unload.{{fact}}
+#{{api|t=e|ADDONS_UNLOADING}}
+#* All AddOns commit SavedVariables prior to reloading, quitting or logging off.  Called once only, rather than for each AddOn.  This does not occur during a crash or Alt-F4.{{fact}}
+
+==Example==
+<span style="font-size: 1.6em">LoadingOrder.toc</span>
+ ##Interface: {{API LatestInterface}}
+ ##Title: Loading Order Demo
+ ##SavedVariables: LoadingOrderSavedVar
+ file1.lua
+ file2.xml
+ file3.lua
+<span style="font-size: 1.6em">file1.lua</span>
+<syntaxhighlight lang="lua">
+print("This loads first")
+</syntaxhighlight>
+<span style="font-size: 1.6em">file2.xml</span>
+<syntaxhighlight lang="xml">
+ <Ui>
+  <Frame name="TemplateFrame" virtual="true">
+    <Frames><Frame><Scripts><OnLoad>print("Inherited elements of the frame are processed first.") </OnLoad></Scripts></Frame></Frames>
+  </Frame>
+  <Frame inherits="TemplateFrame">
+   <Frames>
+    <Frame>
+     <Scripts><OnLoad>print("First child frame's OnLoad fires first")</OnLoad></Scripts>
+    </Frame>
+    <Frame>
+     <Scripts><OnLoad>print("Second child frame's OnLoad fires second")</OnLoad></Scripts>
+    </Frame>
+    <Scripts><OnLoad>print("Parent frame's OnLoad fires after its children's.")</OnLoad></Scripts>
+   </Frames>
+  </Frame>
+  <Script file="file2.5.lua"/>
+</Ui>
+</syntaxhighlight>
+<span style="font-size: 1.6em">file2.5.lua</span>
+<syntaxhighlight lang="lua">
+print("Files included in XML are executed as they are encountered")
+</syntaxhighlight>
+<span style="font-size: 1.6em">file3.lua</span>
+<syntaxhighlight lang="lua">
+LoadingOrderSavedVar = 0  -- default value until ADDON_LOADED
+print("The last file has loaded.")
+
+local frame = CreateFrame("Frame")
+frame:RegisterFrame("ADDON_LOADED")
+frame:SetScript("OnEvent", function(self, event)
+  if event == "ADDON_LOADED" and arg1="LoadingOrder" then
+    LoadingOrderSavedVar = LoadingOrderSavedVar + 1
+    if LoadingOrderSavedVar then
+      print("The demo has now loaded .." LoadingOrderSavedVar .. " times".)
+    end
+  end
+end)
+</syntaxhighlight>
+
+==Patch changes==
+* {{Patch 11.1.5|note=Added the <code>LoadSavedVariablesFirst</code> [[.toc]] directive.}}
+* {{Patch 5.4.0|note={{api|t=e|SAVED_VARIABLES_TOO_LARGE}} added.<ref name="SAVED_VARIABLES_TOO_LARGE" />}}
+* {{Patch 5.4.0|note=Circa 5.4.0, {{api|t=e|PLAYER_ALIVE}} stopped firing during login. It now only fires when a player is resurrected (before releasing spirit) or when a player releases spirit.|comment=Previously, AddOns could use {{api|t=e|PLAYER_ALIVE}} to signal that quest and talent information were available because it was the last event to fire, even later than {{api|t=e|PLAYER_ENTERING_WORLD}}.}}
+* {{Patch 3.0.2|note={{api|t=e|VARIABLES_LOADED}} is no longer a reliable part of the addon loading process.  It fires in response to CVars, Keybindings and other associated "Blizzard" variables being loaded, and therefore may happen after {{api|t=e|PLAYER_ENTERING_WORLD}}.|comment=The event remains useful to override positioning data stored in layout-cache.txt.}}
+
+==See also==
+* [[Handling events]] for information on how to sign up to receive event notifications
+
+{{apinavbox|AddOn}}
+
+==References==
+{{Reflist}}

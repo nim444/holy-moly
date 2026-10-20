@@ -1,0 +1,114 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Warcraft_Wiki%3AInterface_customization | revision 6852653 (2026-08-29T17:18:12Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+__NOTOC__
+<div>
+{| width="75%" border="0" cellpadding="4px" cellspacing="2px" style="text-align:center;"
+|- align="center" bgcolor="#121212"
+! width="50%" | '''What are AddOns?'''
+! width="50%" | '''How do I install AddOns?'''
+|- valign="top"
+| [[AddOn]]s are [[Lua]]/XML files that can modify the WoW [[User Interface]].
+| You can [[AddOn#Installing_an_addon|install]] an addon by extracting its folder(s) into the addons directory:
+<code>World of Warcraft\_retail_\Interface\AddOns</code>
+|}
+{| width="75%" border="0" cellpadding="4px" cellspacing="2px" style="text-align:center;"
+|- align="center" bgcolor="#121212"
+! width="50%" | '''How do I develop AddOns?'''
+! width="50%" | '''Where can I get AddOns?'''
+|- valign="top"
+| Start with [[Create a WoW AddOn in 15 Minutes]].
+| They can be downloaded from [https://www.curseforge.com/wow/addons CurseForge] and [https://www.wowinterface.com/addons.php WoWInterface] or one of the [https://ogri-la.github.io/wow-addon-managers/ addon updater] clients.
+|}
+</div>
+
+== Interface documentation ==
+[[File:Interface Customization logo.png|right|Interface customization]]
+<ul class=side-by-side><li>
+<h4>API Reference</h4>
+* [[World of Warcraft API|Global API]] · [[Lua functions|Lua API]]
+** [[Widget API]] · [[ScriptObject API]] · [[Widget_script_handlers|Script Types]]
+** [[Events]] · [[CVars]] · [[API change summaries|API changes]]
+* [[XML_user_interface|XML overview]] · [[XML schema]]
+* [[Macro commands]] · [[Macro conditionals]] &nbsp; &nbsp; &nbsp; &nbsp; 
+
+<h4>Technical Details</h4>
+
+* [[TOC format]]
+* [[UnitId]] · [[GUID]]
+* [[COMBAT_LOG_EVENT|Combat Log]]
+* [[UI escape sequences]] · [[Hyperlinks]]
+* [[Object security]]
+* [[Secure Execution and Tainting]]
+** [[SecureTemplates]] · [[SecureHandlers]]
+** [https://www.townlong-yak.com/taint.log/about <s>About taint</s>] · [https://www.wowinterface.com/forums/showthread.php?t=58021#5 How to deal with taint]
+
+<h4>Development Resources</h4>
+* [[Viewing Blizzard's interface code]]
+** [https://github.com/Gethe/wow-ui-source wow-ui-source]
+** [https://github.com/Ketho/BlizzardInterfaceResources BlizzardInterfaceResources]
+Townlong Yak
+* [https://www.townlong-yak.com/framexml/live FrameXML] · [https://www.townlong-yak.com/framexml/live/Blizzard_APIDocumentation API Documentation]
+* [https://www.townlong-yak.com/globe/ Globe] · [https://www.townlong-yak.com/globe/wut/ who uses that?]
+[[wago.io|wago.tools]]
+* [https://wago.tools/files File search] · [https://wago.tools/db2 DBC Browser]
+wowprogramming.com
+* [https://wowprogramming.com/ Website] · [https://books.google.com/books?id=tOSDV71ND_0C 2nd Edition Book]
+
+<h4>Development Tools</h4>
+* Language Server: [https://marketplace.visualstudio.com/items?itemName=TradeSkillMaster.wowlua-ls WoW Lua Language Server]
+* VS Code: [https://marketplace.visualstudio.com/items?itemName=sumneko.lua LuaLS Language Server] + [https://marketplace.visualstudio.com/items?itemName=ketho.wow-api WoW API Extension]
+* IntelliJ IDEA [https://github.com/Ellypse/IntelliJ-IDEA-Lua-IDE-WoW-API EmmyLua WoW API]
+* Sublime Text [https://packagecontrol.io/packages/WoWDevelopment WoWDevelopment]
+* WeakAuras Wiki [https://github.com/WeakAuras/WeakAuras2/wiki/Lua-Dev-Environment Lua Dev Environment]
+</li><li>
+<h4>Tutorials ([[HOWTOs]])</h4>
+# [[Introduction to Lua]]
+# [[Create a WoW AddOn in 15 Minutes]]
+# [[Ace3 for Dummies]]
+# [[Using the BigWigs Packager with GitHub Actions]]
+YouTube
+: [https://www.youtube.com/playlist?list=PL3wt7cLYn4N-3D3PTTUZBM2t1exFmoA2G Mayron: Creating WoW AddOns]
+: [https://www.youtube.com/playlist?list=PLtKjv92L0ihCEwnh3jNifgGaZ6KxKV9AW Paul Halliday: World of Warcraft AddOn Development]
+
+<h4>AddOn Features</h4>
+* [[Handling events]]
+* [[Creating a slash command]]
+* [[Saving variables between game sessions]]
+* [[Using the Interface Options Addons panel]]
+* [[Using UIDropDownMenu]]
+* [[Hooking functions]]
+* [[Localizing an addon]]
+
+<h4>Developer Communities</h4>
+Discord
+* [https://discord.gg/sVQCHr5 WoWUIDev]
+* [https://discord.gg/sXy46yZ WoW AddOns;]
+
+Forums
+* [https://www.wowinterface.com/forums/ WoWInterface]
+* [https://www.reddit.com/r/wowaddons/ r/wowaddons]
+* [https://us.forums.blizzard.com/en/wow/c/guides/ui-macro/35 UI and Macro forums] (US)
+* [https://eu.forums.blizzard.com/en/wow/c/guides/interface-and-macros/239 UI and Macro forums] (EU)
+</li></ul>
+
+== Categories ==
+* [[:Category:Interface customization]]
+* [[:Category:UI technical details]]
+* [[:Category:HOWTOs]]
+* [[:Category:API types]]
+
+* [[:Category:Development Help AddOns]]
+* [[:Category:AddOns]]
+* [[:Category:Function Libraries]]
+
+== Things you can help out with ==
+* Before editing API pages, please read [[Project:How to edit API pages|the relevant guidelines]].
+* Fill out all those red links in [[World of Warcraft API]]! &nbsp; (though pick in order of likelihood of being useful). [[Viewing Blizzard's interface code|Looking at the FrameXML]] code to find out how the functions are being used is good way to begin. Please do not create stubs if you are not adding new and useful facts - we prefer red links over stubs with no additional information.
+* Scan [[:Category:API stubs]] for unfinished pages!
+* Take a look in [[:Category:Votes for deleting]] and look for API pages.
+* Help convert old pages to the [[Help:API Function articles]] style!
+<!-- outdated pages
+* [[User defined functions]]
+* [[Lua editors|Lua and XML editing software]]
+-->
+
+[[Category:Interface customization| ]]

@@ -1,0 +1,3 @@
+# SharedTraitsEnums
+
+Type: None

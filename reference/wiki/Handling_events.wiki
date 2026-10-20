@@ -1,0 +1,121 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Handling_events | revision 493727 (2023-09-22T17:27:12Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{UIHowTo}}
+Events are messages sent by the WoW client to UI code (OnEvent script handlers of Frame derivatives), mostly in reaction to things occurring in the game world. To process events, an addon needs to create an event handler and register it for the events it wishes to receive.
+
+== Setting up an event handler ==
+Events are sent to Frame-derived [[Widget API|widgets]]; an add-on needs to create a frame if it does not already own one that can be used for the purpose of handling events. Frames may be created in Lua using the [[API_CreateFrame|CreateFrame]] function; or constructed in XML (using the <Frame> tag).
+
+Once a frame has been created, its OnEvent handler must be set to a function that would handle the event on behalf of the addon. The OnEvent script handler may be set using the Lua frame:[[API_Frame_SetScript|SetScript]]() function; or constructed in XML (using <Scripts><OnEvent>function body</OnEvent></Scripts>). The OnEvent handler function receives at least two arguments: 
+# self, a reference to the frame to which the script handler belongs
+# event, the name of the event being fired
+# The remaining event arguments are placed within the vararg expression (...). You can extract variables from the vararg expression by simply assigning it to your local variables: <code>local arg1, arg2, arg3 = ...;</code>
+The addon's OnEvent script handler function should either handle the event, or call another addon function to handle the event.
+
+In order to receive event notifications, the event handler frame needs to be registered for events the addon needs to handle; use frame:[[API_Frame_RegisterEvent|RegisterEvent]]("eventName") to achieve this. The RegisterEvent function can can be called at any time after the frame's creation; the OnLoad script handler is a convenient location to register for the desired events when using XML.
+
+If you no longer wish to receive event notifications for a particular event, use the frame:[[API_Frame_UnregisterEvent|UnregisterEvent]]() function. If you wish to disable all event notifications currently delivered to a frame, use the frame:[[API_Frame_UnregisterAllEvents|UnregisterAllEvents]]().
+
+== Examples ==
+===Hello World===
+The two implementations below are functionally identical: they print "Hello World! Hello PLAYER_ENTERING_WORLD" to the default chat frame when the character zones into the world. Note that the event variable is implicit in the XML OnEvent handler: it is supplied by the OnEvent closure signature.
+
+'''Using XML'''
+<syntaxhighlight lang="xml">
+<Ui>
+  <Frame name="FooAddonFrame">
+    <Scripts>
+      <OnLoad> self:RegisterEvent("PLAYER_ENTERING_WORLD"); </OnLoad>
+      <OnEvent> print("Hello World! Hello " .. event); </OnEvent>
+    </Scripts>
+  </Frame>
+</Ui>
+</syntaxhighlight>
+
+'''Using Lua'''
+<syntaxhighlight lang="lua">
+local frame = CreateFrame("FRAME", "FooAddonFrame");
+frame:RegisterEvent("PLAYER_ENTERING_WORLD");
+local function eventHandler(self, event, ...)
+  print("Hello World! Hello " .. event);
+end
+frame:SetScript("OnEvent", eventHandler);
+</syntaxhighlight>
+
+=== XML-Specific ===
+You may bind an already declared Lua function to the OnEvent handler in XML directly, rather than creating another function by providing a function body within the <OnEvent></OnEvent> tags. Doing so will save you memory:
+
+'''FooAddOn.lua'''
+<syntaxhighlight lang="lua">
+function FooHandler_OnEvent(self, event, ...)
+  -- insert event handling code here
+end
+</syntaxhighlight>
+
+'''FooAddOn.xml'''
+<syntaxhighlight lang="xml">
+<Ui>
+  <Script file="FooAddon.lua"/>
+  <Frame name="FooHandler">
+    <Scripts>
+      <OnEvent function="FooHandler_OnEvent"/>
+    </Scripts>
+  </Frame>
+</Ui>
+</syntaxhighlight>
+
+=== Lua-specific ===
+If your frame registers a large number of events, you could reduce the required number of if clauses, and generally simplify your design by doing:
+<syntaxhighlight lang="lua">
+local frame, events = CreateFrame("Frame"), {};
+function events:PLAYER_ENTERING_WORLD(...)
+  -- handle PLAYER_ENTERING_WORLD here
+end
+function events:PLAYER_LEAVING_WORLD(...)
+  -- handle PLAYER_LEAVING_WORLD here
+end
+frame:SetScript("OnEvent", function(self, event, ...)
+  events[event](self, ...); -- call one of the functions above
+end);
+for k, v in pairs(events) do
+  frame:RegisterEvent(k); -- Register all events for which handlers have been defined
+end
+</syntaxhighlight>
+Note that in the case of the events:XXX functions above, the variable self, implicitly defined by using the function table:functionName notation, will point to the frame handling the event rather than the events table.
+
+=== The vararg expression ===
+The vararg expression (...) may contain additional arguments supplied by the event. Arguments contained in ... can be read by simply assigning them to other variables, possibly using the [[API_select|select]] function to skip forward to a specific argument in the list.
+
+Consider the example of handling [[API_COMBAT_LOG_EVENT|COMBAT_LOG_EVENT]]:
+<syntaxhighlight lang="lua">
+function eventHandler(self, event, ...)
+  if event == "COMBAT_LOG_EVENT" then
+    local timestamp, combatEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = ...; -- Those arguments appear for all combat event variants.
+    local eventPrefix, eventSuffix = combatEvent:match("^(.-)_?([^_]*)$");
+    if eventSuffix == "DAMAGE" then
+      -- Something dealt damage. The last 9 arguments in ... describe how much damage was dealt.
+      -- To extract those, we can use the select function:
+      local numArgumentsInVarArg = select("#", ...)
+      local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = select(numArgumentsInVarArg - 8, ...);
+      -- Do something with the damage details ... 
+      if eventPrefix == "RANGE" or eventPrefix:match("^SPELL") then
+        -- The first three arguments for these prefixes (appearing after the 11 common to all COMBAT_LOG_EVENTs) 
+        --  describe the spell or ability dealing damage. Extract these using select:
+        local spellId, spellName, spellSchool = select(12, ...); -- Everything from 12th argument in ... onward
+        -- Do something with the spell details ...
+      end
+    end
+  end
+end
+</syntaxhighlight>
+
+== Notes ==
+* The global this, event, and argX variables have been removed in [[Patch 4.0.1/API changes|Patch 4.0.1]]. Instead, use the arguments passed to the OnEvent script handler.
+
+== Relevant API ==
+* [[API_CreateFrame|CreateFrame]]("widgetType"[, "name"[, parent[, "inherits"]]])
+* frame:[[API_ScriptRegion_SetScript|SetScript]]("handlerType", func)
+* frame:[[API_ScriptRegion_HookScript|HookScript]]("handlerType", func)
+* frame:[[API_Frame_RegisterEvent|RegisterEvent]]("eventName") (and possibly frame:[[API_Frame_RegisterAllEvents|RegisterAllEvents]]() )
+* frame:[[API_Frame_UnregisterEvent|UnregisterEvent]]("eventName") (and possibly frame:[[API_Frame_UnregisterAllEvents|UnregisterAllEvents]]() )
+* frame:[[API_Frame_RegisterUnitEvent|RegisterUnitEvent]]("eventName", "unit1"[, "unit2"])
+* [[Events (API)]], a listing of events you may subscribe to.

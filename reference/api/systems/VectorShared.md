@@ -1,0 +1,3 @@
+# VectorShared
+
+Type: None

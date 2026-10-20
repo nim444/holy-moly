@@ -1,0 +1,3 @@
+# SharedScriptObjectNamePlateFrame
+
+Type: None

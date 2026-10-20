@@ -1,0 +1,36 @@
+# SecretPredicates
+
+Type: None
+
+## Preconditions
+
+- `RequiresComparableUnitTokens` (FailureMode=ReturnNothing)
+- `RequiresDeclassifiedUnitIdentity` (FailureMode=ReturnWithError)
+- `RequiresFontStringTextAccess` (FailureMode=ReturnNothing)
+- `RequiresNonSecretAura` ()
+- `RequiresScriptObjectAlphaAccess` (FailureMode=ReturnWithError)
+- `RequiresScriptObjectDesaturationAccess` (FailureMode=ReturnWithError)
+- `RequiresStatusBarDesaturationAccess` (FailureMode=ReturnWithError)
+- `RequiresUnitAuraAccess` (FailureMode=Error)
+- `RequiresUnitIdentityAccess` (FailureMode=ReturnWithError)
+- `SecretInActivePvPMatch` ()
+- `SecretInChatMessagingLockdown` ()
+- `SecretOnRestrictedMaps` ()
+- `SecretWhenAnchoringSecret` ()
+- `SecretWhenUnitAuraRestricted` ()
+- `SecretWhenAurasRestricted` ()
+- `SecretWhenCooldownsRestricted` ()
+- `SecretWhenInCombat` ()
+- `SecretWhenLossOfControlInfoRestricted` ()
+- `SecretWhenTotemSlotSecret` ()
+- `SecretWhenUnitSpellCastRestricted` ()
+- `SecretWhenUnitComparisonRestricted` ()
+- `SecretWhenUnitHealthMaxRestricted` ()
+- `SecretWhenUnitIdentityRestricted` ()
+- `SecretWhenUnitNameIdentityRestricted` ()
+- `SecretWhenUnitPossessionRestricted` ()
+- `SecretWhenUnitPowerMaxRestricted` ()
+- `SecretWhenUnitPowerRestricted` ()
+- `SecretWhenUnitStatsRestricted` ()
+- `SecretWhenUnitThreatStateRestricted` ()
+- `SecretWhenUnitThreatValuesRestricted` ()

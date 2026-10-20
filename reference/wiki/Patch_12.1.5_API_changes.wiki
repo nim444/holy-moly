@@ -1,0 +1,363 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Patch_12.1.5/API_changes | revision 6919763 (2026-10-16T22:38:41Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{apichanges|prev=12.1.0|12.1.5|next=12.1.7}} {{#description2:12.1.5 (69952) Sep 21 2026}}
+
+==Resources==
+* TOC: <code>120105</code>
+* <span class="blizztext">Official API patch notes:</span> [[{{PAGENAME}}/notes|Midnight 12.1.5 PTR Changes]]
+* Official development notes: [https://us.forums.blizzard.com/en/wow/t/midnight-1215-ptr-development-notes/2344395 Midnight: 12.1.5 PTR Development Notes]
+* Diffs: [https://github.com/Gethe/wow-ui-source/compare/12.1.0..12.1.5 wow-ui-source], [https://github.com/Ketho/BlizzardInterfaceResources/compare/12.1.0...12.1.5 BlizzardInterfaceResources]
+
+==Blue posts==
+{{api.hiddensection}}
+<details>
+<summary>Official patch notes</summary>
+{{:{{PAGENAME}}/notes}}
+</details>
+
+==Consolidated changes==
+: <font color="pink">12.1.0 (69587)</font> &rarr; <font color="lightgreen">12.1.5 (69952)</font> Sep 21 2026
+
+===Global API===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-global-c"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(82)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(4)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-global-c"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=a|C_ActionBar.IsMacroActionWithShowTooltip}}
+: {{api|t=a|C_AuraContainerUtil.ProcessCustomAuraButtonCasterNameOptions}}
+: {{api|t=a|C_Intl.CompareStrings}}
+: {{api|t=a|C_Intl.CreateLocaleContext}}
+: {{api|t=a|C_Intl.FindBreaks}}
+: {{api|t=a|C_Intl.FindStringMatches}}
+: {{api|t=a|C_Intl.FoldCase}}
+: {{api|t=a|C_Intl.FormatCurrency}}
+: {{api|t=a|C_Intl.FormatDateTime}}
+: {{api|t=a|C_Intl.FormatDate}}
+: {{api|t=a|C_Intl.FormatNumber}}
+: {{api|t=a|C_Intl.FormatTime}}
+: {{api|t=a|C_Intl.GetCharacterProperties}}
+: {{api|t=a|C_Intl.GetCurrencyFractionDigits}}
+: {{api|t=a|C_Intl.GetCurrencyName}}
+: {{api|t=a|C_Intl.GetCurrentLocale}}
+: {{api|t=a|C_Intl.GetDisplayName}}
+: {{api|t=a|C_Intl.GetSortKey}}
+: {{api|t=a|C_Intl.IsNormalized}}
+: {{api|t=a|C_Intl.Length}}
+: {{api|t=a|C_Intl.Normalize}}
+: {{api|t=a|C_Intl.ParseCurrency}}
+: {{api|t=a|C_Intl.ParseNumber}}
+: {{api|t=a|C_Intl.SelectPlural}}
+: {{api|t=a|C_Intl.ToLower}}
+: {{api|t=a|C_Intl.ToTitle}}
+: {{api|t=a|C_Intl.ToUpper}}
+: {{api|t=a|C_Intl.TransformLocale}}
+: {{api|t=a|C_Intl.Transliterate}}
+: {{api|t=a|C_LFGInfo.GetActiveLFGDungeonName}}
+: {{api|t=a|C_PvP.GetRandomTrainingGroundArenaRewards}}
+: {{api|t=a|C_PvP.GetRandomTrainingGroundBGRewards}}
+: {{api|t=a|C_PvP.HasRandomTrainingGroundArenaWinToday}}
+: {{api|t=a|C_PvP.HasRandomTrainingGroundBGWinToday}}
+: {{api|t=a|C_PvP.IsTrainingGroundsArena}}
+: {{api|t=a|C_PvP.IsTrainingGroundsBG}}
+: {{api|t=a|C_PvP.JoinRandomTrainingGroundBG}}
+: {{api|t=a|C_Timer.NewTimedSignalMap}}
+: {{api|t=a|C_UnitAuras.GetAuraCasterGUID}}
+: {{api|t=a|C_UnitAuras.GetRefreshCarryOverDuration}} 🆕
+: {{api|t=a|C_Weather.GetCurrentWeather}}
+: {{api|t=a|Clamp}}
+: {{api|t=a|CountTable}}
+: {{api|t=a|CreateFrameWithOptions}}
+: {{api|t=a|GetKeysArray}}
+: {{api|t=a|GetScriptBucketThrottleLimits}}
+: {{api|t=a|GetTextureMetatable}}
+: {{api|t=a|GetValuesArray}}
+: {{api|t=a|Lerp}}
+: {{api|t=a|RoundToSignificantDigits}}
+: {{api|t=a|Round}}
+: {{api|t=a|Saturate}}
+: {{api|t=a|Sign}}
+: {{api|t=a|TableIsEmpty}}
+: {{api|t=a|math.clamp}}
+: {{api|t=a|math.isfinite}}
+: {{api|t=a|math.isinf}}
+: {{api|t=a|math.isnan}}
+: {{api|t=a|math.lerp}}
+: {{api|t=a|math.normalize}}
+: {{api|t=a|math.remap}}
+: {{api|t=a|math.round}}
+: {{api|t=a|math.saturate}}
+: {{api|t=a|math.sign}}
+: {{api|t=a|math.wrap}}
+: {{api|t=a|string.contains}}
+: {{api|t=a|string.endswith}}
+: {{api|t=a|string.ltrim}}
+: {{api|t=a|string.rtrim}}
+: {{api|t=a|string.startswith}}
+: {{api|t=a|tContains}}
+: {{api|t=a|tDeleteItem}}
+: {{api|t=a|tIndexOf}}
+: {{api|t=a|tUnorderedRemove}}
+: {{api|t=a|table.contains}}
+: {{api|t=a|table.getcountinfo}}
+: {{api|t=a|table.indexof}}
+: {{api|t=a|table.isempty}}
+: {{api|t=a|table.keys}}
+: {{api|t=a|table.removeunordered}}
+: {{api|t=a|table.removevalue}}
+: {{api|t=a|table.values}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=a|C_PvP.GetRandomTrainingGroundRewards}}
+: {{api|t=a|C_PvP.HasRandomTrainingGroundWinToday}}
+: {{api|t=a|C_PvP.JoinRandomTrainingGroundBattleground}}
+: {{api|t=a|C_TableUtil.FindIndexedMismatch}}
+</div>
+|}
+
+===FrameXML===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-framexml"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(29)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(15)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-framexml"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{tlygo|ChatFrameUtil.GetTabAlphas}}
+: {{tlygo|ChatFrameUtil.IsTabAlerting}}
+: {{tlygo|ChatFrameUtil.SetTabAlerting}}
+: {{tlygo|ChatFrameUtil.SetTabAlphas}}
+: {{tlygo|ChatFrameUtil.StartFlash}}
+: {{tlygo|ChatFrameUtil.StartSyncedFlash}}
+: {{tlygo|ChatFrameUtil.StopFlash}}
+: {{tlygo|CombatAudioAlertUtil.EnumeratePulseHealthPercentInfo}}
+: {{tlygo|CombatAudioAlertUtil.GetCurrentPulseHealthPercentInfo}}
+: {{tlygo|CombatAudioAlertUtil.GetPulseHealthPercentInfo}}
+: {{tlygo|CombatAudioAlertUtil.GetPulseHealthSoundKit}}
+: {{tlygo|CombatAudioAlertUtil.SetPulseHealthSoundKit}}
+: {{tlygo|CompactUnitFrame_GetOptionDispelIndicatorAnimatedBorder}}
+: {{tlygo|GenericTraitUtil.GetKnownTreeIDs}}
+: {{tlygo|GetTimeSinceLastQuestProgress}}
+: {{tlygo|HousingFramesUtil.MoveLayoutCameraFloor}}
+: {{tlygo|MarchingAnts_CreateAsChildOf}}
+: {{tlygo|MarchingAnts_CreateForTarget}}
+: {{tlygo|MarchingAnts_Create}}
+: {{tlygo|PixelUtil.SetRoundLayoutToNearestPixelRecursively}}
+: {{tlygo|QuestMapLog_GetStoryTooltip}}
+: {{tlygo|TimerUtil.CreateTimedSignalCallbackMap}}
+: {{tlygo|UnitFrameUtil.GetArenaOpponentSpecDisplayInfo}}
+: {{tlygo|UnitFrameUtil.GetUnitPvPIndicatorDisplayInfo}}
+: {{tlygo|UnitFrameUtil.GetUnitRoleIconDisplayInfo}}
+: {{tlygo|UnitFrameUtil.UpdateArenaOpponentSpecDisplayName}}
+: {{tlygo|UnitFrameUtil.UpdateArenaOpponentSpecDisplay}}
+: {{tlygo|UnitFrameUtil.UpdateUnitFrameRoleIcon}}
+: {{tlygo|UnitFrameUtil.UpdateUnitPvPIndicator}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+: {{tlygo|build=12.1.0|Clamp}}
+: {{tlygo|build=12.1.0|CountTable}}
+: {{tlygo|build=12.1.0|GetKeysArray}}
+: {{tlygo|build=12.1.0|GetValuesArray}}
+: {{tlygo|build=12.1.0|Lerp}}
+: {{tlygo|build=12.1.0|RoundToSignificantDigits}}
+: {{tlygo|build=12.1.0|Round}}
+: {{tlygo|build=12.1.0|Saturate}}
+: {{tlygo|build=12.1.0|Sign}}
+: {{tlygo|build=12.1.0|StringContains}}
+: {{tlygo|build=12.1.0|TableIsEmpty}}
+: {{tlygo|build=12.1.0|tContains}}
+: {{tlygo|build=12.1.0|tDeleteItem}}
+: {{tlygo|build=12.1.0|tIndexOf}}
+: {{tlygo|build=12.1.0|tUnorderedRemove}}
+</div>
+|}
+
+===ScriptObjects===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-scriptobject"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(30)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(0)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-scriptobject"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=w|LocaleContext:CompareStrings}}
+: {{api|t=w|LocaleContext:FindBreaks}}
+: {{api|t=w|LocaleContext:FindStringMatches}}
+: {{api|t=w|LocaleContext:FoldCase}}
+: {{api|t=w|LocaleContext:FormatCurrency}}
+: {{api|t=w|LocaleContext:FormatDate}}
+: {{api|t=w|LocaleContext:FormatDateTime}}
+: {{api|t=w|LocaleContext:FormatNumber}}
+: {{api|t=w|LocaleContext:FormatTime}}
+: {{api|t=w|LocaleContext:GetCurrencyName}}
+: {{api|t=w|LocaleContext:GetDisplayName}}
+: {{api|t=w|LocaleContext:GetLocale}}
+: {{api|t=w|LocaleContext:GetSortKey}}
+: {{api|t=w|LocaleContext:Length}}
+: {{api|t=w|LocaleContext:ParseCurrency}}
+: {{api|t=w|LocaleContext:ParseNumber}}
+: {{api|t=w|LocaleContext:SelectPlural}}
+: {{api|t=w|LocaleContext:SetLocale}}
+: {{api|t=w|LocaleContext:ToLower}}
+: {{api|t=w|LocaleContext:ToTitle}}
+: {{api|t=w|LocaleContext:ToUpper}}
+: {{api|t=w|LocaleContext:TransformLocale}}
+: {{api|t=w|TimedSignalMap:CancelAllSignals}}
+: {{api|t=w|TimedSignalMap:CancelSignal}}
+: {{api|t=w|TimedSignalMap:GetNextSignal}}
+: {{api|t=w|TimedSignalMap:GetSignalCount}}
+: {{api|t=w|TimedSignalMap:GetSignalTime}}
+: {{api|t=w|TimedSignalMap:HasSignal}}
+: {{api|t=w|TimedSignalMap:SignalAfter}}
+: {{api|t=w|TimedSignalMap:SignalAt}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+</div>
+|}
+
+===Widgets===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-widgets"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(2)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(0)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-widgets"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=w|ScriptRegion:GetRoundLayoutToNearestPixel}}
+: {{api|t=w|ScriptRegion:SetRoundLayoutToNearestPixel}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+</div>
+|}
+
+===Events===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-events"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(1)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(0)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-events"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=e|WEATHER_CHANGED}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+</div>
+|}
+
+===CVars===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-cvars"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(12)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(0)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-cvars"
+| valign="top" | <div style="margin-left:-1.5em">
+: ''{{apitooltip|type=command|name=dumpSmallAlloc|cat=4}}''
+: {{apitooltip|type=cvar|name=CAAPulsePlayerHealthPercent|default=0|scope=Account|cat=4|desc=Play a looping pulse sound once the player's health is below X percent. The pulse gets faster as health drops}}
+: {{apitooltip|type=cvar|name=CAAPulsePlayerHealthVolume|default=100|scope=Account|cat=4|desc=Volume of the player health pulse combat audio alert (0 to 100)}}
+: {{apitooltip|type=cvar|name=coordsByTenths|default=1|scope=Account|cat=4|desc=Show coordinates by tenths}}
+: {{apitooltip|type=cvar|name=maximumConnectionAttempts|default=2|cat=6|desc=Maximum number of times to try to connect to a server using QUIC before doing TCP}}
+: {{apitooltip|type=cvar|name=minimapShowPlayerCoords|default=1|scope=Account|cat=4|desc=Show player coordinates on the minimap}}
+: {{apitooltip|type=cvar|name=nameplateBottomInset|default=0.100000|cat=4|desc=The inset from the bottom (in screen percent) that nameplates are clamped to.}}
+: {{apitooltip|type=cvar|name=nameplateMotionSpeed|default=0.025000|cat=4|desc=Controls the rate at which nameplate animates into their target locations [0.0-1.0]}}
+: {{apitooltip|type=cvar|name=nameplateTopInset|default=0.080000|cat=4|desc=The inset from the top (in screen percent) that nameplates are clamped to.}}
+: {{apitooltip|type=cvar|name=raidFramesDispelIndicatorAnimatedBorder|default=0|scope=Character|cat=4|desc=When showing dispel indicators, display an animated border}}
+: {{apitooltip|type=cvar|name=tooltipShowAuraCasterNames|default=0|scope=Account|cat=4|desc=Show caster unit names in tooltips for unit auras.}}
+: {{apitooltip|type=cvar|name=winePlatformTTS|default=0|cat=4|desc=Use Windows TTS on Wine. Disabled by default as it can cause crashes.}} 🆕
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+</div>
+|}
+
+==Deprecated API==
+{{ambox|border=red|image=[[File:Spell_holy_borrowedtime.png|32px|link=]]|style=margin-left: 2em;|type=The following deprecation fallbacks have been removed.|info=''Please upgrade to the updated APIs as soon as possible.''}}
+
+{| class=darktable
+|
+'''[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedCurrencyScript/Deprecated_CurrencyScript.lua Deprecated_CurrencyScript.lua]'''
+* {{api|GetCoinIcon}} = {{api|C_CurrencyInfo.GetCoinIcon}}
+* {{api|GetCoinText}} = {{api|C_CurrencyInfo.GetCoinText}}
+* {{api|GetCoinTextureString}} = {{api|C_CurrencyInfo.GetCoinTextureString}}
+
+'''[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedGlue/Deprecated_Glue.lua Blizzard_DeprecatedGlue]'''
+* {{api|IsOnGlueScreen}} = {{api|C_Glue.IsOnGlueScreen}}
+
+'''[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedItemScript/Deprecated_ItemScript.lua Blizzard_DeprecatedItemScript]'''
+* {{api|GetItemQualityColor}} = {{api|C_Item.GetItemQualityColor}}
+* {{api|GetItemInfoInstant}} = {{api|C_Item.GetItemInfoInstant}}
+* {{api|GetItemSetInfo}} = {{api|C_Item.GetItemSetInfo}}
+* {{api|GetItemChildInfo}} = {{api|C_Item.GetItemChildInfo}}
+* {{api|DoesItemContainSpec}} = {{api|C_Item.DoesItemContainSpec}}
+* {{api|GetItemGem}} = {{api|C_Item.GetItemGem}}
+* {{api|GetItemCreationContext}} = {{api|C_Item.GetItemCreationContext}}
+* {{api|GetItemIcon}} = {{api|C_Item.GetItemIconByID}}
+* {{api|GetItemFamily}} = {{api|C_Item.GetItemFamily}}
+* {{api|GetItemSpell}} = {{api|C_Item.GetItemSpell}}
+* {{api|IsArtifactPowerItem}} = {{api|C_Item.IsArtifactPowerItem}}
+* {{api|IsCurrentItem}} = {{api|C_Item.IsCurrentItem}}
+* {{api|IsUsableItem}} = {{api|C_Item.IsUsableItem}}
+* {{api|IsHelpfulItem}} = {{api|C_Item.IsHelpfulItem}}
+* {{api|IsHarmfulItem}} = {{api|C_Item.IsHarmfulItem}}
+* {{api|IsConsumableItem}} = {{api|C_Item.IsConsumableItem}}
+* {{api|IsEquippableItem}} = {{api|C_Item.IsEquippableItem}}
+* {{api|IsEquippedItem}} = {{api|C_Item.IsEquippedItem}}
+* {{api|IsEquippedItemType}} = {{api|C_Item.IsEquippedItemType}}
+* {{api|ItemHasRange}} = {{api|C_Item.ItemHasRange}}
+* {{api|IsItemInRange}} = {{api|C_Item.IsItemInRange}}
+* {{api|GetItemClassInfo}} = {{api|C_Item.GetItemClassInfo}}
+* {{api|GetItemInventorySlotInfo}} = {{api|C_Item.GetItemInventorySlotInfo}}
+* {{api|BindEnchant}} = {{api|C_Item.BindEnchant}}
+* {{api|ActionBindsItem}} = {{api|C_Item.ActionBindsItem}}
+* {{api|ReplaceEnchant}} = {{api|C_Item.ReplaceEnchant}}
+* {{api|ReplaceTradeEnchant}} = {{api|C_Item.ReplaceTradeEnchant}}
+* {{api|ConfirmBindOnUse}} = {{api|C_Item.ConfirmBindOnUse}}
+* {{api|ConfirmOnUse}} = {{api|C_Item.ConfirmOnUse}}
+* {{api|ConfirmNoRefundOnUse}} = {{api|C_Item.ConfirmNoRefundOnUse}}
+* {{api|DropItemOnUnit}} = {{api|C_Item.DropItemOnUnit}}
+* {{api|EndBoundTradeable}} = {{api|C_Item.EndBoundTradeable}}
+* {{api|EndRefund}} = {{api|C_Item.EndRefund}}
+* {{api|GetItemInfo}} = {{api|C_Item.GetItemInfo}}
+* {{api|GetDetailedItemLevelInfo}} = {{api|C_Item.GetDetailedItemLevelInfo}}
+* {{api|GetItemSpecInfo}} = {{api|C_Item.GetItemSpecInfo}}
+* {{api|GetItemUniqueness}} = {{api|C_Item.GetItemUniqueness}}
+* {{api|GetItemCount}} = {{api|C_Item.GetItemCount}}
+* {{api|PickupItem}} = {{api|C_Item.PickupItem}}
+* {{api|GetItemSubClassInfo}} = {{api|C_Item.GetItemSubClassInfo}}
+* {{api|UseItemByName}} = {{api|C_Item.UseItemByName}}
+* {{api|EquipItemByName}} = {{api|C_Item.EquipItemByName}}
+* {{api|ReplaceTradeskillEnchant}} = {{api|C_Item.ReplaceTradeskillEnchant}}
+* {{api|GetItemCooldown}} = {{api|C_Item.GetItemCooldown}}
+* {{api|IsCorruptedItem}} = {{api|C_Item.IsCorruptedItem}}
+* {{api|IsCosmeticItem}} = {{api|C_Item.IsCosmeticItem}}
+* {{api|IsDressableItem}} = {{api|C_Item.IsDressableItem}}
+	
+'''[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedItemSocketInfo/Deprecated_ItemSocketInfo.lua Blizzard_DeprecatedItemSocketInfo]'''
+* {{api|CloseSocketInfo}} = {{api|C_ItemSocketInfo.CloseSocketInfo}}
+* {{api|GetSocketItemInfo}} = {{api|C_ItemSocketInfo.GetSocketItemInfo}}
+* {{api|GetNumSockets}} = {{api|C_ItemSocketInfo.GetNumSockets}}
+* {{api|GetExistingSocketInfo}} = {{api|C_ItemSocketInfo.GetExistingSocketInfo}}
+* {{api|GetExistingSocketLink}} = {{api|C_ItemSocketInfo.GetExistingSocketLink}}
+* {{api|GetNewSocketInfo}} = {{api|C_ItemSocketInfo.GetNewSocketInfo}}
+* {{api|GetNewSocketLink}} = {{api|C_ItemSocketInfo.GetNewSocketLink}}
+* {{api|ClickSocketButton}} = {{api|C_ItemSocketInfo.ClickSocketButton}}
+* {{api|AcceptSockets}} = {{api|C_ItemSocketInfo.AcceptSockets}}
+* {{api|GetSocketTypes}} = {{api|C_ItemSocketInfo.GetSocketTypes}}
+* {{api|GetSocketItemRefundable}} = {{api|C_ItemSocketInfo.GetSocketItemRefundable}}
+* {{api|GetSocketItemBoundTradeable}} = {{api|C_ItemSocketInfo.GetSocketItemBoundTradeable}}
+* {{api|HasBoundGemProposed}} = {{api|C_ItemSocketInfo.HasBoundGemProposed}}
+
+'''[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedLFG/Deprecated_LFG.lua Blizzard_DeprecatedLFG]'''
+* {{api|C_LFGInfo.IsPremadeGroupEnabled}} = {{api|C_LFGList.IsPremadeGroupFinderEnabled}}
+* {{api|C_LFGList.GetSearchResultMemberInfo}} = {{api|C_LFGList.GetSearchResultPlayerInfo}}
+
+'''[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedPetInfo/Deprecated_PetInfo.lua Blizzard_DeprecatedPetInfo]'''
+* {{api|PetAssistMode}} = {{api|C_PetInfo.PetAssistMode}}
+* {{api|GetPetTalentTree}} = {{api|C_PetInfo.GetPetTalentTree}}
+
+'''[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedPvpScript/Deprecated_PvpScript.lua Blizzard_DeprecatedPvpScript]'''
+* {{api|IsSubZonePVPPOI}} = {{api|C_PvP.IsSubZonePVPPOI}}
+* {{api|GetZonePVPInfo}} = {{api|C_PvP.GetZonePVPInfo}}
+* {{api|TogglePVP}} = {{api|C_PvP.TogglePVP}}
+* {{api|SetPVP}} = {{api|C_PvP.SetPVP}}
+
+'''[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedSoundScript/Deprecated_SoundScript.lua Blizzard_DeprecatedSoundScript]'''
+* {{api|PlayVocalErrorSoundID}} = {{api|C_Sound.PlayVocalErrorSound}}
+
+'''[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedTradeInfo/Deprecated_TradeInfo.lua Blizzard_DeprecatedTradeInfo]'''
+* {{api|PickupTradeMoney}} = {{api|C_TradeInfo.PickupTradeMoney}}
+|}

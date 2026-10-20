@@ -1,0 +1,194 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Lua_functions | revision 6879939 (2026-09-19T22:06:56Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{apinav}} {{wowapi|page=list}}
+World of Warcraft uses a modified version of [[Lua]] 5.1 that supports [[Secure Execution and Tainting|taint]]. Notably, operating system and file I/O libraries are not present.
+
+==Lua standard libraries==
+: [[API:assert|assert]](<span class="apiarg">value[, errormsg]</span>) - asserts a value evaluates to true. If it is, returns value, otherwise causes a Lua error to be thrown.
+: [[API:collectgarbage|collectgarbage]]() - Forces garbage collection. (Added in 1.10.1)
+: [[API:date|date]](<span class="apiarg">format, time</span>) - Returns the current date according to the user's machine.
+: [[API:difftime|difftime]](<span class="apiarg">t1, t2</span>) - Calculate the number of seconds between time t1 to time t2.
+: [[API:error|error]](<span class="apiarg">"error message",level</span>) - Throws an error with the given error message. Use pcall() (see below) to catch errors.
+: [[API:getfenv|getfenv]](<span class="apiarg">function or integer</span>) - Returns the table representing the environment of the given function or stack level.
+: [[API:getmetatable|getmetatable]](<span class="apiarg">obj, mtable</span>) - Returns the metatable of the given table or userdata object.
+: [[API:ipairs|ipairs]](<span class="apiarg">table</span>) - Returns an iterator of type integer to traverse a table.
+: [[API:loadstring|loadstring]](<span class="apiarg">"Lua code"</span>) - Parse the string as Lua code and return it as a function reference.
+: [[API:next|next]](<span class="apiarg">table, index</span>) - Returns the next key, value pair of the table, allowing you to walk over the table.
+: [[API:newproxy|newproxy]](<span class="apiarg">boolean or proxy</span>) - Creates a userdata with a sharable metatable.
+: [[API:pairs|pairs]](<span class="apiarg">table</span>) - Returns an iterator to traverse a table.
+: [[API:pcall|pcall]](<span class="apiarg">func [, ...]</span>) - Returns a boolean value indicating successful execution of func and the error message or func's results as additional values.
+: [[API:print|print]](<span class="apiarg">...</span>) {{apitag|framexml}} - Calls the current print output handler with the provided values; by default printing the values to the default chat frame.
+: [[API:select|select]](<span class="apiarg">index, list</span>) - Returns the number of items in '''list''' or a subset of the list beginning at index and running to the end of the list.
+: [[API:setfenv|setfenv]](<span class="apiarg">function or integer, table</span>) - Sets the table representing the stack frame of the given function or stack level.
+: [[API:setmetatable|setmetatable]](<span class="apiarg">table, metatable</span>) - Sets the metatable of the given table.
+: [[API:time|time]](<span class="apiarg">table</span>) - Returns time in seconds since epoch (00:00:00 Jan 1 1970)
+: [[API:type|type]](<span class="apiarg">var</span>) - Returns the type of variable as a string, "nil", "boolean", "number", "string", "table", "function", "thread" or "userdata". (The only Lua data types.)
+: [[API:unpack|unpack]](<span class="apiarg">table[, start][, end]</span>) - Returns the contents of its argument as separate values.
+: [[API:xpcall|xpcall]](<span class="apiarg">func, err [, ...]</span>) - Returns a boolean indicating successful execution of func and calls err on failure, additionally returning func's or err's results.
+: [[API:rawequal|rawequal]](<span class="apiarg">value, value</span>) - Compares two values for equality without invoking metamethods.
+: [[API:rawget|rawget]](<span class="apiarg">table, index</span>) - Gets the value of a table item without invoking metamethods.
+: [[API:rawset|rawset]](<span class="apiarg">table, index, value</span>) - Sets the value of a table item without invoking metamethods.
+: [[API:tonumber|tonumber]](<span class="apiarg">arg[, base]</span>) - Return a number if arg can be converted to number. Optional argument specifies the base to interpret the numeral. Bases other than 10 accept only unsigned integers.
+: [[API:tostring|tostring]](<span class="apiarg">arg</span>) - Convert arg to a string.
+: [[API:tostringall|tostringall]](<span class="apiarg">...</span>) {{apitag|wow}} - Converts all arguments to strings and returns them in the same order that they were passed.
+: [[API:gcinfo|gcinfo]]() {{apitag|deprecated}} - Returns the number of kB of add-on memory in use and the current garbage collection threshold (in kB). (Function gcinfo is deprecated; use <code>collectgarbage("count")</code> instead.)
+
+===Math library===
+See [http://lua-users.org/wiki/MathLibraryTutorial MathLibraryTutorial] for more info. ''Function references or aliases like <code><font color="#71D5FF">abs</font></code> for <code>math.abs</code> are marked beside the function name.''
+: {{apilink.lua|math.abs|alias=abs|arg=value|ret=absoluteValue}} - Returns the absolute value of a number.
+: {{apilink.lua|math.ceil|alias=ceil|arg=value|ret=ceilValue}} - Returns the ceiling of a number.
+: {{apilink.lua|math.clamp|alias=Clamp|arg=value, minimum, maximum|ret=clampedValue}} {{apitag|wow}} - Clamps a value to the inclusive range defined by the minimum and maximum values.
+: {{apilink.lua|math.exp|alias=exp|arg=value|ret=ex}} - Returns the value <code>e<sup>x</sup></code>.
+: {{apilink.lua|math.floor|alias=floor|arg=value|ret=floorValue}} - Returns the floor of a number.
+: {{apilink.lua|math.fmod|alias=mod|arg=x, y|ret=fmodValue}} - Returns the remainder of the division of x by y that rounds the result (quotient) towards zero.
+: {{apilink.lua|math.frexp|alias=frexp|arg=x}} - Extracts mantissa and exponent from a floating point number.
+: {{apilink.lua|math.isfinite|arg=value}} {{apitag|wow}} - Returns whether a value is finite.
+: {{apilink.lua|math.isinf|arg=value}} {{apitag|wow}} - Returns whether a value is positive or negative infinity.
+: {{apilink.lua|math.isnan|arg=value}} {{apitag|wow}} - Returns whether a value is NaN.
+: {{apilink.lua|math.ldexp|alias=ldexp|arg=value, exponent}} - Loads exponent of a floating point number.
+: {{apilink.lua|math.lerp|alias=Lerp|arg=startValue, endValue, amount}} {{apitag|wow}} - Linearly interpolates between two values.
+: {{apilink.lua|math.log|alias=log|arg=x}} - Returns the natural logarithm of x.
+: {{apilink.lua|math.log10|alias=log10|arg=x}} - Returns the base-10 logarithm of x.
+: {{apilink.lua|math.max|alias=max|arg=x, ...}} - Returns the maximum value among its arguments.
+: {{apilink.lua|math.min|alias=min|arg=x, ...}} - Returns the minimum value among its arguments.
+: {{apilink.lua|math.modf|arg=x|ret=integral, fractional}} - Returns two numbers, the integral part of x and the fractional part of x.
+: {{apilink.lua|math.normalize|arg=value, minimum, maximum}} {{apitag|wow}} - Returns the relative position of a value within a range, where the minimum maps to 0 and the maximum maps to 1.
+: {{apilink.lua|math.pow|arg=value}} - Returns <code>x<sup>y</sup></code>.
+: {{apilink.lua|math.random|alias=random|arg=&#91;&#91;lower,] upper]}} - Returns a random number (optionally bounded integer value)
+: {{apilink.lua|math.remap|arg=value, sourceMinimum, sourceMaximum, destinationMinimum, destinationMaximum}} {{apitag|wow}} - Maps a value from one range to the corresponding position in another range.
+: {{apilink.lua|math.round|alias=Round,RoundToSignificantDigits|arg=value [, decimalPlaces]}} {{apitag|wow}} - Rounds a value to the specified number of decimal places, with halfway values rounded away from zero.
+: {{apilink.lua|math.saturate|alias=Saturate|arg=value}} {{apitag|wow}} - Clamps a value to the inclusive range [0, 1].
+: {{apilink.lua|math.sign|alias=Sign|arg=value}} {{apitag|wow}} - Returns -1 for negative values, 0 for zero, and 1 for positive values.
+: {{apilink.lua|math.sqrt|alias=sqrt|arg=x}} - Returns the square root of x.
+: {{apilink.lua|math.wrap|arg=value, minimum, maximum}} {{apitag|wow}} - Wraps a value into the half-open range [minimum, maximum).
+: {{apilink.lua|fastrandom|arg=&#91;&#91;lower,] upper]}} {{apitag|wow}} - Returns a random number; faster than math.random.
+Trigonometric functions
+: {{apilink.lua|math.acos|arg=x}} - Returns the arc cosine of x (in radians).
+: {{apilink.lua|math.asin|arg=x}} - Returns the arc sine of x (in radians).
+: {{apilink.lua|math.atan|arg=x}} - Returns the arc tangent of x (in radians).
+: {{apilink.lua|math.atan2|arg=y, x}} - Returns the arc tangent of y/x (in radians), but uses the signs of both parameters to find the quadrant of the result.
+: {{apilink.lua|math.cos|arg=x}} - Returns the cosine of x (assumed to be in radians).
+: {{apilink.lua|math.cosh|arg=x}} - Returns the hyperbolic cosine of x.
+: {{apilink.lua|math.deg|alias=deg|arg=x}} - Returns the angle x (given in radians) in degrees.
+: {{apilink.lua|math.rad|alias=rad|arg=x}} - Returns the angle x (given in degrees) in radians.
+: {{apilink.lua|math.sin|arg=x}} - Returns the sine of x (assumed to be in radians).
+: {{apilink.lua|math.sinh|arg=x}} - Returns the hyperbolic sine of x.
+: {{apilink.lua|math.tan|arg=x}} - Returns the tangent of x (assumed to be in radians).
+: {{apilink.lua|math.tanh|arg=x}} - Returns the hyperbolic tangent of x.
+The below functions are degree→radian conversion wrappers. Lua's standard math library works with radians, while Blizzard's version works with degrees.<ref>https://github.com/Gethe/wow-ui-source/blob/live/Interface/AddOns/Blizzard_SharedXMLBase/Compat.lua</ref>
+: {{apilink.lua|acos|alias=math.deg(math.acos(x))}} {{apitag|wow}} - Returns the arc cosine of the value in degrees.
+: {{apilink.lua|asin|alias=math.deg(math.asin(x))}} {{apitag|wow}} - Returns the arc sine of the value in degrees.
+: {{apilink.lua|atan|alias=math.deg(math.atan(x))}} {{apitag|wow}} - Returns the arc tangent of the value in degrees.
+: {{apilink.lua|atan2|alias=math.deg(math.atan2(y, x))}} {{apitag|wow}} - Returns the arc tangent of y/x in degrees.
+: {{apilink.lua|cos|alias=math.cos(math.rad(x))}} {{apitag|wow}} - Returns the cosine of the degree value.
+: {{apilink.lua|sin|alias=math.sin(math.rad(x))}} {{apitag|wow}} - Returns the sine of the degree value.
+: {{apilink.lua|tan|alias=math.tan(math.rad(x))}} {{apitag|wow}} - Returns the tangent of the degree value.
+
+===String library===
+See [http://lua-users.org/wiki/StringLibraryTutorial StringLibraryTutorial] for more info.
+: {{apilink.lua|string.byte|alias=strbyte|arg=string [, index]}} - Returns the internal numeric code of the i-th character of string
+: {{apilink.lua|string.char|alias=strchar|arg=asciiCode [, ...]}} - Returns a string with length equal to number of arguments, with each character assigned the internal code for that argument.
+: {{apilink.lua|string.concat|alias=strconcat|arg=...}} {{apitag|wow}} - Returns a concatenation of all number/string arguments passed.
+: {{apilink.lua|string.contains|arg=str, substring}} {{apitag|wow}} - Returns true if a string contains the specified literal substring.
+: {{apilink.lua|string.endswith|arg=str, suffix}} {{apitag|wow}} - Returns true if a string ends with the specified suffix.
+: {{apilink.lua|string.find|alias=strfind|arg=string, pattern [, initpos [, plain]]}} - Look for match of pattern in string, optionally from specific location or using plain substring.
+: {{apilink.lua|string.format|alias=format|arg=formatstring [, value [, ...]]}} - Return a formatted string using values passed in.
+: {{apilink.lua|string.gfind|arg=s, pattern}} {{apitag|obsolete}} - throws an error if called, it is replaced by {{api|string.gmatch}}.
+: {{apilink.lua|string.gmatch|alias=gmatch|arg=string, pattern}} - This returns a pattern finding iterator. The iterator will search through the string passed looking for instances of the pattern you passed.
+: {{apilink.lua|string.gsub|alias=gsub|arg=string, pattern, replacement [, limitCount]}} - Globally substitute pattern for replacement in string.
+: {{apilink.lua|string.join|alias=strjoin|arg=delimiter, str1 [, ...]}} {{apitag|wow}} - Join string arguments into a single string, separated by delimiter.
+: {{apilink.lua|string.len|alias=strlen|arg=string}} - Return length of the string.
+: {{apilink.lua|string.lower|alias=strlower|arg=string}} - Return string with all upper case changed to lower case.
+: {{apilink.lua|string.ltrim|arg=str [, characters]}} {{apitag|wow}} - Returns a string with all bytes in the specified character set removed from the start.
+: {{apilink.lua|string.match|alias=strmatch|arg=string, pattern [, initpos]}} - Similar to strfind but only returns the matches, not the string positions.
+: {{apilink.lua|string.rep|alias=strrep|arg=seed, count}} - Return a string which is count copies of seed.
+: {{apilink.lua|string.reverse|alias=strrev|arg=string}} - Reverses a string.
+: {{apilink.lua|string.rtgsub|arg=s, pattern, repl [, n]}} {{apitag|framexml}} - A version of <code>string.gsub</code> which is able to be passed restricted tables.
+: {{apilink.lua|string.rtrim|arg=str [, characters]}} {{apitag|wow}} - Returns a string with all bytes in the specified character set removed from the end.
+: {{apilink.lua|string.split|alias=strsplit|arg=delimiter, string [, pieces]}} {{apitag|wow}} - Splits a string using a delimiter.
+: {{apilink.lua|string.sub|alias=strsub|arg=string, index [, endIndex]}} - Return a substring of string starting at index
+: {{apilink.lua|string.trim|alias=strtrim|arg=string [, chars]}} {{apitag|wow}} - Trim leading and trailing spaces or the characters passed to chars from string.
+: {{apilink.lua|string.upper|alias=strupper|arg=string}} - Return string with all lower case changed to upper case.
+: {{apilink.lua|strcmputf8i|arg=string, string}} {{apitag|wow}} - string comparison accounting for UTF-8 chars
+: {{apilink.lua|strlenutf8|arg=string}} {{apitag|wow}} - Returns the number of characters in a UTF8-encoded string.
+: {{apilink.lua|strsplittable|arg=delimiter, subject [, pieces]}} {{apitag|wow}} - Splits a string using a delimiter and returns an array.
+
+===Table library===
+See [http://lua-users.org/wiki/TableLibraryTutorial TableLibraryTutorial] for more info.
+<!-- Be also aware that many table functions are designed to work with tables indexed only with numerical indexes, starting with 1 and without holes (like {[1] = "foo", [3] = "bar"} --- recognize that [2] will be nil in this table). When working with any other tables behavior is not defined and might lead to unexpected results. Not being aware of this fact is one major causes for bugs in code written in Lua. -->
+: {{apilink.lua|table.concat|arg=list [, sep [, i [, j]}} - Concatenates the contents of a table to a string.
+: {{apilink.lua|table.contains|alias=tContains|arg=table [, value]}} {{apitag|wow}}
+: {{apilink.lua|table.count|alias=CountTable|arg=tbl}} {{apitag|wow}} - Returns the number of elements within a table.
+: {{apilink.lua|table.create|arg=arraySizeHint [, nodeSizeHint]}} {{apitag|wow}}
+: {{apilink.lua|table.freeze|arg=table}} {{apitag|wow}} - Marks a supplied table as frozen, preventing any modifications to its contents, or replacement of its metatable.
+: {{apilink.lua|table.getcountinfo|arg=table}} {{apitag|wow}}
+: {{apilink.lua|table.indexof|alias=tIndexOf|arg=table [, value]}} {{apitag|wow}}
+: {{apilink.lua|table.insert|alias=tinsert|arg=list [, pos], value}} - Insert value into the table at position pos (defaults to end of table).
+: {{apilink.lua|table.isempty|alias=TableIsEmpty|arg=table}} {{apitag|wow}}
+: {{apilink.lua|table.isfrozen|arg=table}} {{apitag|wow}} - Returns true if a table has been marked as frozen.
+: {{apilink.lua|table.keys|alias=GetKeysArray|arg=table}} {{apitag|wow}}
+: {{apilink.lua|table.maxn|arg=list}} - Returns the largest positive numerical index of the given table, or zero if the table has no positive numerical indices.
+: {{apilink.lua|table.remove|alias=tremove|arg=list [, pos]}} - Remove and return the table element at position pos (defaults to last entry in table).
+: {{apilink.lua|table.removemulti|arg=list [, pos [, count]]}} {{apitag|wow}} - Removes <code>count</code> elements from a table starting at index <code>pos</code>.
+: {{apilink.lua|table.removeunordered|alias=tUnorderedRemove|arg=table [, index]}} {{apitag|wow}}
+: {{apilink.lua|table.removevalue|alias=tDeleteItem|arg=table [, value]}} {{apitag|wow}}
+: {{apilink.lua|table.sort|alias=sort|arg=list [, comp]}} - Sort the elements in the table in-place, optionally using a custom comparator.
+: {{apilink.lua|table.values|alias=GetValuesArray|arg=table}} {{apitag|wow}}
+: {{apilink.lua|table.wipe|alias=wipe|arg=list}} {{apitag|wow}} - Restore the table to its initial value (like tab = {} without the garbage).
+
+: {{apilink.lua|table.foreach|alias=foreach|arg=table, function}} {{apitag|deprecated}} - Executes a function for each element in table. Deprecated, it is replaced by {{api|pairs}}.
+: {{apilink.lua|table.foreachi|alias=foreachi|arg=table, function}} {{apitag|deprecated}} - Executes a function for each sequential element in table. Deprecated, it is replaced by {{api|ipairs}}.
+: {{apilink.lua|table.getn|alias=getn|arg=table}} {{apitag|deprecated}} - Return the size of the table when seen as a list. Deprecated, it is replaced by the length operator <code>#</code>.
+: {{apilink.lua|table.setn|arg=table, n}} {{apitag|obsolete}} - throws an error if called.
+
+===Coroutine library===
+See [http://lua-users.org/wiki/CoroutinesTutorial CoroutinesTutorial] and [https://www.lua.org/pil/contents.html#9 PIL: Coroutines] for more info.
+<!-- Coroutine functions should be used sparingly because of the amount of memory they use. --> 
+: [[API:coroutine.create|coroutine.create]](<span class="apiarg">f</span>)
+: [[API:coroutine.resume|coroutine.resume]](<span class="apiarg">co [, val1, ...]</span>)
+: [[API:coroutine.running|coroutine.running]]()
+: [[API:coroutine.status|coroutine.status]](<span class="apiarg">co</span>)
+: [[API:coroutine.wrap|coroutine.wrap]](<span class="apiarg">f</span>)
+: [[API:coroutine.yield|coroutine.yield]](<span class="apiarg">...</span>)
+
+===Bitwise library===
+World of Warcraft includes the Lua [https://www.lua.org/manual/5.2/manual.html#6.7 bitlib] library which has been available since [[Patch 1.9.0/API changes|Patch 1.9]]. It seems to work internally with standard 32-bit 'int' values, since {{api.inline|bit.lshift(0x80000000, 1) {{=}}{{=}} 0}}. See [http://lua-users.org/wiki/BitwiseOperators BitwiseOperators] for more info.
+<!-- Using these functions to pack data structures is fairly slow work. Unless you have a very large database and ''need'' to conserve memory, save your information in several, individual variables or table fields. -->
+: [[API:bit.bnot|bit.bnot]](<span class="apiarg">a</span>) - binary 'not' - the one's complement of a
+: [[API:bit.band|bit.band]](<span class="apiarg">a1, ...</span>) - binary 'and' - the bitwise and of the values
+: [[API:bit.bor|bit.bor]](<span class="apiarg">a1, ...</span>) - binary 'or' - the bitwise or of the values
+: [[API:bit.bxor|bit.bxor]](<span class="apiarg">a1, ...</span>) - bitwise 'xor' - the bitwise exclusive or of the values
+: [[API:bit.lshift|bit.lshift]](<span class="apiarg">a, n</span>) - 'left shift' - a shifted left by n bits
+: [[API:bit.rshift|bit.rshift]](<span class="apiarg">a, n</span>) - 'right shift' - a shifted right by n bits
+: [[API:bit.arshift|bit.arshift]](<span class="apiarg">a, n</span>) - 'arithmetic right shift' - a shifted right arithmetically by n bits
+: [[API:bit.mod|bit.mod]](<span class="apiarg">a, n</span>) - signed 'modulus' - the signed value of a modulo n (result is the same sign as a)
+<!-- ==Details==
+===String Functions===
+* All strings have their metatable set to index the global string table, so any string function may be called through it with the colon syntax:
+ -- This...
+ local s = string.format(input, arg1, arg2, ...)
+ 
+ -- ...can be written as this
+ local s = input:format(arg1, arg2, ...)  -- input gets passed as the first argument, replicating the above code, as per the colon syntax
+To make this work for string constants, you have to use parentheses. "%d":format(arg1) is not valid Lua code, you have to do
+ ("%d"):format(arg1)
+
+===Table Functions===
+* Any function that takes a table as its first argument can be assigned to a method in said table and used thusly.
+** There's no practical reason for doing this, but it's kinda fun to know these useless things.
+** '''Notice''' that [[API wipe|table.wipe]] (and [[API wipe|wipe]]) will remove itself and all other methods assigned in this manner.
+ tab = {}
+ 
+ -- this works, of course.
+ tinsert(tab, 1, value) -- change the value at index 1 to value.
+ 
+ -- as does this
+ tab.insert = tinsert
+ tab:insert(1, value) -- change the value at index 1 to value (note the ":"). -->
+
+==See also==
+* https://www.lua.org/manual/5.1/ Lua 5.1 Reference Manual
+* https://www.lua.org/pil/contents.html Programming in Lua (first edition)
+* https://github.com/Meorawr/elune A customized Lua 5.1 implementation extending the virtual machine with a tainted execution model based off the World of Warcraft user interface environment.
+
+==References==
+{{Reflist}}

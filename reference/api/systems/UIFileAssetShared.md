@@ -1,0 +1,3 @@
+# UIFileAssetShared
+
+Type: None

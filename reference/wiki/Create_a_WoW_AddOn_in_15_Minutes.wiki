@@ -1,0 +1,568 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Create_a_WoW_AddOn_in_15_Minutes | revision 6740609 (2026-06-10T05:29:03Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{UIHowTo}}
+This guide describes how to make a simple HelloWorld addon, use slash commands and store user settings.
+
+==Getting started==
+* You need a basic understanding of Lua, otherwise see [[Introduction to Lua]] or other tutorials.
+* A simple text editor like [https://code.visualstudio.com/ VS Code] or [https://notepad-plus-plus.org/ Notepad++].
+
+==Hello World==
+===Running scripts===
+You can execute Lua scripts from the chat window or in a macro with the <code>/run</code> or [[MACRO_script|/script]] command. There is no difference between them.
+<syntaxhighlight lang="lua">
+/run print("Hello World!")
+</syntaxhighlight>
+''To quickly turn scripts like this into an addon, just remove the "/run" part and paste it into https://addon.bool.no/''
+
+===Creating an AddOn===
+An addon consists of Lua/XML files and a [[TOC_format|TOC]] file. We won't be using [[XML]] since most things that are possible in XML can also be done in Lua.
+
+Go to your AddOns folder and create a new folder with the following files:<br><code>World of Warcraft\_retail_\Interface\AddOns\HelloWorld</code>
+
+'''<font color="#4ec9b0">HelloWorld.lua</font>'''
+<syntaxhighlight lang="lua">
+print("Hello World!")
+</syntaxhighlight>
+
+'''<font color="#4ec9b0">HelloWorld.toc</font>'''
+{{#tag:syntaxhighlight|
+
+## Interface: {{API LatestInterface}}
+## Version: 1.0.0
+## Title: Hello World
+## Notes: My first addon
+## Author: YourName
+
+HelloWorld.lua
+|lang=wowtoc}}
+*❗The name of the TOC file ''must'' match the folder name or the addon won't be detected by the game.
+* The TOC Interface metadata <code>{{API LatestInterface}}</code> as returned by {{api|GetBuildInfo}}() tells which [[TOC_format#Interface_version|version]] of the game the addon was made for. If they don't match then the addon will be marked out-of-date in the addon list.
+Load up World of Warcraft, the addon should show up in the addon list and greet you upon login.
+<gallery>
+<!-- Tutorial_CreateAddOn_1.png|File Structure -->
+Tutorial_CreateAddOn_2.png|VS Code
+Tutorial_CreateAddOn_3.png|AddOn List
+Tutorial_CreateAddOn_4.png|In-game
+</gallery>
+
+==Development tips==
+<!-- <span class="noexcerpt" data-nosnippet>''See also: [[Lua Coding Tips]]''</span> -->
+* When updating addon code use [[MACRO_reload|/reload]] to test the new changes, you may want to put it on a macro hotkey; as well as temporarily disabling any unnecessary addons that would increase loading time.
+* Get an error reporting addon like [https://www.curseforge.com/wow/addons/bugsack BugSack] or turn on <code>/console scriptErrors 1</code>
+* There is the [[MACRO_dump|/dump]] slash command for general debugging, [[MACRO_eventtrace|/etrace]] for showing events and [[MACRO_framestack|/fstack]] for debugging visible UI elements.
+* [[Viewing_Blizzard%27s_interface_code|Export]], [https://github.com/git-guides/git-clone clone], download or [https://github.com/Gethe/wow-ui-source bookmark] Blizzard's user interface code a.k.a. the FrameXML. If you don't know what a specific API does it's best to just reference it in FrameXML. Not everything is documented so we generally [https://code.visualstudio.com/docs/editor/codebasics#_search-across-files look] through the code from Blizzard or other addons.
+* For VS Code the [https://marketplace.visualstudio.com/items?itemName=sumneko.lua Lua extension] by Sumneko adds [https://code.visualstudio.com/docs/editor/intellisense IntelliSense] features like code completion.
+
+==Responding to events==
+{{Main|Handling events}}
+Almost every action in the game is an [[Events|Event]] which tells the UI that something happened. For example {{api|t=e|CHAT_MSG_CHANNEL}} fires when someone sends a message in a chat channel like ''General'' and ''Trade''. 
+
+To respond to events you create a frame with {{api|CreateFrame}}() and register the events to it with {{api|t=w|ScriptObject:SetScript}}.
+[[File:Tutorial_CreateAddOn_5.png|thumb|right|Event payload in the chat window and [[MACRO_eventtrace|/etrace]]]]
+<syntaxhighlight lang="lua">
+local function OnEvent(self, event, ...)
+	print(event, ...)
+end
+
+local f = CreateFrame("Frame")
+f:RegisterEvent("CHAT_MSG_CHANNEL")
+f:SetScript("OnEvent", OnEvent)
+</syntaxhighlight>
+
+Another example is to play a sound on levelup with {{api|PlaySoundFile}}() or {{api|PlayMusic}}() by registering for the {{api|t=e|PLAYER_LEVEL_UP}} event.
+<syntaxhighlight lang="lua">
+local f = CreateFrame("Frame")
+f:RegisterEvent("PLAYER_LEVEL_UP")
+f:SetScript("OnEvent", function()
+	PlayMusic(642322) -- sound/music/pandaria/mus_50_toast_b_hero_01.mp3
+end)
+</syntaxhighlight>
+
+===Handling multiple events===
+When registering multiple events it can be messy if there are a lot of them.
+<syntaxhighlight lang="lua">
+local function OnEvent(self, event, ...)
+	if event == "ADDON_LOADED" then
+		local addOnName = ...
+		print(event, addOnName)
+	elseif event == "PLAYER_ENTERING_WORLD" then
+		local isLogin, isReload = ...
+		print(event, isLogin, isReload)
+	elseif event == "CHAT_MSG_CHANNEL" then
+		local text, playerName, _, channelName = ...
+		print(event, text, playerName, channelName)
+	end
+end
+
+local f = CreateFrame("Frame")
+f:RegisterEvent("ADDON_LOADED")
+f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:RegisterEvent("CHAT_MSG_CHANNEL")
+f:SetScript("OnEvent", OnEvent)
+</syntaxhighlight>
+Which can be refactored to this:
+<syntaxhighlight lang="lua">
+local f = CreateFrame("Frame")
+
+function f:OnEvent(event, ...)
+	self[event](self, event, ...)
+end
+
+function f:ADDON_LOADED(event, addOnName)
+	print(event, addOnName)
+end
+
+function f:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
+	print(event, isLogin, isReload)
+end
+
+function f:CHAT_MSG_CHANNEL(event, text, playerName, _, channelName)
+	print(event, text, playerName, channelName)
+end
+
+f:RegisterEvent("ADDON_LOADED")
+f:RegisterEvent("PLAYER_ENTERING_WORLD")
+f:RegisterEvent("CHAT_MSG_CHANNEL")
+f:SetScript("OnEvent", f.OnEvent)
+</syntaxhighlight>
+: 📝 ''Note: We won't use this in our further examples, but knowing this is useful when your addon gets bigger.''
+
+==Slash commands==
+{{Main|Creating a slash command}}
+:<span class="noexcerpt" data-nosnippet>''FrameXML: [https://github.com/Gethe/wow-ui-source/blob/9.1.5/Interface/FrameXML/ChatFrame.lua#L2657 RegisterNewSlashCommand()]''</span>
+Slash commands are an easy way to let users interact with your addon. Any <code>SLASH_*</code> globals will automatically be registered as a slash command.
+[[File:Tutorial_CreateAddOn_6.png|thumb|right|Using a slash command]]
+ <font color="#6a9955">-- increment the index for each slash command</font>
+ SLASH_<font color="#ecbc2a">HELLOWORLD</font>1 = "/helloworld"
+ SLASH_<font color="#ecbc2a">HELLOWORLD</font>2 = "/hw"
+ 
+ <font color="#6a9955">-- define the corresponding slash command handler</font>
+ SlashCmdList.<font color="#ecbc2a">HELLOWORLD</font> = function(msg, editBox)
+ 	local name1, name2 = strsplit(" ", msg)
+ 	if #name1 > 0 then <font color="#6a9955">-- check for empty string</font>
+ 		print(format("hello %s and also %s", name1, name2 or "Carol"))
+ 	else
+ 		print("Please give at least one name")
+ 	end
+ end
+
+We can also add a shorter /reload command.
+<syntaxhighlight lang="lua">
+SLASH_NEWRELOAD1 = "/rl"
+SlashCmdList.NEWRELOAD = ReloadUI
+</syntaxhighlight>
+
+==SavedVariables==
+{{Main|Saving variables between game sessions}}
+To store data or save user settings, set the <code>SavedVariables</code> in the [[TOC_format#Loading_conditions|TOC]] which will persist between sessions. You can /reload instead of restarting the game client when updating the TOC file.
+
+ ## Interface: {{API LatestInterface}}
+ ## Version: 1.0.0
+ ## Title: Hello World
+ ## Notes: My first addon
+ ## Author: YourName
+ <font color="#ecbc2a">## SavedVariables: HelloWorldDB</font>
+ 
+ HelloWorld.lua
+
+SavedVariables are only accessible once the respective {{api|t=e|ADDON_LOADED}} event fires. This example prints how many times you logged in (or reloaded) with the addon enabled.
+<syntaxhighlight lang="lua">
+local function OnEvent(self, event, addOnName)
+	if addOnName == "HelloWorld" then -- name as used in the folder name and TOC file name
+		HelloWorldDB = HelloWorldDB or {} -- initialize it to a table if this is the first time
+		HelloWorldDB.sessions = (HelloWorldDB.sessions or 0) + 1
+		print("You loaded this addon "..HelloWorldDB.sessions.." times")	
+	end
+end
+
+local f = CreateFrame("Frame")
+f:RegisterEvent("ADDON_LOADED")
+f:SetScript("OnEvent", OnEvent)
+</syntaxhighlight>
+
+This example initializes the SavedVariables with default values. It also updates the DB when new keys are added to the defaults table. <br>The [https://www.townlong-yak.com/framexml/live/go/CopyTable CopyTable()] function is defined in FrameXML. {{api|GetBuildInfo}}() is an API function.
+<syntaxhighlight lang="lua">
+local defaults = {
+	sessions = 0,
+	someOption = true,
+	--someNewOption = "banana",
+}
+
+local function OnEvent(self, event, addOnName)
+	if addOnName == "HelloWorld" then
+		HelloWorldDB = HelloWorldDB or {}
+		self.db = HelloWorldDB -- makes it more readable and generally a good practice
+		for k, v in pairs(defaults) do -- copy the defaults table and possibly any new options
+			if self.db[k] == nil then
+				self.db[k] = v
+			end
+		end
+		self.db.sessions = self.db.sessions + 1
+		print("You loaded this addon "..self.db.sessions.." times")
+		print("someOption is", self.db.someOption)
+
+		local version, build, _, tocversion = GetBuildInfo()
+		print(format("The current WoW build is %s (%d) and TOC is %d", version, build, tocversion))
+	end
+end
+
+local f = CreateFrame("Frame")
+f:RegisterEvent("ADDON_LOADED")
+f:SetScript("OnEvent", OnEvent)
+
+SLASH_HELLOWORLD1 = "/hw"
+SLASH_HELLOWORLD2 = "/helloworld"
+
+SlashCmdList.HELLOWORLD = function(msg, editBox)
+	if msg == "reset" then
+		HelloWorldDB = CopyTable(defaults) -- reset to defaults
+		f.db = HelloWorldDB 
+		print("DB has been reset to default")
+	elseif msg == "toggle" then
+		f.db.someOption = not f.db.someOption
+		print("Toggled someOption to", f.db.someOption)
+	end
+end
+</syntaxhighlight>
+
+Tips for troubleshooting tables:
+* These examples show the contents of a (global) table.
+<syntaxhighlight lang="lua">
+/dump HelloWorldDB
+/tinspect HelloWorldDB
+/run for k, v in pairs(HelloWorldDB) do print(k, v) end
+</syntaxhighlight>
+* These examples empty the table, as in removing its contents.
+<syntaxhighlight lang="lua">
+/run wipe(HelloWorldDB)
+/run for k in pairs(HelloWorldDB) do HelloWorldDB[k] = nil; end
+</syntaxhighlight>
+* This essentially resets your savedvariables.
+<syntaxhighlight lang="lua">
+/run HelloWorldDB = nil; ReloadUI()
+</syntaxhighlight>
+
+==Options Panel==
+{{Main|Using the Interface Options Addons panel}}
+This final example provides a graphical user interface which is opened with the <code>/hw</code> slash command. It includes an option to print a message when you jump.
+
+FrameXML:
+* [https://github.com/Gethe/wow-ui-source/blob/9.1.5/Interface/FrameXML/InterfaceOptionsPanels.xml#L19 InterfaceOptionsCheckButtonTemplate]
+* [https://github.com/Gethe/wow-ui-source/blob/9.1.5/Interface/SharedXML/SharedUIPanelTemplates.xml#L414 UIPanelButtonTemplate]
+
+[[File:Tutorial_CreateAddOn_8.png|thumb|right|Minimal example]]
+[[File:Tutorial_CreateAddOn_7.png|thumb|right|Multiple options with reset button]]
+{{i-note|This example is up to date for patch 11.0.7}}
+<onlyinclude><syntaxhighlight lang="lua">
+local f = CreateFrame("Frame")
+
+local defaults = {
+	someOption = true,
+}
+
+function f:OnEvent(event, addOnName)
+	if addOnName == "HelloWorld" then
+		HelloWorldDB = HelloWorldDB or CopyTable(defaults)
+		self.db = HelloWorldDB
+		self:InitializeOptions()
+		hooksecurefunc("JumpOrAscendStart", function()
+			if self.db.someOption then
+				print("Your character jumped.")
+			end
+		end)
+	end
+end
+
+f:RegisterEvent("ADDON_LOADED")
+f:SetScript("OnEvent", f.OnEvent)
+
+function f:InitializeOptions()
+	self.panel = CreateFrame("Frame")
+	self.panel.name = "HelloWorld"
+
+	local cb = CreateFrame("CheckButton", nil, self.panel, "InterfaceOptionsCheckButtonTemplate")
+	cb:SetPoint("TOPLEFT", 20, -20)
+	cb.Text:SetText("Print when you jump")
+	-- there already is an existing OnClick script that plays a sound, hook it
+	cb:HookScript("OnClick", function(_, btn, down)
+		self.db.someOption = cb:GetChecked()
+	end)
+	cb:SetChecked(self.db.someOption)
+
+	local btn = CreateFrame("Button", nil, self.panel, "UIPanelButtonTemplate")
+	btn:SetPoint("TOPLEFT", cb, 0, -40)
+	btn:SetText("Click me")
+	btn:SetWidth(100)
+	btn:SetScript("OnClick", function()
+		print("You clicked me!")
+	end)
+
+	local cat = Settings.RegisterCanvasLayoutCategory(self.panel, self.panel.name, self.panel.name);
+	cat.ID = self.panel.name
+	Settings.RegisterAddOnCategory(cat)
+end
+
+SLASH_HELLOWORLD1 = "/hw"
+SLASH_HELLOWORLD2 = "/helloworld"
+
+SlashCmdList.HELLOWORLD = function(msg, editBox)
+	Settings.OpenToCategory(f.panel.name)
+end
+</syntaxhighlight></onlyinclude>
+
+This reference example has a couple of checkboxes (with related functionality) and a reset button.
+{| class="darktable mw-collapsible mw-collapsed"
+! Multiple options with reset button &nbsp;
+|-
+|
+GitHub [https://github.com/ketho-wow/HelloWorld source]
+
+'''<span class="apialt">HelloWorld.toc</span>'''
+ ## Interface: {{API LatestInterface}}
+ ## Version: 1.0.2
+ ## Title: Hello World
+ ## Notes: My first addon
+ ## Author: YourName
+ ## SavedVariables: HelloWorldDB
+ 
+ Core.lua
+ Options.lua
+
+'''<span class="apialt">Core.lua</span>'''
+<syntaxhighlight lang="lua">
+HelloWorld = CreateFrame("Frame")
+
+function HelloWorld:OnEvent(event, ...)
+	self[event](self, event, ...)
+end
+HelloWorld:SetScript("OnEvent", HelloWorld.OnEvent)
+HelloWorld:RegisterEvent("ADDON_LOADED")
+
+function HelloWorld:ADDON_LOADED(event, addOnName)
+	if addOnName == "HelloWorld" then
+		HelloWorldDB = HelloWorldDB or {}
+		self.db = HelloWorldDB
+		for k, v in pairs(self.defaults) do
+			if self.db[k] == nil then
+				self.db[k] = v
+			end
+		end
+		self.db.sessions = self.db.sessions + 1
+		print("You loaded this addon "..self.db.sessions.." times")
+
+		local version, build, _, tocversion = GetBuildInfo()
+		print(format("The current WoW build is %s (%d) and TOC is %d", version, build, tocversion))
+
+		self:RegisterEvent("PLAYER_ENTERING_WORLD")
+		hooksecurefunc("JumpOrAscendStart", self.JumpOrAscendStart)
+
+		self:InitializeOptions()
+		self:UnregisterEvent(event)
+	end
+end
+
+function HelloWorld:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
+	if isLogin and self.db.hello then
+		DoEmote("HELLO")
+	end
+end
+
+-- note we don't pass `self` here because of hooksecurefunc, hence the dot instead of colon
+function HelloWorld.JumpOrAscendStart()
+	if HelloWorld.db.jump then
+		print("Your character jumped.")
+	end
+end
+
+function HelloWorld:COMBAT_LOG_EVENT_UNFILTERED(event)
+	-- it's more convenient to work with the CLEU params as a vararg
+	self:CLEU(CombatLogGetCurrentEventInfo())
+end
+
+local playerGUID = UnitGUID("player")
+local MSG_DAMAGE = "Your %s hit %s for %d damage."
+
+function HelloWorld:CLEU(...)
+	local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = ...
+	local spellId, spellName, spellSchool
+	local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand
+	local isDamageEvent
+
+	if subevent == "SWING_DAMAGE" then
+		amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, ...)
+		isDamageEvent = true
+	elseif subevent == "SPELL_DAMAGE" then
+		spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, ...)
+		isDamageEvent = true
+	end
+
+	if isDamageEvent and sourceGUID == playerGUID then
+		-- get the link of the spell or the MELEE globalstring
+		local action = spellId and C_Spell.GetSpellLinkGetSpellLink(spellId) or MELEE
+		print(MSG_DAMAGE:format(action, destName, amount))
+	end
+end
+
+SLASH_HELLOWORLD1 = "/hw"
+SLASH_HELLOWORLD2 = "/helloworld"
+
+SlashCmdList.HELLOWORLD = function(msg, editBox)
+	Settings.OpenToCategory(HelloWorld.panel_main.name)
+end
+</syntaxhighlight>
+'''<span class="apialt">Options.lua</span>'''
+<syntaxhighlight lang="lua">
+HelloWorld.defaults = {
+	sessions = 0,
+	hello = false,
+	mushroom = false,
+	jump = true,
+	combat = true,
+	--someNewOption = "banana",
+}
+
+local function CreateIcon(icon, width, height, parent)
+	local f = CreateFrame("Frame", nil, parent)
+	f:SetSize(width, height)
+	f.tex = f:CreateTexture()
+	f.tex:SetAllPoints(f)
+	f.tex:SetTexture(icon)
+	return f
+end
+
+local function RegisterCanvas(frame)
+	local cat = Settings.RegisterCanvasLayoutCategory(frame, frame.name, frame.name);
+	cat.ID = frame.name
+	Settings.RegisterAddOnCategory(cat)
+end
+
+function HelloWorld:CreateCheckbox(option, label, parent, updateFunc)
+	local cb = CreateFrame("CheckButton", nil, parent, "InterfaceOptionsCheckButtonTemplate")
+	cb.Text:SetText(label)
+	local function UpdateOption(value)
+		self.db[option] = value
+		cb:SetChecked(value)
+		if updateFunc then
+			updateFunc(value)
+		end
+	end
+	UpdateOption(self.db[option])
+	-- there already is an existing OnClick script that plays a sound, hook it
+	cb:HookScript("OnClick", function(_, btn, down)
+		UpdateOption(cb:GetChecked())
+	end)
+	EventRegistry:RegisterCallback("HelloWorld.OnReset", function()
+		UpdateOption(self.defaults[option])
+	end, cb)
+	return cb
+end
+
+function HelloWorld:InitializeOptions()
+	-- main panel
+	self.panel_main = CreateFrame("Frame")
+	self.panel_main.name = "HelloWorld"
+
+	local cb_hello = self:CreateCheckbox("hello", "Do the |cFFFFFF00/hello|r emote when you login", self.panel_main)
+	cb_hello:SetPoint("TOPLEFT", 20, -20)
+
+	local cb_mushroom = self:CreateCheckbox("mushroom", "Show a mushroom on your screen", self.panel_main, self.UpdateIcon)
+	cb_mushroom:SetPoint("TOPLEFT", cb_hello, 0, -30)
+
+	local cb_jump = self:CreateCheckbox("jump", "Print when you jump", self.panel_main)
+	cb_jump:SetPoint("TOPLEFT", cb_mushroom, 0, -30)
+
+	local cb_combat = self:CreateCheckbox("combat", "Print when you damage a unit", self.panel_main, function(value)
+		self:UpdateEvent(value, "COMBAT_LOG_EVENT_UNFILTERED")
+	end)
+	cb_combat:SetPoint("TOPLEFT", cb_jump, 0, -30)
+
+	local btn_reset = CreateFrame("Button", nil, self.panel_main, "UIPanelButtonTemplate")
+	btn_reset:SetPoint("TOPLEFT", cb_combat, 0, -40)
+	btn_reset:SetText(RESET)
+	btn_reset:SetWidth(100)
+	btn_reset:SetScript("OnClick", function()
+		HelloWorldDB = CopyTable(HelloWorld.defaults)
+		self.db = HelloWorldDB
+		EventRegistry:TriggerEvent("HelloWorld.OnReset")
+	end)
+
+	RegisterCanvas(self.panel_main)
+
+	-- sub panel
+	local panel_shroom = CreateFrame("Frame")
+	panel_shroom.name = "Shrooms"
+	panel_shroom.parent = self.panel_main.name
+
+	for i = 1, 10 do
+		local icon = CreateIcon("interface/icons/inv_mushroom_11", 32, 32, panel_shroom)
+		icon:SetPoint("TOPLEFT", 20, -32*i)
+	end
+
+	RegisterCanvas(panel_shroom)
+end
+
+function HelloWorld.UpdateIcon(value)
+	if not HelloWorld.mushroom then
+		HelloWorld.mushroom = CreateIcon("interface/icons/inv_mushroom_11", 64, 64, UIParent)
+		HelloWorld.mushroom:SetPoint("CENTER")
+	end
+	HelloWorld.mushroom:SetShown(value)
+end
+
+-- a bit more efficient to register/unregister the event when it fires a lot
+function HelloWorld:UpdateEvent(value, event)
+	if value then
+		self:RegisterEvent(event)
+	else
+		self:UnregisterEvent(event)
+	end
+end
+</syntaxhighlight>
+|}
+
+==AddOn namespace==
+{{Main|Using the AddOn namespace}}
+For bigger addons it's a good practice to divide your logic into multiple files, e.g. a file for options and another file for handling events.
+
+The addon namespace is a private table shared between Lua files in the same addon. This way you can keep things tidy and avoid leaking variables to the global environment.
+
+'''<span class="apialt">HelloWorld.toc</span>'''
+{{#tag:syntaxhighlight|
+## Interface: {{API LatestInterface}}
+## Version: 1.0.0
+## Title: Hello World
+ 
+FileA.lua
+FileB.lua
+|lang=wowtoc}}
+
+'''<span class="apialt">FileA.lua</span>'''
+* Note that the underscore "_" here is a [https://stackoverflow.com/a/34476033/1297035 throwaway variable] when we don't really care about it.
+<syntaxhighlight lang="lua">
+local _, ns = ...
+ns.foo = "Banana"
+</syntaxhighlight>
+
+'''<span class="apialt">FileB.lua</span>'''
+<syntaxhighlight lang="lua">
+local addonName, ns = ...
+print(addonName, ns.foo) -- prints "HelloWorld" and "Banana"
+</syntaxhighlight>
+
+==Conclusion==
+If you want to cheat and rather start with a complete example it's available here in [https://github.com/ketho-wow/HelloWorld/releases ketho-wow/HelloWorld]
+
+You should now be able to write a simple addon from scratch! Addons can be published on [https://www.curseforge.com/project/1/1/create CurseForge] ([https://support.curseforge.com/en/support/solutions/articles/9000197241-creating-and-submitting-a-project guide]), [https://www.wowinterface.com/downloads/upload-update.php WoWInterface] ([https://www.wowinterface.com/forums/faq.php?faq=managing#faq_upload guide]) and/or [https://addons.wago.io/ wago.io].
+
+: ➡️ Follow-up: [[Ace3 for Dummies]]
+
+
+<big>'''See also'''</big>
+* [https://www.mmo-champion.com/threads/817817-Creating-Your-Own-WoW-Addon MMO-Champion: Creating Your Own WoW Addon]
+
+{{Elink|type=youtube|link=https://www.youtube.com/playlist?list=PL3wt7cLYn4N-3D3PTTUZBM2t1exFmoA2G|site=Mayron: Creating WoW AddOns}}
+{{Elink|type=youtube|link=https://www.youtube.com/playlist?list=PLtKjv92L0ihCEwnh3jNifgGaZ6KxKV9AW|site=Paul Halliday: World of Warcraft AddOn Development}}
+
+
+<big>'''Patch changes'''</big>
+* {{Patch 10.0.0|note=<code>InterfaceOptionsFrame_OpenToCategory</code> was replaced by [https://github.com/Gethe/wow-ui-source/blob/10.0.0/Interface/SharedXML/Settings/Blizzard_Deprecated.lua#L24 Settings.OpenToCategory].}}

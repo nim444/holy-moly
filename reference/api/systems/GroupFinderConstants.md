@@ -1,0 +1,3 @@
+# GroupFinderConstants
+
+Type: None

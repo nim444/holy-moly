@@ -1,0 +1,55 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/SecureHandlers | revision 799925 (2021-10-12T02:33:27Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{uitech}}
+:::''These templates are defined in <code>[https://www.townlong-yak.com/framexml/live/SecureHandlerTemplates.xml FrameXML/SecureHandlerTemplates.xml]</code> and <code>[https://www.townlong-yak.com/framexml/live/SecureHandlers.lua FrameXML/SecureHandlers.lua]''</code>
+'''SecureHandlers''' (created by [[Virtual XML template|inheriting]] '''SecureHandlerBaseTemplate''') use code snippets inside the [[RestrictedEnvironment]].  Each snippet is a {{api|t=t|string}} that behaves like the body of a Lua function, but it can only contain a subset of the [[World of Warcraft API]].
+
+== Defined methods ==
+* {{api|t=w|SecureHandlerBaseTemplate:Execute(body)}}  - Executes a code snippet in the restricted environment.
+* {{api|t=w|SecureHandlerBaseTemplate:WrapScript(header, script, preBody [, postBody])}} - Wraps a widget script with code snippets executed in the restricted environment.
+* {{api|t=w|SecureHandlerBaseTemplate:UnwrapScript(frame, script)}} - Strips (and returns) the outermost-wrapped handler.
+* {{api|t=w|SecureHandlerBaseTemplate:SetFrameRef(id, refFrame)}} - Creates a frame reference accessible in the restricted environment.
+
+== Details ==
+* The base template has an OnLoad widget script which adds the four defined methods.
+* Other templates (listed below) use {{api|t=w|Frame:SetAttribute}}() to run [[widget script handlers]] in the RestrictedEnvironment.
+
+{| class="darktable"
+! Template !! Description !! Attribute (<span class="apiarg">arguments</span>)
+|-
+| '''SecureHandlerBaseTemplate''' || Enables common methods on the frame || ''none''
+|-
+| [[SecureHandlerStateTemplate]] || Only "state-''xxx''" attribute changes || '''_onstate-''xxx'''''(<span class="apiarg">self, stateid, newstate</span>)
+|-
+| [[SecureHandlerAttributeTemplate]] || Any attribute change || '''_onattributechanged'''(<span class="apiarg">self, name, value</span>)
+|-
+| [[SecureHandlerClickTemplate]] || Clicks || '''_onclick'''(<span class="apiarg">self, button, down</span>)
+|-
+| [[SecureHandlerDoubleClickTemplate]] || Double clicks || '''_ondoubleclick'''(<span class="apiarg">self, button, down</span>)
+|-
+| [[SecureHandlerDragTemplate]] || Dragging || '''_ondragstart'''(<span class="apiarg">self, button</span>), '''_onreceivedrag'''(<span class="apiarg">self, button, kind, value, ...</span>)
+|-
+| [[SecureHandlerMouseUpDownTemplate]] || Mouse up/down || '''_onmouseup'''(<span class="apiarg">self, button</span>), '''_onmousedown'''(<span class="apiarg">self, button</span>)
+|-
+| [[SecureHandlerMouseWheelTemplate]] || Mouse wheel || '''_onmousewheel'''(<span class="apiarg">self, delta</span>)
+|-
+| [[SecureHandlerEnterLeaveTemplate]] || Mouse entering/leaving || '''_onenter'''(<span class="apiarg">self</span>), '''_onleave'''(<span class="apiarg">self</span>)
+|-
+| [[SecureHandlerShowHideTemplate]] || Frame shown/hidden || '''_onshow'''(<span class="apiarg">self</span>), '''_onhide'''(<span class="apiarg">self</span>)
+|}
+
+== Example ==
+<syntaxhighlight lang="lua">
+local frame = CreateFrame("Frame", nil, "SecureHandlerClickTemplate")
+frame:SetAttribute("_onclick", [=[
+	-- self, button, down
+	if button == "RightButton" then
+		self:Hide();
+	end
+]=])
+</syntaxhighlight>
+
+== External links ==
+* {{elink|link=http://www.iriel.org/wow/docs/SecureHeadersGuide-4.0-r1.pdf|icon=externalarticle|site=Iriel's Field Guide to Secure Handlers|desc=4.0 revision 1}}
+
+
+{{API Trail Secure}}

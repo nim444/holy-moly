@@ -1,0 +1,328 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/XML | revision 6859842 (2026-09-04T16:48:17Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{apinav}} {{widget|page=list}} {{tocright}}
+In World of Warcraft addons, [[Wikipedia:XML|XML]] files are used to define user interface elements. It is however not required since most functionality is also supported in Lua via the [[Widget API]]. Similarly to Lua files, XML files are referenced from the [[TOC format|TOC]] file.
+
+==Overview==
+It's recommended to use an editor like [https://code.visualstudio.com/ VS Code] with the [https://marketplace.visualstudio.com/items?itemName=redhat.vscode-xml Red Hat XML] extension. 
+
+{| class="darktable"
+| [[File:XML_schema_01.png|link=]]
+|}
+
+* A '''tag''' begins with <code><</code> and ends with <code>></code>; for example {{api.code|<Frame>}}.
+* A tag can have '''attributes'''; for example <code><Frame <font color="#ecbc2a">name="ShinyRedApple"</font></code>.
+* An '''element''' consists of a start tag, end tag and anything in between; for example {{api.code|<Frame>content</Frame>}}.
+
+===XML schema===
+Each XML file consists of a <code>Ui</code> element. The <code>xmlns</code> and related attributes are optional but essential for XML parsers and validation.
+<syntaxhighlight lang="xml">
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
+</Ui>
+</syntaxhighlight>
+<syntaxhighlight lang="xml">
+<!-- can also be formatted like this for readability purposes -->
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+                        https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
+</Ui>
+</syntaxhighlight>
+{| class="darktable"
+|
+* {{api.code|xmlns}} declares the default namespace so that all of the nested elements will be namespaced to <code><nowiki>http://www.blizzard.com/wow/ui/</nowiki></code> which basically means the XML file will be associated with World of Warcraft.
+* {{api.code|xmlns:xsi}} declares the <code>http://www.w3.org/2001/XMLSchema-instance</code> namespace and binds it to the <code>xsi</code> prefix. ''(which stands for xml schema instance but you can also just use an arbitrary prefix name like <code>foo</code>)''
+* {{api.code|xsi:schemaLocation}} declares whitespace-separated pairs of namespace and [[Wikipedia:XML_Schema_(W3C)|XSD]] files. This means that https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd will be used with the <code><nowiki>http://www.blizzard.com/wow/ui/</nowiki></code> namespace for validation and hinting.
+|}
+
+===Example===
+Shows a texture on the center of the screen.
+[[File:API_CreateFrame_mushroom.png|thumb|left|link=|]]
+<syntaxhighlight lang="xml">
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
+    <Frame parent="UIParent">
+        <Size x="64" y="64"/>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture file="interface/icons/inv_mushroom_11" setAllPoints="true"/>
+            </Layer>
+        </Layers>
+    </Frame>
+</Ui>
+</syntaxhighlight>
+
+==UI==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Ui|Children}}
+</div>
+
+==LayoutFrame==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/LayoutFrame|Children}}
+</div>
+
+==Frame==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Frame|Children}}
+</div>
+
+===AuraContainer===
+<div style="margin-left:1.5em;">
+<AuraContainer> is an [[intrinsic frame]] extending {{api|t=x|Frame}}.
+</div>
+
+===Button===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Button|Children}}
+</div>
+
+====AuraButton====
+<div style="margin-left:1.5em;">
+<AuraButton> is an [[intrinsic frame]] extending {{api|t=x|Button}}.
+</div>
+
+====CheckButton====
+<div style="margin-left:1.5em;">
+{{#lstx:XML/CheckButton|Children}}
+</div>
+
+====ItemButton====
+<div style="margin-left:1.5em;">
+<ItemButton> is an [[intrinsic frame]] extending {{api|t=x|Button}}.
+</div>
+
+===ColorSelect===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/ColorSelect|Children}}
+</div>
+
+===Cooldown===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Cooldown|Children}}
+</div>
+
+===EditBox===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/EditBox|Children}}
+</div>
+
+===GameTooltip===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/GameTooltip|Children}}
+</div>
+
+===MessageFrame===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/MessageFrame|Children}}
+</div>
+
+===Model===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Model|Children}}
+</div>
+
+===PlayerModel===
+<div style="margin-left:.5em;">
+[[XML/PlayerModel|<PlayerModel>]] (inherits from {{api|t=x|Model}}, creates a {{api|t=o|PlayerModel}} widget) displays a pose of the player character.
+</div>
+
+===DressUpModel===
+<div style="margin-left:1.5em;">
+[[XML/DressUpModel|<DressUpModel>]] (inherits from {{api|t=x|PlayerModel}}, creates a {{api|t=o|DressUpModel}} widget) trials equipment appearances on the player character.
+</div>
+
+===TabardModel===
+<div style="margin-left:1.5em;">
+[[XML/TabardModel|<TabardModel>]] (inherits from {{api|t=x|PlayerModel}}, creates a {{api|t=o|TabardModel}} widget) trials tabard appearances on the player character.
+</div>
+
+===CinematicModel===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/CinematicModel|Children}}
+</div>
+
+===UiCamera===
+<div style="margin-left:1.5em;">
+[[XML/UiCamera|<UiCamera>]] (inherits from {{api|t=x|Model}}, creates a {{api|t=o|UiCamera}} widget) -- ''needs summary''.
+</div>
+
+===ModelScene===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/ModelScene|Children}}
+</div>
+
+===MovieFrame===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/MovieFrame|Children}}
+</div>
+
+===ScrollFrame===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/ScrollFrame|Children}}
+</div>
+
+===ScrollingMessageFrame===
+<div style="margin-left:1.5em;">
+<ScrollingMessageFrame> is an [[intrinsic frame]], extending {{api|t=x|Frame}}
+</div>
+
+===SimpleHTML===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/SimpleHTML|Children}}
+</div>
+
+===Slider===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Slider|Children}}
+</div>
+
+===StatusBar===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/StatusBar|Children}}
+</div>
+
+===ArchaeologyDigSiteFrame===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/ArchaeologyDigSiteFrame|Children}}
+</div>
+
+===ScenarioPOIFrame===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/ScenarioPOIFrame|Children}}
+</div>
+
+===QuestPOIFrame===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/QuestPOIFrame|Children}}
+</div>
+
+===UnitPositionFrame===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/UnitPositionFrame|Children}}
+</div>
+
+===FogOfWarFrame===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/FogOfWarFrame|Children}}
+</div>
+
+==Texture==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Texture|Children}}
+</div>
+
+===MaskTexture===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/MaskTexture|Children}}
+</div>
+
+===Line===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Line|Children}}
+</div>
+
+==VectorGraphics==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/VectorGraphics|Children}}
+</div>
+
+==FontString==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/FontString|Children}}
+</div>
+
+==Font==
+<div style="margin-left:1.5em;">
+{{:XML/Font}}
+</div>
+
+==FontFamily==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/FontFamily|Children}}
+</div>
+
+==AnimationGroup==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/AnimationGroup|Children}}
+</div>
+
+==Animation==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Animation|Children}}
+</div>
+
+===Alpha===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Alpha|Children}}
+</div>
+
+===FlipBook===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/FlipBook|Children}}
+</div>
+
+===LineScale===
+<div style="margin-left:1.5em;">
+<LineScale> inherits from {{api|t=x|Scale}}; Specific for {{api|t=x|Line}} objects.
+</div>
+
+===LineTranslation===
+<div style="margin-left:1.5em;">
+<LineTranslation> inherits from {{api|t=x|Translation}}; Specific for {{api|t=x|Line}} objects.
+</div>
+
+===Path===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Path|Children}}
+</div>
+
+===RadialProgress===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/RadialProgress|Children}}
+</div>
+
+===Rotation===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Rotation|Children}}
+</div>
+
+===Scale===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Scale|Children}}
+</div>
+
+===TextureCoordTranslation===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/TextureCoordTranslation|Children}}
+</div>
+
+===Translation===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Translation|Children}}
+</div>
+
+===VertexColor===
+<div style="margin-left:1.5em;">
+{{#lstx:XML/VertexColor|Children}}
+</div>
+
+==Actor==
+<div style="margin-left:1.5em;">
+{{#lstx:XML/Actor|Children}}
+</div>
+
+==See also==
+* [[XML user interface]]
+
+Not intended for user-made AddOns:
+* {{api|t=x|Browser}}
+* {{api|t=x|Checkout}}
+* {{api|t=x|Minimap}}
+* {{api|t=x|WorldFrame}}
+
+Removed or no longer used:
+* {{api|t=x|TaxiRouteFrame}}
+
+[[Category:XML elements| ]]

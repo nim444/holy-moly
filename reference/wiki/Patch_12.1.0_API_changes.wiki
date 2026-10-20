@@ -1,0 +1,1197 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Patch_12.1.0/API_changes | revision 6905801 (2026-10-09T18:59:58Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{apichanges|prev=12.0.7|12.1.0|next=12.1.5}} {{#description2:12.1.0 (69587) Aug 27 2026}}
+
+==Resources==
+* TOC: <code>120100</code>
+* <span class="blizztext">Official API patch notes:</span> [[Patch 12.1.0/API_changes/notes|Midnight 12.1.0 PTR Changes]]
+* Official content update notes: [https://worldofwarcraft.blizzard.com/en-us/news/24293281/curse-of-ulatek-content-update-notes#item21 Curse of Ula'tek Content Update Notes]
+* Diffs: [https://github.com/Gethe/wow-ui-source/compare/12.0.7..12.1.0 wow-ui-source], [https://github.com/Ketho/BlizzardInterfaceResources/compare/12.0.7...12.1.0 BlizzardInterfaceResources]
+
+==Summary==
+* Added {{api|t=i|AuraContainer}} and {{api|t=i|AuraButton}} intrinsic frames.
+* SVG textures are now supported with the {{api|t=o|VectorGraphics}} object type.
+* {{api|UIParentLoadAddOn}} has been moved to {{tlygo|LoadAddOnWithErrorHandling}}.
+* {{api|MouseIsOver}} has been moved to {{tlygo|InputUtil.IsMouseOver}}.
+* {{tlygo|build=12.0.7|CanAccessObject}} has been replaced with {{api|t=w|FrameScriptObject:CanBeAccessedInContext}}.
+* Deprecated {{api|getglobal}} and {{api|setglobal}}.
+* The Auto Loot setting (CVar {{api|t=c|autoLootDefault}}) is now account wide.
+* New UI texture filenames will no longer be published to the {{dbc|ManifestInterfaceData}} DB. Existing filenames will remain available, and this change will not affect players. Addons will still be able to use these textures.
+
+==Consolidated changes==
+: <font color="pink">12.0.7 (68256)</font> &rarr; <font color="lightgreen">12.1.0 (69587)</font> Aug 27 2026
+
+===Global API===
+''Disclaimer:'' Any [[Patch_12.1.0/API_changes#Deprecated_API|deprecated]] functions will still be listed as removed.
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-global-c"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(145)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(19)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-global-c"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=a|C_AuraContainerUtil.ProcessAuraTooltipBackdropOptions}}
+: {{api|t=a|C_AuraContainerUtil.ProcessAuraTooltipNineSliceOptions}}
+: {{api|t=a|C_AuraContainerUtil.ProcessAuraTooltipTextureSliceOptions}}
+: {{api|t=a|C_AuraContainerUtil.ProcessCustomAuraButtonApplicationBarOptions}}
+: {{api|t=a|C_AuraContainerUtil.ProcessCustomAuraButtonApplicationCountOptions}}
+: {{api|t=a|C_AuraContainerUtil.ProcessCustomAuraButtonDispelTypeTextOptions}}
+: {{api|t=a|C_AuraContainerUtil.ProcessCustomAuraButtonDispelTypeTextureOptions}}
+: {{api|t=a|C_AuraContainerUtil.ProcessCustomAuraButtonDurationBarOptions}}
+: {{api|t=a|C_AuraContainerUtil.ProcessCustomAuraButtonDurationTextOptions}}
+: {{api|t=a|C_BattleNet.AreFriendTagsEnabled}}
+: {{api|t=a|C_BattleNet.AreTitleFriendCustomNamesEnabled}}
+: {{api|t=a|C_BattleNet.AreTitleFriendsEnabled}}
+: {{api|t=a|C_BattleNet.BNCheckTitleFriendInviteToUnit}}
+: {{api|t=a|C_BattleNet.CanToggleHighResTexturesWithoutClientReload}}
+: {{api|t=a|C_BattleNet.GetCustomTitleFriendName}}
+: {{api|t=a|C_BattleNet.GetFriendInviteInfo}}
+: {{api|t=a|C_BattleNet.IsBattleNetFriendsListEnabled}}
+: {{api|t=a|C_BattleNet.IsBattleNetFriendsListSupported}}
+: {{api|t=a|C_BattleNet.SearchFriends}}
+: {{api|t=a|C_BattleNet.SendTitleFriendInviteByName}}
+: {{api|t=a|C_BattleNet.SendVerifiedBattleNetFriendInvite}}
+: {{api|t=a|C_BattleNet.SetAppearOffline}}
+: {{api|t=a|C_BattleNet.SetCustomTitleFriendName}}
+: {{api|t=a|C_BattleNet.SetFriendTags}}
+: {{api|t=a|C_Browser.CloseFullscreenBrowser}}
+: {{api|t=a|C_CVar.AreCVarsLoaded}}
+: {{api|t=a|C_ClientScene.IsSceneTypeActive}}
+: {{api|t=a|C_Club.SendTitleFriendRequest}}
+: {{api|t=a|C_CooldownViewer.GetGroupBuffItems}}
+: {{api|t=a|C_DelvesUI.GetFlavorNodeForCompanion}}
+: {{api|t=a|C_DelvesUI.GetFlavorNodeNameForCompanion}}
+: {{api|t=a|C_DelvesUI.HasActiveLFGLair}}
+: {{api|t=a|C_DelvesUI.HasActiveLair}}
+: {{api|t=a|C_DelvesUI.IsInLair}}
+: {{api|t=a|C_Discord.Authorize}}
+: {{api|t=a|C_Discord.GetDiscordChannelName}}
+: {{api|t=a|C_Discord.GetDiscordUserID}}
+: {{api|t=a|C_Discord.GetDiscordUserName}}
+: {{api|t=a|C_Discord.GetDisplayNameType}}
+: {{api|t=a|C_Discord.GetGuildLinkStatus}}
+: {{api|t=a|C_Discord.GetNumDiscordChannels}}
+: {{api|t=a|C_Discord.GetNumDiscordServers}}
+: {{api|t=a|C_Discord.GetServerLinkableChannels}}
+: {{api|t=a|C_Discord.GetServerName}}
+: {{api|t=a|C_Discord.GuildLink}}
+: {{api|t=a|C_Discord.GuildUnlink}}
+: {{api|t=a|C_Discord.IsEnabled}}
+: {{api|t=a|C_Discord.IsGuildChannelLinked}}
+: {{api|t=a|C_Discord.IsGuildSettingSet}}
+: {{api|t=a|C_Discord.IsUserOAuthed}}
+: {{api|t=a|C_Discord.RefreshAuth}}
+: {{api|t=a|C_Discord.SetGuildSetting}}
+: {{api|t=a|C_Discord.UpdateDiscordServers}}
+: {{api|t=a|C_Discord.UpdateGuildLobby}}
+: {{api|t=a|C_DyeColor.GetDyeColorsForItemLocation}}
+: {{api|t=a|C_DyeColor.GetDyeColorsForItem}}
+: {{api|t=a|C_EncounterJournal.GetBaseDifficultyID}}
+: {{api|t=a|C_EncounterJournal.InstanceHasDifficultyID}}
+: {{api|t=a|C_FriendList.IsLegacyFriendSystemEnabled}}
+: {{api|t=a|C_GuildInfo.IsDiscordStreamSeparate}}
+: {{api|t=a|C_HouseEditor.GetHouseEditorPlayerType}}
+: {{api|t=a|C_Housing.HouseFinderIgnoreNeighborhood}}
+: {{api|t=a|C_Housing.IsInsideOwnedHouseOrPlot}}
+: {{api|t=a|C_Housing.IsInsideOwnedHouse}}
+: {{api|t=a|C_Housing.IsInsideOwnedPlot}}
+: {{api|t=a|C_Housing.ResetHouse}}
+: {{api|t=a|C_HousingBlueprint.CanExportRoom}}
+: {{api|t=a|C_HousingBlueprint.CanExportTypeFromCurrentLocation}}
+: {{api|t=a|C_HousingBlueprint.CanImportTypeFromCurrentLocation}}
+: {{api|t=a|C_HousingBlueprint.DeleteBlueprint}}
+: {{api|t=a|C_HousingBlueprint.ExportBlueprint}}
+: {{api|t=a|C_HousingBlueprint.ExportRoomBlueprint}}
+: {{api|t=a|C_HousingBlueprint.GetBlueprintHyperlink}}
+: {{api|t=a|C_HousingBlueprint.GetBlueprintTypeForCode}}
+: {{api|t=a|C_HousingBlueprint.GetExportAvailability}}
+: {{api|t=a|C_HousingBlueprint.GetFeatureAvailability}}
+: {{api|t=a|C_HousingBlueprint.GetImportAvailability}}
+: {{api|t=a|C_HousingBlueprint.ImportBlueprint}}
+: {{api|t=a|C_HousingBlueprint.IsShareCodeValid}}
+: {{api|t=a|C_HousingBlueprint.RenameBlueprint}}
+: {{api|t=a|C_HousingBlueprint.RequestBlueprintCollection}}
+: {{api|t=a|C_HousingBlueprint.RequestBlueprintContentsForContext}}
+: {{api|t=a|C_HousingBlueprint.RequestBlueprintContents}}
+: {{api|t=a|C_HousingBlueprint.StartImportRoomBlueprint}}
+: {{api|t=a|C_HousingBlueprint.UpdateBlueprintStringFromInput}}
+: {{api|t=a|C_HousingCustomizeMode.ApplyPetToSelectedDecor}}
+: {{api|t=a|C_HousingCustomizeMode.GetSelectedDecorPetInfo}}
+: {{api|t=a|C_HousingDecor.AnyDecorPlacedInRoom}}
+: {{api|t=a|C_HousingDecor.GetAllMaxPlacementBudgets}}
+: {{api|t=a|C_HousingDecor.GetAllSpentPlacementBudgets}}
+: {{api|t=a|C_HousingDecor.GetDecorAssignedPetName}}
+: {{api|t=a|C_HousingDecor.GetDecorCanAttachPet}}
+: {{api|t=a|C_HousingDecor.GetMaxPetPlacementBudget}}
+: {{api|t=a|C_HousingDecor.GetSpentPetPlacementBudget}}
+: {{api|t=a|C_HousingLayout.GetBaseRoomFloor}}
+: {{api|t=a|C_HousingLayout.GetHighestOccupiedFloorIndex}}
+: {{api|t=a|C_HousingLayout.GetLowestOccupiedFloorIndex}}
+: {{api|t=a|C_HousingLayout.GetRoomPlayerIsIn}}
+: {{api|t=a|C_HousingLayout.GetSelectedBlueprintFloorplan}}
+: {{api|t=a|C_HousingLayout.HasSelectedBlueprintFloorplan}}
+: {{api|t=a|C_HousingLayout.RoomHasStairs}}
+: {{api|t=a|C_Item.DoesItemMatchSpellItemCondition}}
+: {{api|t=a|C_LFGInfo.IsInMatchmadeRaidWithoutRoleRequirements}}
+: {{api|t=a|C_LFGList.ConfirmCensoredActiveEntry}}
+: {{api|t=a|C_LFGList.DoesCensoredTextMatch}}
+: {{api|t=a|C_LFGList.IsCensoredActiveEntryUnresolved}}
+: {{api|t=a|C_LFGList.RevealCensoredActiveEntry}}
+: {{api|t=a|C_LFGList.RevealCensoredSearchResult}}
+: {{api|t=a|C_Navigation.GetNextWaypointForMap}}
+: {{api|t=a|C_NeighborhoodInitiative.GetInitiativeTaskRewardScaling}}
+: {{api|t=a|C_PaperDollInfo.CancelTemporaryEnchantment}}
+: {{api|t=a|C_PaperDollInfo.GetInventorySlotInfoForInvSlot}}
+: {{api|t=a|C_PaperDollInfo.GetInventorySlotInfo}}
+: {{api|t=a|C_PaperDollInfo.GetTemporaryEnchantmentInfo}}
+: {{api|t=a|C_PetJournal.GetPetInfoTableBySpeciesID}}
+: {{api|t=a|C_PvP.CanSurrenderArena}}
+: {{api|t=a|C_PvP.JoinRandomTrainingGroundArena}}
+: {{api|t=a|C_PvP.JoinRandomTrainingGroundBattleground}}
+: {{api|t=a|C_QuestHub.IsAreaPOICurrentlyRelatedToHub}}
+: {{api|t=a|C_RecentAllies.SearchRecentAllies}}
+: {{api|t=a|C_RecruitAFriend.IsSystemEnabled}}
+: {{api|t=a|C_RecruitAFriend.IsSystemSupported}}
+: {{api|t=a|C_Roleset.ApplyRolesetFilters}}
+: {{api|t=a|C_Roleset.GetActiveAllowedRolesets}}
+: {{api|t=a|C_Roleset.GetActiveBlockedRolesets}}
+: {{api|t=a|C_SocialQueue.IsSystemEnabled}}
+: {{api|t=a|C_SocialQueue.IsSystemSupported}}
+: {{api|t=a|C_SocialRestrictions.IsFriendsDisabled}}
+: {{api|t=a|C_SocialUI.IsSystemEnabled}}
+: {{api|t=a|C_Sound.PlaySoundWithOptions}}
+: {{api|t=a|C_SpecializationInfo.GetInspectSpecialization}}
+: {{api|t=a|C_Spell.GetLastCategoryCooldownSource}}
+: {{api|t=a|C_Spell.GetSpellDescriptionForItemLocation}}
+: {{api|t=a|C_Spell.TargetSpellChecksItemCondition}}
+: {{api|t=a|C_TransmogOutfitInfo.CanPlayerTransmogSlot}}
+: {{api|t=a|C_TransmogOutfitInfo.IsTransmogEnabled}}
+: {{api|t=a|C_UnitAuras.AddAuraSound}}
+: {{api|t=a|C_UnitAuras.CancelAuraByInstanceID}}
+: {{api|t=a|C_UnitAuras.GetGroupBuffVisualAlerts}}
+: {{api|t=a|C_UnitAuras.GetHiddenGroupBuffs}}
+: {{api|t=a|C_UnitAuras.RemoveAuraSound}}
+: {{api|t=a|C_UnitAuras.SetGroupBuffVisualAlerts}}
+: {{api|t=a|C_UnitAuras.SetHiddenGroupBuffs}}
+: {{api|t=a|GetSpecializationSystem}}
+: {{api|t=a|UnitIsPlayerControlledOrGroupMember}}
+: {{api|t=a|securecopy}}
+: {{api|t=a|settablesecurity}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=a|BNGetFriendInviteInfo}}
+: {{api|t=a|BNSendVerifiedBattleTagInvite}}
+: {{api|t=a|C_DyeColor.GetDyeColorForItemLocation}}
+: {{api|t=a|C_DyeColor.GetDyeColorForItem}}
+: {{api|t=a|C_Housing.IsInsideOwnHouse}}
+: {{api|t=a|C_HousingLayout.GetNumFloors}}
+: {{api|t=a|C_Ping.GetContextualPingTypeForUnit}}
+: {{api|t=a|C_PvP.JoinRandomTrainingGround}}
+: {{api|t=a|C_RecruitAFriend.IsEnabled}}
+: {{api|t=a|C_SuperTrack.GetNextWaypointForMap}}
+: {{api|t=a|C_UnitAuras.AddPrivateAuraAppliedSound}}
+: {{api|t=a|C_UnitAuras.RemovePrivateAuraAppliedSound}}
+: {{api|t=a|C_UnitAuras.TriggerPrivateAuraShowDispelType}}
+: {{api|t=a|CanSurrenderArena}}
+: {{api|t=a|CancelItemTempEnchantment}}
+: {{api|t=a|GetInspectSpecialization}}
+: {{api|t=a|GetInventorySlotInfo}}
+: {{api|t=a|GetWeaponEnchantInfo}}
+: {{api|t=a|SetTableSecurityOption}}
+</div>
+ '''Changed'''
+ {{api|t=a|C_ActionBar.ForceUpdateAction}}
+   + <font color="#00b400">arg2 = suppressEvents</font>
+ {{api|t=a|C_CombatAudioAlert.SpeakText}}
+   + <font color="#00b400">ret1 = utteranceID</font>
+   + <font color="#00b400">MayReturnNothing</font>
+ {{api|t=a|C_HousingDecor.GetMaxPlacementBudget}}
+   # <font color="#ecbc2a">ret1.Nilable false -> true</font>
+ {{api|t=a|C_HousingDecor.GetSpentPlacementBudget}}
+   # <font color="#ecbc2a">ret1.Nilable false -> true</font>
+ {{api|t=a|C_HousingLayout.GetRoomPlacementBudget}}
+   # <font color="#ecbc2a">ret1.Nilable false -> true</font>
+ {{api|t=a|C_HousingLayout.GetSpentPlacementBudget}}
+   # <font color="#ecbc2a">ret1.Nilable false -> true</font>
+ {{api|t=a|C_Ping.SendMacroPing}}
+   # <font color="#ecbc2a">arg1.Name type -> macroInfo</font>
+   # <font color="#ecbc2a">arg1.Nilable true -> false</font>
+   # <font color="#ecbc2a">arg1.Type PingSubjectType -> PingMacroInfo</font>
+   - <font color="#ff6767">arg2 = targetToken</font>
+ {{api|t=a|C_QuestHub.IsQuestCurrentlyRelatedToHub}}
+   # <font color="#ecbc2a">arg2.Name areaPoiID -> hubAreaPoiID</font>
+ {{api|t=a|C_RecruitAFriend.CanSummonFriend}}
+   # <font color="#ecbc2a">ret1.Name result -> canSummon</font>
+   + <font color="#00b400">ret2 = reason</font>
+   + <font color="#00b400">MayReturnNothing</font>
+ {{api|t=a|C_Sound.PlaySound}}
+   + <font color="#00b400">arg6 = volumeOverride</font>
+ {{api|t=a|C_Spell.GetSpellTexture}}
+   + <font color="#00b400">ret3 = conditionalIconID</font>
+ {{api|t=a|CreateSecureDelegate}}
+   + <font color="#00b400">arg2 = options</font>
+|}
+
+===FrameXML===
+''Disclaimer:'' Any [[Patch_12.1.0/API_changes#Deprecated_API|deprecated]] functions will still be listed as removed.
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-framexml"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(337)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(124)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-framexml"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{tlygo|AchievementFrame_RefreshBackButton}}
+: {{tlygo|AchievementFrame_SetComparisonMode}}
+: {{tlygo|AddBehavioralMessagingTrayToStatusFrames}}
+: {{tlygo|AddFriendFrame_Show}}
+: {{tlygo|AddGMChatStatusFrameToStatusFrames}}
+: {{tlygo|AddTicketStatusFrameToStatusFrames}}
+: {{tlygo|AddWowSurveyStatusFrameToStatusFrames}}
+: {{tlygo|AlliedRacesFrame_TryShow}}
+: {{tlygo|AnchorUtil.ApplyFlowLayout}}
+: {{tlygo|AnchorUtil.CreateFlowLayout}}
+: {{tlygo|ApplySecureDelegatesToTable}}
+: {{tlygo|ArchaeologyFrame_ToggleUI}}
+: {{tlygo|ArcheologyDigsiteProgressBar_OnSurveyCast}}
+: {{tlygo|ArdenwealdGardening_LoadUI}}
+: {{tlygo|ArtifactFrame_OnTraitsRefunded}}
+: {{tlygo|AuraUtil.AuraInstanceIDOnlyAuraCompare}}
+: {{tlygo|AuraUtil.ExpirationAuraCompare}}
+: {{tlygo|AuraUtil.ExpirationOnlyAuraCompare}}
+: {{tlygo|AuraUtil.GetAuraBorderColor}}
+: {{tlygo|AuraUtil.GetAuraDispelTypeIcon}}
+: {{tlygo|AuraUtil.GetUnitAuras}}
+: {{tlygo|AuraUtil.ImportantOnlyAuraCompare}}
+: {{tlygo|AuraUtil.IsValidFilterString}}
+: {{tlygo|AuraUtil.NameAuraCompare}}
+: {{tlygo|AuraUtil.NameOnlyAuraCompare}}
+: {{tlygo|AuraUtil.SetAuraDispelTypeIcon}}
+: {{tlygo|AzeriteEmpoweredItemUI_LoadUI}}
+: {{tlygo|AzeriteEssenceUI_LoadUI}}
+: {{tlygo|BattlefieldMap_ToggleUI}}
+: {{tlygo|BehavioralMessaging_LoadUI}}
+: {{tlygo|BehavioralMessagingTray_OnNotification}}
+: {{tlygo|Blizzard_HousingCatalogUtil.AddDecorEntryTooltipTrackingText}}
+: {{tlygo|Blizzard_HousingCatalogUtil.TrackHousingDecorID}}
+: {{tlygo|BNet_GetBattleTagComponents}}
+: {{tlygo|BNet_GetBattleTagSelf}}
+: {{tlygo|BNet_GetBroadcastTextSelf}}
+: {{tlygo|BNet_GetFriendLevelRank}}
+: {{tlygo|BNet_IsFriendLevelEqualOrHigher}}
+: {{tlygo|BoostTutorial_LoadUI}}
+: {{tlygo|CDMDebugGetDebugger}}
+: {{tlygo|ChallengeModeCompleteBanner_OnChallengeModeCompleted}}
+: {{tlygo|ChatAdditionalColor_OpenColorPicker}}
+: {{tlygo|ChatFrameUtil.DiscordNameColorize}}
+: {{tlygo|ChatFrameUtil.FormatDiscordMessage}}
+: {{tlygo|ChatFrameUtil.GetNameForDiscordMessage}}
+: {{tlygo|CheckActiveStoreForFree}}
+: {{tlygo|CombatAudioAlertUtil.EnumerateInterruptCastInfo}}
+: {{tlygo|CombatAudioAlertUtil.EnumerateInterruptCastSuccessInfo}}
+: {{tlygo|CombatAudioAlertUtil.EnumerateSayCombatEndInfo}}
+: {{tlygo|CombatAudioAlertUtil.EnumerateSayCombatStartInfo}}
+: {{tlygo|CombatAudioAlertUtil.EnumeratetWhenTargetDiesInfo}}
+: {{tlygo|CombatAudioAlertUtil.GetInterruptCastInfo}}
+: {{tlygo|CombatAudioAlertUtil.GetInterruptCastSuccessInfo}}
+: {{tlygo|CombatAudioAlertUtil.GetSayCombatEndInfo}}
+: {{tlygo|CombatAudioAlertUtil.GetSayCombatStartInfo}}
+: {{tlygo|CombatAudioAlertUtil.GetWhenTargetDiesInfo}}
+: {{tlygo|CombatText_LoadUI}}
+: {{tlygo|CompactUnitFrame_GetOptionDispelIndicatorOverlayAnimation}}
+: {{tlygo|CompactUnitFrame_GetOptionDispelIndicatorOverlayType}}
+: {{tlygo|CompactUnitFrameLayoutTemplates_LayoutFrameElement}}
+: {{tlygo|CompactUnitFrameUtil.ApplyConfig}}
+: {{tlygo|CompactUnitFrameUtil.GenerateNewConfig}}
+: {{tlygo|ConfirmDisenchantRollDialog_Show}}
+: {{tlygo|ConfirmLootRollDialog_Show}}
+: {{tlygo|ConfirmTalentWipeDialog_Show}}
+: {{tlygo|ContributionCollectionFrame_LoadUI}}
+: {{tlygo|CooldownManagerLayout_GetGroupBuffVisualAlerts}}
+: {{tlygo|CooldownManagerLayout_GetHiddenGroupBuffs}}
+: {{tlygo|CooldownManagerLayout_SetGroupBuffVisualAlerts}}
+: {{tlygo|CooldownManagerLayout_SetHiddenGroupBuffs}}
+: {{tlygo|CooldownViewer_MarkAuraCacheDirty}}
+: {{tlygo|CooldownViewerContextMenu_AddAlertEntryButton}}
+: {{tlygo|CooldownViewerContextMenu_AddNewAlertButton}}
+: {{tlygo|CooldownViewerDraggedItem_Clear}}
+: {{tlygo|CooldownViewerDraggedItem_Pickup}}
+: {{tlygo|CooldownViewerDraggedItem_SetIsLegalTarget}}
+: {{tlygo|CooldownViewerUtil.AddSoundAlertRadio}}
+: {{tlygo|CooldownViewerUtil.BuildSoundMenus}}
+: {{tlygo|CooldownViewerUtil.GetSoundTypeSoundKit}}
+: {{tlygo|CooldownViewerUtil.GetSoundTypeText}}
+: {{tlygo|CovenantCallings_LoadUI}}
+: {{tlygo|DebugTools_LoadUI}}
+: {{tlygo|DifficultyUtil.GetCreatureDifficultyColor}}
+: {{tlygo|DifficultyUtil.GetDifficultyColor}}
+: {{tlygo|DifficultyUtil.GetQuestDifficultyColor}}
+: {{tlygo|DifficultyUtil.GetRelativeDifficultyColor}}
+: {{tlygo|DifficultyUtil.GetScalingQuestDifficultyColor}}
+: {{tlygo|EditModeManagerFrame_EscapePressed}}
+: {{tlygo|EncounterJournal_OpenToTieredEntrance}}
+: {{tlygo|EventTrace_LoadUI}}
+: {{tlygo|ExpansionTrial_LoadUI}}
+: {{tlygo|FadingFrame_CopyTextScalingTime}}
+: {{tlygo|FadingFrame_GetTextScalingMinHeight}}
+: {{tlygo|FadingFrame_InitSlot}}
+: {{tlygo|FadingFrame_SetTextScaling}}
+: {{tlygo|FadingFrame_StartTextScaling}}
+: {{tlygo|FadingFrame_StopTextScaling}}
+: {{tlygo|FadingFrame_UpdateTextScaling}}
+: {{tlygo|FriendsFrame_HideAllPotentialSubFrames}}
+: {{tlygo|FriendsListUtil.BuildCharacterClassDisplayText}}
+: {{tlygo|FriendsListUtil.BuildCharacterLevelDisplayText}}
+: {{tlygo|FriendsListUtil.BuildCharacterNameDisplayText}}
+: {{tlygo|FriendsListUtil.BuildFriendNameDisplayText}}
+: {{tlygo|FriendsListUtil.BuildLocationDisplayText}}
+: {{tlygo|FriendsListUtil.BuildTooltipBroadcastText}}
+: {{tlygo|FriendsListUtil.GameStateUsesFactions}}
+: {{tlygo|FriendsListUtil.GetBattleNetFriendGameAccountInfoIfExactlyOneDirectInviteTargetExists}}
+: {{tlygo|FriendsListUtil.GetBattleNetFriendInviteInfo}}
+: {{tlygo|FriendsListUtil.GetBattleNetFriendInviteTypeLabel}}
+: {{tlygo|FriendsListUtil.GetBattleNetFriendPartyInviteRestrictionText}}
+: {{tlygo|FriendsListUtil.GetBattleNetFriendPartyInviteRestriction}}
+: {{tlygo|FriendsListUtil.GetFormattedCharacterName}}
+: {{tlygo|FriendsListUtil.GetFriendAccountNameText}}
+: {{tlygo|FriendsListUtil.GetFriendNameColorForFriendType}}
+: {{tlygo|FriendsListUtil.GetFriendNameDisplayColor}}
+: {{tlygo|FriendsListUtil.GetFriendNameOfflineDisplayColor}}
+: {{tlygo|FriendsListUtil.GetGameAccountPartyInviteRestriction}}
+: {{tlygo|FriendsListUtil.GetLastOnlineText}}
+: {{tlygo|FriendsListUtil.GetRegionName}}
+: {{tlygo|FriendsListUtil.GetRelativeTimeText}}
+: {{tlygo|FriendsListUtil.HasMultipleGameAccounts}}
+: {{tlygo|FriendsListUtil.InviteOrRequestToJoin}}
+: {{tlygo|FriendsListUtil.IsPlayingDifferentWoWProject}}
+: {{tlygo|FriendsListUtil.IsPlayingSameWoWProject}}
+: {{tlygo|FriendsListUtil.IsPlayingWoW}}
+: {{tlygo|FriendsListUtil.IsRequestInviteType}}
+: {{tlygo|FriendsListUtil.IsTitleFriend}}
+: {{tlygo|FriendsListUtil.ShouldShowRichPresenceOnly}}
+: {{tlygo|GameMenuFrame_EscapePressed}}
+: {{tlygo|GameMenuFrame_IsShown}}
+: {{tlygo|GameMenuFrame_Show}}
+: {{tlygo|GameRulesUtil.IsPlayerAtEffectiveMaxLevel}}
+: {{tlygo|GetBottomManagedFrameContainer}}
+: {{tlygo|GetChatAdditionalColor}}
+: {{tlygo|GetDiscordUserCommunityLink}}
+: {{tlygo|GetDiscordUserLink}}
+: {{tlygo|GetGarrisonMissionFrameNameForFollowerType}}
+: {{tlygo|GetGarrisonTypeForFollowerType}}
+: {{tlygo|GetPlayerBottomManagedFrameContainer}}
+: {{tlygo|GetRightManagedFrameContainer}}
+: {{tlygo|GetTimeStringFromSeconds}}
+: {{tlygo|GetUIPanelLayoutAttribute}}
+: {{tlygo|GetUIPanelLayoutFrame}}
+: {{tlygo|GMChatFrame_OnWhisperFromGM}}
+: {{tlygo|GossipConfirmDialog_Show}}
+: {{tlygo|GuildControlDiscord_Loaded_OnEvent}}
+: {{tlygo|GuildControlDiscord_Loaded_OnLoad}}
+: {{tlygo|GuildControlDiscord_SetGuildSettingsCheckboxes}}
+: {{tlygo|GuildControlRankDiscord_OnLoad}}
+: {{tlygo|GuildControlUI_Discord_HideAll}}
+: {{tlygo|GuildControlUI_Discord_Update}}
+: {{tlygo|GuildControlUI_DiscordFrame_OnLoad}}
+: {{tlygo|GuildControlUI_LoadUI}}
+: {{tlygo|GuildControlUI_OnShow}}
+: {{tlygo|GuildControlUI_SetupDiscord}}
+: {{tlygo|GuildControlUI_SetupSelected}}
+: {{tlygo|GuildControlUI_Setup}}
+: {{tlygo|GuildControlUI_Show}}
+: {{tlygo|GuildControlUI_UnlinkDiscord}}
+: {{tlygo|HandleQuestSessionInviteToPartyConfirmation}}
+: {{tlygo|HelpFrame_EscapePressed}}
+: {{tlygo|HideAuctionHouseFrame}}
+: {{tlygo|HideBarberShopFrame}}
+: {{tlygo|HideBlackMarketFrame}}
+: {{tlygo|HideGarrisonMissionFrames}}
+: {{tlygo|HideGarrisonShipyardFrame}}
+: {{tlygo|HideGossipFrame}}
+: {{tlygo|HideGuildBankFrame}}
+: {{tlygo|HideInstanceBootDialog}}
+: {{tlygo|HideInstanceLockDialog}}
+: {{tlygo|HideItemUpgradeFrame}}
+: {{tlygo|HideProfessionsCustomerOrdersFrame}}
+: {{tlygo|HideSummonConfirmationDialogs}}
+: {{tlygo|HouseFinderFrame_LoadUI}}
+: {{tlygo|HousingBulletinBoardFrame_LoadUI}}
+: {{tlygo|HousingControls_LoadUI}}
+: {{tlygo|HousingFramesUtil.IsBlueprintCollectionAvailable}}
+: {{tlygo|HousingFramesUtil.IsBlueprintOperationInProgress}}
+: {{tlygo|HousingFramesUtil.ShowBlueprintExport}}
+: {{tlygo|HousingFramesUtil.ShowBlueprintImport}}
+: {{tlygo|HousingFramesUtil.ShowBlueprintRoomExport}}
+: {{tlygo|HousingFramesUtil.TryOpenBlueprintCollection}}
+: {{tlygo|HousingTutorialUtil.HousingDecorQuestTutorialComplete}}
+: {{tlygo|HybridMinimap_LoadUI}}
+: {{tlygo|InputBoxInstructions_OnEnter}}
+: {{tlygo|InputBoxInstructions_OnLeave}}
+: {{tlygo|InputBoxInstructions_ShowTooltipIfTruncated}}
+: {{tlygo|InputUtil.CursorOnUpdate}}
+: {{tlygo|InputUtil.CursorUpdate}}
+: {{tlygo|InputUtil.GetCursorDelta}}
+: {{tlygo|InputUtil.IsMouseOver}}
+: {{tlygo|InputUtil.ShowInspectCursor}}
+: {{tlygo|InterfaceUtil.GetScreenHeightScale}}
+: {{tlygo|InterfaceUtil.GetScreenWidthScale}}
+: {{tlygo|InterpolatorUtil.GetSmoothProgressChange}}
+: {{tlygo|IslandsPartyPoseFrame_TryShow}}
+: {{tlygo|IsMouseoverCastSupported}}
+: {{tlygo|IsSummonConfirmationDialogVisible}}
+: {{tlygo|IsTypeAdditionalChatColor}}
+: {{tlygo|IsUnseenNewSettingInCurrentVersion}}
+: {{tlygo|ItemUtil.DisplayEquipSlotTooltip}}
+: {{tlygo|ItemUtil.GetEmptyEquipSlotTooltipForSlotName}}
+: {{tlygo|ItemUtil.GetEmptyEquipSlotTooltip}}
+: {{tlygo|ItemUtil.GetEquipSlotTexture}}
+: {{tlygo|ItemUtil.GetValidatedItemLocation}}
+: {{tlygo|Kiosk_LoadUI}}
+: {{tlygo|KioskFrame_HandlePlayerEnteringWorld}}
+: {{tlygo|LandingSoulbinds_LoadUI}}
+: {{tlygo|LFGListApplicationViewer_OpenEditMode}}
+: {{tlygo|LFGListApplicationViewerRemoveEntryButton_OnClick}}
+: {{tlygo|LoadAddOnWithErrorHandling}}
+: {{tlygo|LocaleUtil.GetLocaleDisplayName}}
+: {{tlygo|LocalizePlayerFrame_zhCN}}
+: {{tlygo|LocalizePlayerFrame_zhTW}}
+: {{tlygo|LootFrame_EscapePressed}}
+: {{tlygo|MacroFrame_SaveMacro}}
+: {{tlygo|ManageFramePositions}}
+: {{tlygo|MenuUtil.CreateHighlightButton}}
+: {{tlygo|MovePad_LoadUI}}
+: {{tlygo|NarrationUtil.CreateNarrationInfo}}
+: {{tlygo|NarrationUtil.GetCheckboxContext}}
+: {{tlygo|NarrationUtil.MakeIndexInfo}}
+: {{tlygo|NarrationUtil.MakeNarrationStringForMoney}}
+: {{tlygo|NarrationUtil.MakeNarrationStringFromIndexInfo}}
+: {{tlygo|NarrationUtil.MakeNarrationStringFromInfo}}
+: {{tlygo|NarrationUtil.MakeNarrationString}}
+: {{tlygo|NarrationUtil.NarrateCurrentScreen}}
+: {{tlygo|NarrationUtil.RegionToNarrationInfo}}
+: {{tlygo|NarrationUtil.ResolveForwardedRegion}}
+: {{tlygo|NarrationUtil.SetStaticDescription}}
+: {{tlygo|NarrationUtil.SetStaticName}}
+: {{tlygo|NarrationUtil.ShouldBeEnabled}}
+: {{tlygo|NarrationUtil.ShouldRegionNavigationSkipTooltips}}
+: {{tlygo|NPE_InitializeIfLoaded}}
+: {{tlygo|OpacityFrame_EscapePressed}}
+: {{tlygo|OpenEncounterJournalToJourney}}
+: {{tlygo|OpenEncounterJournalToTieredEntrance}}
+: {{tlygo|OpenMapToUserWaypoint}}
+: {{tlygo|OpenOrderHallTalentUI}}
+: {{tlygo|OpenPlayerSpellsToGlyphTarget}}
+: {{tlygo|PhotoSharingFrame_EscapePressed}}
+: {{tlygo|PingUtil.SendMacroPing}}
+: {{tlygo|PingUtil.TogglePingTarget}}
+: {{tlygo|PlayerChoiceFrame_TryShow}}
+: {{tlygo|PlayerChoiceToggle_TryShow}}
+: {{tlygo|PVPUI_LoadUI}}
+: {{tlygo|RaidWarningUtil.AddMessage}}
+: {{tlygo|RaidWarningUtil.ClearBossEmotes}}
+: {{tlygo|RaidWarningUtil.UpdateCenterScreenAnchors}}
+: {{tlygo|RecentAlliesUtil.GetBestSocialUIPresenceTypeForStateData}}
+: {{tlygo|RecruitAFriendFrameSocialViewInitializeAADC}}
+: {{tlygo|RegionUtil.GetTopLeftMost}}
+: {{tlygo|RegionUtil.SortByTopLeft}}
+: {{tlygo|RegisterGameMenuEscHandler}}
+: {{tlygo|RegisterPlayerInteraction}}
+: {{tlygo|ReportFrame_EscapePressed}}
+: {{tlygo|ResetDiscordSettings}}
+: {{tlygo|RestoreGMChatFrameSession}}
+: {{tlygo|SetGhostFrameShown}}
+: {{tlygo|SetPlayerInteractionConditions}}
+: {{tlygo|SettingsPanel_EscapePressed}}
+: {{tlygo|SetUIPanelLayoutAttribute}}
+: {{tlygo|ShakeFrameRandom}}
+: {{tlygo|ShakeFrame}}
+: {{tlygo|ShouldDisplaySpellCooldown}}
+: {{tlygo|ShowAchievementFrameForAchievement}}
+: {{tlygo|ShowAdventureMapFrameForFollowerType}}
+: {{tlygo|ShowArtifactFrame}}
+: {{tlygo|ShowArtifactRelicForgeFrame}}
+: {{tlygo|ShowAuctionHouseFrame}}
+: {{tlygo|ShowBarberShopFrame}}
+: {{tlygo|ShowBlackMarketFrame}}
+: {{tlygo|ShowChallengesKeystoneFrame}}
+: {{tlygo|ShowFlightMapFrame}}
+: {{tlygo|ShowGarrisonCapacitiveDisplayFrame}}
+: {{tlygo|ShowGarrisonMissionFrameForFollowerType}}
+: {{tlygo|ShowGarrisonRecruiterFrame}}
+: {{tlygo|ShowGarrisonShipyardFrame}}
+: {{tlygo|ShowGuildBankFrame}}
+: {{tlygo|ShowHeirloomsJournalToClosestUpgradeablePage}}
+: {{tlygo|ShowInstanceBootDialog}}
+: {{tlygo|ShowInstanceLockDialog}}
+: {{tlygo|ShowItemSocketingFrame}}
+: {{tlygo|ShowItemUpgradeFrame}}
+: {{tlygo|ShowMatchCelebrationPartyPoseFrame}}
+: {{tlygo|ShowPendingPlayerChoiceResponseUI}}
+: {{tlygo|ShowPerksProgramFrame}}
+: {{tlygo|ShowProfessionEquipmentHelpTip}}
+: {{tlygo|ShowProfessionsCustomerOrdersFrame}}
+: {{tlygo|ShowProfessionsFrame}}
+: {{tlygo|ShowQuestSessionGroupInviteConfirmation}}
+: {{tlygo|ShowQuestSessionGroupInviteReceivedConfirmation}}
+: {{tlygo|ShowRemixArtifactFrame}}
+: {{tlygo|ShowRuneforgeFrame}}
+: {{tlygo|ShowSummonConfirmationDialog}}
+: {{tlygo|ShowTaxiMapFrame}}
+: {{tlygo|SimpleCheckout_EscapePressed}}
+: {{tlygo|SocialUIContactsFrameInitializeAADC}}
+: {{tlygo|SocialUIUtil.AddSeparatorToTooltip}}
+: {{tlygo|SocialUIUtil.GetBattleNetFriendTagInterestsUIOrder}}
+: {{tlygo|SocialUIUtil.GetBattleNetFriendTagRoleUIOrder}}
+: {{tlygo|SocialUIUtil.GetBlockedName}}
+: {{tlygo|SocialUIUtil.GetIconForPresenceType}}
+: {{tlygo|SocialUIUtil.GetLabelForBattleNetFriendTag}}
+: {{tlygo|SocialUIUtil.GetLabelForPresenceType}}
+: {{tlygo|SocialUIUtil.GetPresenceTypeForBattleNetAccountInfo}}
+: {{tlygo|SocialUIUtil.GetPresenceTypeSelf}}
+: {{tlygo|SocialUIUtil.InitializeUserScaledDropdownButton}}
+: {{tlygo|SocialUIUtil.InitializeUserScaledDropdownMainTitle}}
+: {{tlygo|SocialUIUtil.InitializeUserScaledDropdownTitle}}
+: {{tlygo|SocialUIUtil.SetBattleNetPresenceFromSocialUIPresence}}
+: {{tlygo|SoulbindViewer_LoadUI}}
+: {{tlygo|SpellFlyout_EscapePressed}}
+: {{tlygo|SplashFrame_EscapePressed}}
+: {{tlygo|StoreEscapePressed}}
+: {{tlygo|StringUtil.JoinAlternatingConditionalColor}}
+: {{tlygo|TextureUtil.AnimateTexCoords}}
+: {{tlygo|TimeUtil.BetterDate}}
+: {{tlygo|TimeUtil.GetRecentTimeDate}}
+: {{tlygo|ToggleRAFPanel}}
+: {{tlygo|ToggleSocialUI}}
+: {{tlygo|TryShowAnimaDiversionFrame}}
+: {{tlygo|TryShowCovenantPreviewFrame}}
+: {{tlygo|UIModeUtil.CreateExtendedBlocklist}}
+: {{tlygo|UIModeUtil.CreateModifiedBlocklist}}
+: {{tlygo|UIModeUtil.IsModeActive}}
+: {{tlygo|UIModeUtil.RegisterMode}}
+: {{tlygo|UIModeUtil.SetModeActive}}
+: {{tlygo|UnitPopupSharedUtil.IsFriendshipUpgrade}}
+: {{tlygo|UpdateQuestAcceptLogFullDialog}}
+: {{tlygo|VisualAlert_GetTypeTemplate}}
+: {{tlygo|VisualAlert_GetTypeText}}
+: {{tlygo|VisualAlertData_ForEach}}
+: {{tlygo|VisualAlerts_RegisterAll}}
+: {{tlygo|WarfrontsPartyPoseFrame_TryShow}}
+: {{tlygo|WowSurveyStatusFrame_OnSurveyDelivered}}
+: {{tlygo|assertf}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+: {{tlygo|build=12.0.7|AddFrameLock}}
+: {{tlygo|build=12.0.7|AnimatedShine_OnUpdate}}
+: {{tlygo|build=12.0.7|AnimateTexCoords}}
+: {{tlygo|build=12.0.7|BattleTagInviteFrame_Show}}
+: {{tlygo|build=12.0.7|BetterDate}}
+: {{tlygo|build=12.0.7|BFAMissionFrame_EscapePressed}}
+: {{tlygo|build=12.0.7|BoostTutorial_AttemptLoad}}
+: {{tlygo|build=12.0.7|BuildColoredListString}}
+: {{tlygo|build=12.0.7|BuildIconArray}}
+: {{tlygo|build=12.0.7|BuildListString}}
+: {{tlygo|build=12.0.7|BuildMultilineTooltip}}
+: {{tlygo|build=12.0.7|BuildNewLineListString}}
+: {{tlygo|build=12.0.7|ButtonPulse_OnUpdate}}
+: {{tlygo|build=12.0.7|CanAccessObject}}
+: {{tlygo|build=12.0.7|ClassTrainerFrame_Hide}}
+: {{tlygo|build=12.0.7|ClassTrainerFrame_Show}}
+: {{tlygo|build=12.0.7|CloseCalendarMenus}}
+: {{tlygo|build=12.0.7|CommunitiesFrame_IsEnabled}}
+: {{tlygo|build=12.0.7|CompactUnitFrame_GetOptionDisplayOnlyHealerPowerBars}}
+: {{tlygo|build=12.0.7|CompactUnitFrame_GetOptionDisplayPowerBar}}
+: {{tlygo|build=12.0.7|CompactUnitFrame_GetOptionShowDispelIndicatorOverlay}}
+: {{tlygo|build=12.0.7|ConvertRGBtoColorString}}
+: {{tlygo|build=12.0.7|DisplayTypeUnassignedSupported}}
+: {{tlygo|build=12.0.7|EventUtil.AreVariablesLoaded}}
+: {{tlygo|build=12.0.7|ExpansionTrial_CheckLoadUI}}
+: {{tlygo|build=12.0.7|FriendsFrame_CloseQuickJoinHelpTip}}
+: {{tlygo|build=12.0.7|FriendsFrameAddFriendButton_OnClick}}
+: {{tlygo|build=12.0.7|FriendsFriends_InitButton}}
+: {{tlygo|build=12.0.7|FriendsFriends_SetSelection}}
+: {{tlygo|build=12.0.7|FriendsFriendsButton_SetSelected}}
+: {{tlygo|build=12.0.7|FriendsFriendsFrame_Close}}
+: {{tlygo|build=12.0.7|GetDungeonNameWithDifficulty}}
+: {{tlygo|build=12.0.7|GetNotchHeight}}
+: {{tlygo|build=12.0.7|GetPlayerKeyState}}
+: {{tlygo|build=12.0.7|GetScaledCursorDelta}}
+: {{tlygo|build=12.0.7|GetScaledCursorPositionForFrame}}
+: {{tlygo|build=12.0.7|GetScaledCursorPosition}}
+: {{tlygo|build=12.0.7|GetScreenHeightScale}}
+: {{tlygo|build=12.0.7|GetScreenWidthScale}}
+: {{tlygo|build=12.0.7|GetSmoothProgressChange}}
+: {{tlygo|build=12.0.7|GetSocialColoredName}}
+: {{tlygo|build=12.0.7|GetSortedSelfResurrectOptions}}
+: {{tlygo|build=12.0.7|GetUIParentOffset}}
+: {{tlygo|build=12.0.7|HelpPlatesSupported}}
+: {{tlygo|build=12.0.7|HousingControlsUtil.CanActivateHousingControls}}
+: {{tlygo|build=12.0.7|HousingTutorialUtil.HousingQuestTutorialComplete}}
+: {{tlygo|build=12.0.7|IsFrameLockActive}}
+: {{tlygo|build=12.0.7|IsFrameSmartShown}}
+: {{tlygo|build=12.0.7|IsLevelAtEffectiveMaxLevel}}
+: {{tlygo|build=12.0.7|IsPlayerAtEffectiveMaxLevel}}
+: {{tlygo|build=12.0.7|KeyBindingFrame_LoadUI}}
+: {{tlygo|build=12.0.7|LocalizePlayerFrame}}
+: {{tlygo|build=12.0.7|LocalizezhCN}}
+: {{tlygo|build=12.0.7|LocalizezhTW}}
+: {{tlygo|build=12.0.7|MacroFrame_SaveMacro}}
+: {{tlygo|build=12.0.7|MajorFactions_LoadUI}}
+: {{tlygo|build=12.0.7|MouseIsOver}}
+: {{tlygo|build=12.0.7|NPE_CheckTutorials}}
+: {{tlygo|build=12.0.7|NPETutorial_AttemptToBegin}}
+: {{tlygo|build=12.0.7|OpenAchievementFrameToAchievement}}
+: {{tlygo|build=12.0.7|OrderHallMissionFrame_EscapePressed}}
+: {{tlygo|build=12.0.7|OrderHallTalentFrame_EscapePressed}}
+: {{tlygo|build=12.0.7|OutfitterUI_LoadUI}}
+: {{tlygo|build=12.0.7|PingUtil.GetContextualPingTypeForUnit}}
+: {{tlygo|build=12.0.7|PlayerChoiceToggle_TryShow}}
+: {{tlygo|build=12.0.7|QuickJoin_JoinQueueButtonOnClick}}
+: {{tlygo|build=12.0.7|RaidBossEmoteFrame_OnEvent}}
+: {{tlygo|build=12.0.7|RaidBossEmoteFrame_OnLoad}}
+: {{tlygo|build=12.0.7|RaidBrowser_IsEmpowered}}
+: {{tlygo|build=12.0.7|RaidNotice_AddMessage}}
+: {{tlygo|build=12.0.7|RaidNotice_ClearSlot}}
+: {{tlygo|build=12.0.7|RaidNotice_Clear}}
+: {{tlygo|build=12.0.7|RaidNotice_FadeInit}}
+: {{tlygo|build=12.0.7|RaidNotice_OnUpdate}}
+: {{tlygo|build=12.0.7|RaidNotice_SetSlot}}
+: {{tlygo|build=12.0.7|RaidNotice_UpdateSlot}}
+: {{tlygo|build=12.0.7|RaidWarningFrame_OnEvent}}
+: {{tlygo|build=12.0.7|RaidWarningFrame_OnLoad}}
+: {{tlygo|build=12.0.7|RecentTimeDate}}
+: {{tlygo|build=12.0.7|RefreshAuras}}
+: {{tlygo|build=12.0.7|RegisterNewFrameLock}}
+: {{tlygo|build=12.0.7|RemoveFrameLock}}
+: {{tlygo|build=12.0.7|ReverseQuestObjective}}
+: {{tlygo|build=12.0.7|SecureAuraHeader_GetUnit}}
+: {{tlygo|build=12.0.7|SecureAuraHeader_OnAttributeChanged}}
+: {{tlygo|build=12.0.7|SecureAuraHeader_OnEvent}}
+: {{tlygo|build=12.0.7|SecureAuraHeader_OnHide}}
+: {{tlygo|build=12.0.7|SecureAuraHeader_OnLoad}}
+: {{tlygo|build=12.0.7|SecureAuraHeader_OnShow}}
+: {{tlygo|build=12.0.7|SecureAuraHeader_OnUpdate}}
+: {{tlygo|build=12.0.7|SecureAuraHeader_UpdateEventRegistrations}}
+: {{tlygo|build=12.0.7|SecureAuraHeader_Update}}
+: {{tlygo|build=12.0.7|SetDesaturation}}
+: {{tlygo|build=12.0.7|SetFrameLock}}
+: {{tlygo|build=12.0.7|ShowResurrectRequest}}
+: {{tlygo|build=12.0.7|SmartHide}}
+: {{tlygo|build=12.0.7|SmartShow}}
+: {{tlygo|build=12.0.7|TalentFrame_LoadUI}}
+: {{tlygo|build=12.0.7|TargetFrame_UpdateBuffAnchor}}
+: {{tlygo|build=12.0.7|TargetFrame_UpdateDebuffAnchor}}
+: {{tlygo|build=12.0.7|ToggleLFGFrame}}
+: {{tlygo|build=12.0.7|ToggleRafPanel}}
+: {{tlygo|build=12.0.7|ToggleRaidBrowser}}
+: {{tlygo|build=12.0.7|ToggleWoWHackCharacterUI}}
+: {{tlygo|build=12.0.7|TokenFrame_LoadUI}}
+: {{tlygo|build=12.0.7|TrialAccountCapReached_Inform}}
+: {{tlygo|build=12.0.7|UIDoFramesIntersect}}
+: {{tlygo|build=12.0.7|UIParent_ManageFramePositions}}
+: {{tlygo|build=12.0.7|UIParent_OnEvent}}
+: {{tlygo|build=12.0.7|UIParent_OnHide}}
+: {{tlygo|build=12.0.7|UIParent_OnLoad}}
+: {{tlygo|build=12.0.7|UIParent_OnShow}}
+: {{tlygo|build=12.0.7|UIParent_Shared_OnEvent}}
+: {{tlygo|build=12.0.7|UIParent_Shared_OnLoad}}
+: {{tlygo|build=12.0.7|UIParent_UpdateTopFramePositions}}
+: {{tlygo|build=12.0.7|UIParentLoadAddOn}}
+: {{tlygo|build=12.0.7|UnitHasMana}}
+: {{tlygo|build=12.0.7|UpdateFrameLock}}
+: {{tlygo|build=12.0.7|UpdateUIElementsForClientScene}}
+: {{tlygo|build=12.0.7|WorldFrame_OnLoad}}
+: {{tlygo|build=12.0.7|WorldFrame_OnUpdate}}
+: {{tlygo|build=12.0.7|WoWHackSpellsUI_LoadUI}}
+: {{tlygo|build=12.0.7|getglobal}}
+: {{tlygo|build=12.0.7|setglobal}}
+</div>
+|}
+
+===ScriptObjects===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-scriptobject"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(8)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(0)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-scriptobject"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=w|DurationTextBinding:Assign}}
+: {{api|t=w|DurationTextBinding:ClearTextColorCurve}}
+: {{api|t=w|DurationTextBinding:Copy}}
+: {{api|t=w|DurationTextBinding:GetFormattedTextColor}}
+: {{api|t=w|DurationTextBinding:GetTextColorCurve}}
+: {{api|t=w|DurationTextBinding:SetTextColorCurve}}
+: {{api|t=w|SecondsFormatter:GetRounding}}
+: {{api|t=w|SecondsFormatter:SetRounding}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+</div>
+|}
+
+===Widgets===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-widgets"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(45)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(0)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-widgets"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=w|FrameScriptObject:AddAccessRestrictions}}
+: {{api|t=w|FrameScriptObject:AddForbiddenAspects}}
+: {{api|t=w|FrameScriptObject:AddSecretAspect}}
+: {{api|t=w|FrameScriptObject:CanBeAccessedInContext}}
+: {{api|t=w|FrameScriptObject:GetAccessRestrictions}}
+: {{api|t=w|FrameScriptObject:GetForbiddenAspects}}
+: {{api|t=w|FrameScriptObject:GetInheritableForbiddenAspects}}
+: {{api|t=w|FrameScriptObject:GetObjectTable}}
+: {{api|t=w|FrameScriptObject:HasAccessConstraints}}
+: {{api|t=w|FrameScriptObject:HasAnyAccessRestrictions}}
+: {{api|t=w|FrameScriptObject:HasAnyForbiddenAspects}}
+: {{api|t=w|FontString:SetDesaturateEmbeddedTextures}}
+: {{api|t=w|TextureBase:ClearRadialProgressBar}}
+: {{api|t=w|TextureBase:ClearSVG}}
+: {{api|t=w|TextureBase:GetRadialProgressBarEndOffset}}
+: {{api|t=w|TextureBase:GetRadialProgressBarFeather}}
+: {{api|t=w|TextureBase:GetRadialProgressBarPercent}}
+: {{api|t=w|TextureBase:GetRadialProgressBarReverse}}
+: {{api|t=w|TextureBase:GetRadialProgressBarStartOffset}}
+: {{api|t=w|TextureBase:SetRadialProgressBarEndOffset}}
+: {{api|t=w|TextureBase:SetRadialProgressBarFeather}}
+: {{api|t=w|TextureBase:SetRadialProgressBarPercent}}
+: {{api|t=w|TextureBase:SetRadialProgressBarReverse}}
+: {{api|t=w|TextureBase:SetRadialProgressBarStartOffset}}
+: {{api|t=w|TextureBase:SetSVG}}
+: {{api|t=w|RadialProgress:GetFromPercent}}
+: {{api|t=w|RadialProgress:GetToPercent}}
+: {{api|t=w|RadialProgress:SetFromPercent}}
+: {{api|t=w|RadialProgress:SetToPercent}}
+: {{api|t=w|Frame:AddRoleset}}
+: {{api|t=w|Frame:CreateVectorGraphics}}
+: {{api|t=w|Frame:GetOnUpdateMode}}
+: {{api|t=w|Frame:GetRolesetNames}}
+: {{api|t=w|Frame:IsRolesetFiltered}}
+: {{api|t=w|Frame:RemoveRoleset}}
+: {{api|t=w|Frame:ResizeToBoundsRect}}
+: {{api|t=w|Frame:SetOnUpdateMode}}
+: {{api|t=w|Frame:SetRolesets}}
+: {{api|t=w|Minimap:SetIconScale}}
+: {{api|t=w|StatusBar:GetRenderMode}}
+: {{api|t=w|StatusBar:SetRenderMode}}
+: {{api|t=w|VectorGraphics:ClearSVG}}
+: {{api|t=w|VectorGraphics:GetSVGFileID}}
+: {{api|t=w|VectorGraphics:HasSVG}}
+: {{api|t=w|VectorGraphics:SetSVG}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+</div>
+ '''Changed'''
+ {{api|t=w|noparens=1|Animation:GetScript}}
+   # <font color="#ecbc2a">arg1.Type cstring -> ScriptTypeName</font>
+   # <font color="#ecbc2a">arg2.Nilable true -> false</font>
+   # <font color="#ecbc2a">arg2.Type number -> ScriptBindingType</font>
+   + <font color="#00b400">arg2.Default = Extrinsic</font>
+   # <font color="#ecbc2a">ret1.Type luaFunction -> LuaFunctionReference</font>
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+   + <font color="#00b400">RequiresSupportedScript</font>
+ {{api|t=w|noparens=1|Animation:HookScript}}
+   # <font color="#ecbc2a">arg1.Type cstring -> ScriptTypeName</font>
+   # <font color="#ecbc2a">arg2.Type luaFunction -> LuaFunctionReference</font>
+   # <font color="#ecbc2a">arg3.Nilable true -> false</font>
+   # <font color="#ecbc2a">arg3.Type number -> ScriptBindingType</font>
+   + <font color="#00b400">arg3.Default = Extrinsic</font>
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+   + <font color="#00b400">ret1 = success</font>
+   + <font color="#00b400">RequiresAssignableScript</font>
+   # <font color="#ecbc2a">SecretArguments AllowedWhenUntainted -> NotAllowed</font>
+ {{api|t=w|noparens=1|Animation:SetScript}}
+   # <font color="#ecbc2a">arg1.Type cstring -> ScriptTypeName</font>
+   # <font color="#ecbc2a">arg2.Type luaFunction -> LuaFunctionReference</font>
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+   + <font color="#00b400">RequiresAssignableScript</font>
+   # <font color="#ecbc2a">SecretArguments AllowedWhenUntainted -> NotAllowed</font>
+ {{api|t=w|noparens=1|AnimationGroup:GetScript}}
+   # <font color="#ecbc2a">arg1.Type cstring -> ScriptTypeName</font>
+   # <font color="#ecbc2a">arg2.Nilable true -> false</font>
+   # <font color="#ecbc2a">arg2.Type number -> ScriptBindingType</font>
+   + <font color="#00b400">arg2.Default = Extrinsic</font>
+   # <font color="#ecbc2a">ret1.Type luaFunction -> LuaFunctionReference</font>
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+   + <font color="#00b400">RequiresSupportedScript</font>
+ {{api|t=w|noparens=1|AnimationGroup:HookScript}}
+   # <font color="#ecbc2a">arg1.Type cstring -> ScriptTypeName</font>
+   # <font color="#ecbc2a">arg2.Type luaFunction -> LuaFunctionReference</font>
+   # <font color="#ecbc2a">arg3.Nilable true -> false</font>
+   # <font color="#ecbc2a">arg3.Type number -> ScriptBindingType</font>
+   + <font color="#00b400">arg3.Default = Extrinsic</font>
+   + <font color="#00b400">ret1 = success</font>
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+   + <font color="#00b400">RequiresAssignableScript</font>
+   # <font color="#ecbc2a">SecretArguments AllowedWhenUntainted -> NotAllowed</font>
+ {{api|t=w|noparens=1|AnimationGroup:SetScript}}
+   # <font color="#ecbc2a">arg1.Type cstring -> ScriptTypeName</font>
+   # <font color="#ecbc2a">arg2.Type luaFunction -> LuaFunctionReference</font>
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+   + <font color="#00b400">RequiresAssignableScript</font>
+   # <font color="#ecbc2a">SecretArguments AllowedWhenUntainted -> NotAllowed</font>
+ {{api|t=w|noparens=1|FrameScriptObject:SetToDefaults}}
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+ {{api|t=w|noparens=1|ScriptRegion:ClearScripts}}
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+ {{api|t=w|noparens=1|ScriptRegion:GetScript}}
+   # <font color="#ecbc2a">arg1.Type cstring -> ScriptTypeName</font>
+   # <font color="#ecbc2a">arg2.Nilable true -> false</font>
+   # <font color="#ecbc2a">arg2.Type number -> ScriptBindingType</font>
+   + <font color="#00b400">arg2.Default = Extrinsic</font>
+   # <font color="#ecbc2a">ret1.Type luaFunction -> LuaFunctionReference</font>
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+   + <font color="#00b400">RequiresSupportedScript</font>
+ {{api|t=w|noparens=1|ScriptRegion:HookScript}}
+   # <font color="#ecbc2a">arg1.Type cstring -> ScriptTypeName</font>
+   # <font color="#ecbc2a">arg2.Type luaFunction -> LuaFunctionReference</font>
+   # <font color="#ecbc2a">arg3.Nilable true -> false</font>
+   # <font color="#ecbc2a">arg3.Type number -> ScriptBindingType</font>
+   + <font color="#00b400">arg3.Default = Extrinsic</font>
+   + <font color="#00b400">ret1 = success</font>
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+   + <font color="#00b400">RequiresAssignableScript</font>
+   # <font color="#ecbc2a">SecretArguments AllowedWhenUntainted -> NotAllowed</font>
+ {{api|t=w|noparens=1|ScriptRegion:SetScript}}
+   # <font color="#ecbc2a">arg1.Type cstring -> ScriptTypeName</font>
+   # <font color="#ecbc2a">arg2.Type luaFunction -> LuaFunctionReference</font>
+   + <font color="#00b400">ChecksForbiddenAspects</font>
+   + <font color="#00b400">RequiresAssignableScript</font>
+   # <font color="#ecbc2a">SecretArguments AllowedWhenUntainted -> NotAllowed</font>
+|}
+
+===Events===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-events"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(43)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(2)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-events"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=e|BATTLE_NET_FRIEND_TAG_ENABLED_STATUS_UPDATED}}
+: {{api|t=e|BATTLE_NET_TITLE_FRIEND_CUSTOM_NAME_ENABLED_STATUS_UPDATED}}
+: {{api|t=e|CHAT_MSG_GUILD_DISCORD}}
+: {{api|t=e|CONFIRM_BATTLE_NET_FRIEND_INVITE_SHOW}}
+: {{api|t=e|DISCORD_GUILD_ACHIEVEMENT}}
+: {{api|t=e|DISCORD_GUILD_LOBBY_UPDATE}}
+: {{api|t=e|DISCORD_GUILD_SETTINGS_UPDATE}}
+: {{api|t=e|DISCORD_LINK_UPDATE}}
+: {{api|t=e|DISCORD_SERVER_LIST_UPDATE}}
+: {{api|t=e|DISCORD_STATUS_UPDATE}}
+: {{api|t=e|EXTERNAL_EVENT_LAUNCH_URL_FAILED}}
+: {{api|t=e|FULLSCREEN_BROWSER_SPINNER_HIDE}}
+: {{api|t=e|FULLSCREEN_BROWSER_SPINNER_SHOW}}
+: {{api|t=e|GROUP_BUFF_VISUAL_ALERTS_CHANGED}}
+: {{api|t=e|GUILD_RANKS_UPDATE_ACTIVE_PLAYER}}
+: {{api|t=e|HIDDEN_GROUP_BUFFS_CHANGED}}
+: {{api|t=e|HOUSE_RESET_COMPLETED}}
+: {{api|t=e|HOUSE_RESET_FAILED}}
+: {{api|t=e|HOUSING_BLUEPRINT_COLLECTION_FAILURE}}
+: {{api|t=e|HOUSING_BLUEPRINT_COLLECTION_RECEIVED}}
+: {{api|t=e|HOUSING_BLUEPRINT_CONTENTS_FAILURE}}
+: {{api|t=e|HOUSING_BLUEPRINT_CONTENTS_RECEIVED}}
+: {{api|t=e|HOUSING_BLUEPRINT_DELETE_FAILURE}}
+: {{api|t=e|HOUSING_BLUEPRINT_DELETE_SUCCESS}}
+: {{api|t=e|HOUSING_BLUEPRINT_EXPORT_FAILURE}}
+: {{api|t=e|HOUSING_BLUEPRINT_EXPORT_SUCCESS}}
+: {{api|t=e|HOUSING_BLUEPRINT_IMPORT_FAILURE}}
+: {{api|t=e|HOUSING_BLUEPRINT_IMPORT_STARTED}}
+: {{api|t=e|HOUSING_BLUEPRINT_IMPORT_SUCCESS}}
+: {{api|t=e|HOUSING_BLUEPRINT_RENAME_FAILURE}}
+: {{api|t=e|HOUSING_BLUEPRINT_RENAME_SUCCESS}}
+: {{api|t=e|HOUSING_BLUEPRINTS_AVAILABILITY_CHANGED}}
+: {{api|t=e|HOUSING_LAYOUT_OCCUPIED_FLOOR_RANGE_CHANGED}}
+: {{api|t=e|HOUSING_NEW_DECOR_PLACE_COMPLETE}}
+: {{api|t=e|IGNORE_NEIGHBORHOOD_RESPONSE}}
+: {{api|t=e|LEGACY_FRIEND_SYSTEM_STATUS_UPDATED}}
+: {{api|t=e|LFG_LIST_CENSORED_ACTIVE_ENTRY_UPDATE}}
+: {{api|t=e|LFG_LIST_REVEALED_CENSORED_ACTIVE_ENTRY}}
+: {{api|t=e|SOCIAL_UI_FRIENDS_LIST_SYSTEM_STATUS_UPDATED}}
+: {{api|t=e|SOCIAL_UI_SOCIAL_QUEUE_SYSTEM_STATUS_UPDATED}}
+: {{api|t=e|SOCIAL_UI_SYSTEM_STATUS_UPDATED}}
+: {{api|t=e|UNIT_PING_PIN_ADDED}}
+: {{api|t=e|UNIT_PING_PIN_REMOVED}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+: {{api|t=e|BATTLETAG_INVITE_SHOW}}
+: {{api|t=e|HOUSING_LAYOUT_NUM_FLOORS_CHANGED}}
+</div>
+ '''Changed'''
+ [[CHAT_MSG|CHAT_MSG_*]]
+   + <font color="#00b400">discordInfo</font>
+ {{api|t=e|SPELL_UPDATE_COOLDOWN}}
+   + <font color="#00b400">itemID</font>
+|}
+
+===CVars===
+{| class="wikitable" style="min-width: 600px"
+|- class="mw-customtoggle-cvars"
+! style="width: 50%" | <font color="lightgreen">Added</font> <small>(23)</small>
+! style="width: 50%" | <font color="pink">Removed</font> <small>(5)</small>
+|- class="mw-collapsible" id="mw-customcollapsible-cvars"
+| valign="top" | <div style="margin-left:-1.5em">
+: {{apitooltip|type=cvar|name=accessibilityScreenNarrationEnabled|default=1|cat=4|desc=Enables screen narration for accessibility}}
+: {{apitooltip|type=cvar|name=accessibilityScreenNarrationSpeechRate|default=0|cat=4|desc=Speed at which voice narration speaks}}
+: {{apitooltip|type=cvar|name=accessibilityScreenNarrationSpeechVolume|default=100|cat=4|desc=Volume at which voice narration speaks}}
+: {{apitooltip|type=cvar|name=accessibilityScreenNarrationVoice|default=1|cat=4|desc=Voice option used with screen narration}}
+: {{apitooltip|type=cvar|name=AftermathShaderDebug|default=0|desc=Enables NVIDIA Aftermath shader debugging}} {{test-inline}}
+: {{apitooltip|type=cvar|name=discordClientEnabled|default=1|cat=0|desc=Enable the discord client integration}}
+: {{apitooltip|type=cvar|name=discordDisplayName|default=0|cat=4|desc=The name to show for text from you in-game from Discord}}
+: {{apitooltip|type=cvar|name=nameplateCheckDistanceForTarget|default=0|cat=4|desc=If false, show our target's nameplate even if they're very far away.}}
+: {{apitooltip|type=cvar|name=nameplateForceShowUnitName|default=0|cat=4|desc=If true, nameplates will always show the unit name regardless of other unit name settings.}}
+: {{apitooltip|type=cvar|name=nameplateNotSelectedAlpha|default=-1.000000|cat=4|desc=When you have a target, the alpha of other nameplates (not used if value is negative).}}
+: {{apitooltip|type=cvar|name=nameplatePlayRemovalAnimation|default=1|cat=4|desc=If true, play a scale/alpha animation when a nameplate is removed. If false, remove the nameplate instantly.}}
+: {{apitooltip|type=cvar|name=nameplateShowAllPersonalAuras|default=0|cat=4|desc=If true, show all personal auras on nameplates, regardless of whether they are normally flagged to be shown.}}
+: {{apitooltip|type=cvar|name=nameplateShowFriendlyRealmName|default=1|scope=Account|cat=4|desc=Used to show or hide the realm name in friendly player unit nameplate names.}}
+: {{apitooltip|type=cvar|name=nameplateShowFriends|cat=4}}
+: {{apitooltip|type=cvar|name=pingTarget|default=0|cat=4|desc=Determines how pinging in the world should behave for the ping system.}}
+: {{apitooltip|type=cvar|name=raidFramesDispelIndicatorOverlayAnimation|default=0|scope=Character|cat=4|desc=When showing dispel indicators, use a pulsing alpha anim}}
+: {{apitooltip|type=cvar|name=showPingsOnRaidFrames|default=1|cat=4|desc=Enables ping details being shown on raid frames.}}
+: {{apitooltip|type=cvar|name=showScreenNarrationDialog|default=1|cat=4|desc=Show screen narration dialog on startup}}
+: {{apitooltip|type=cvar|name=taintLogObjectSecrets|default=0|cat=0|desc=If enabled, include additional taint log entries when script objects gain secret aspects or values.}}
+: {{apitooltip|type=cvar|name=tooltipShowAuraSpellIDs|default=0|cat=4|desc=Show spell IDs in tooltips for unit auras.}}
+: {{apitooltip|type=cvar|name=userFontScaleGlue|default=1.390000|cat=4|desc=glues: Defines the scale of the font used in places around the UI where readability requires larger defaults which are still customizable by the user.}}
+: {{apitooltip|type=cvar|name=worldMapShowCursorCoords|default=1|scope=Account|cat=4|desc=Show cursor coordinates on the world map}}
+: {{apitooltip|type=cvar|name=worldMapShowPlayerCoords|default=1|scope=Account|cat=4|desc=Show player coordinates on the world map}}
+</div>
+| valign="top" | <div style="margin-left:-1.5em">
+: {{apitooltip|type=cvar|name=auctionDisplayOnCharacter|default=0|scope=Account|cat=4|desc=Show auction items on the dress-up paperdoll}}
+: {{apitooltip|type=cvar|name=auctionSortByBuyoutPrice|default=0|scope=Character|cat=4|desc=Sort auction items by buyout price instead of current bid price}}
+: {{apitooltip|type=cvar|name=auctionSortByUnitPrice|default=0|scope=Character|cat=4|desc=Sort auction items by unit price instead of total stack price}}
+: {{apitooltip|type=cvar|name=lastLockedDelvesCompanionAbilities|cat=4|desc=Stores the nodeIDs of the locked delve companion abilities, to highlight them when unlocked.}}
+: {{apitooltip|type=cvar|name=SlugSupersampling|default=1|cat=0|desc=The slug glyph shader performs adaptive supersampling for high-quality rendering at small font sizes}}
+</div>
+|}
+
+===Enumerations===
+ [[Enum.ClubStreamType]] <small>({{apilink|t=Function|C_Club.GetStreamInfo|noparens=1}}, {{apilink|t=Function|C_Club.GetStreams|noparens=1}})</small>
+   + <font color="#00b400">Discord</font>
+ [[Enum.CompanionConfigSlotTypes]] <small>({{apilink|t=Function|C_DelvesUI.GetUnseenCuriosBySlotType|noparens=1}}, {{apilink|t=Function|C_DelvesUI.SaveSeenCuriosBySlotType|noparens=1}})</small>
+   + <font color="#00b400">Flavor</font>
+ [[Enum.CooldownViewerCategory]] <small>({{apilink|t=Function|C_CooldownViewer.GetCooldownViewerCategorySet|noparens=1}}, {{apilink|t=Function|C_CooldownViewer.GetCooldownViewerCooldownInfo|noparens=1}})</small>
+   + <font color="#00b400">GroupBuff</font>
+   + <font color="#00b400">SpecAgnosticEssential</font>
+   + <font color="#00b400">SpecAgnosticTracked</font>
+   + <font color="#00b400">EquipSlotEssential</font>
+   + <font color="#00b400">EquipSlotTracked</font>
+ [[Enum.EditModeAccountSetting]] <small>({{apilink|t=Function|C_EditMode.SetAccountSetting|noparens=1}})</small>
+   + <font color="#00b400">ShowRaidWarning</font>
+ [[Enum.EditModeMinimapSetting]]
+   + <font color="#00b400">IconScale</font>
+ [[Enum.EditModeSystem]] <small>({{apilink|t=Function|C_EditMode.ConvertLayoutInfoToString|noparens=1}}, {{apilink|t=Function|C_EditMode.ConvertStringToLayoutInfo|noparens=1}}, {{apilink|t=Function|C_EditMode.GetLayouts|noparens=1}}, {{apilink|t=Function|C_EditMode.SaveLayouts|noparens=1}}, {{apilink|t=Event|EDIT_MODE_LAYOUTS_UPDATED}})</small>
+   + <font color="#00b400">RaidWarning</font>
+ [[Enum.EditModeUnitFrameSetting]]
+   - <font color="#ff6767">IconSize</font>
+   + <font color="#00b400">BuffIconSize</font>
+   + <font color="#00b400">DebuffIconSize</font>
+ [[Enum.FragmentID]]
+   + <font color="#00b400">FMapObject</font>
+   + <font color="#00b400">FWorldStateListenerData</font>
+ [[Enum.FrameTutorialAccount]]
+   + <font color="#00b400">HousingPetBeds</font>
+ [[Enum.HouseFinderSuggestionReason]] <small>({{apilink|t=Function|C_HousingNeighborhood.GetCornerstoneNeighborhoodInfo|noparens=1}}, {{apilink|t=Event|B_NET_NEIGHBORHOOD_LIST_UPDATED}}, {{apilink|t=Event|NEIGHBORHOOD_INFO_UPDATED}}, {{apilink|t=Event|NEIGHBORHOOD_LIST_UPDATED}}, {{apilink|t=Event|OPEN_NEIGHBORHOOD_CHARTER}}, {{apilink|t=Event|OPEN_NEIGHBORHOOD_CHARTER_SIGNATURE_REQUEST}}, {{apilink|t=Event|UPDATE_BULLETIN_BOARD_ROSTER}})</small>
+   + <font color="#00b400">Relinquished</font>
+ [[Enum.HousingResult]] <small>({{apilink|t=Function|C_HouseEditor.ActivateHouseEditorMode|noparens=1}}, {{apilink|t=Function|C_HouseEditor.EnterHouseEditor|noparens=1}}, {{apilink|t=Function|C_HouseEditor.GetHouseEditorAvailability|noparens=1}}, {{apilink|t=Function|C_HouseEditor.GetHouseEditorModeAvailability|noparens=1}}, {{apilink|t=Event|B_NET_NEIGHBORHOOD_LIST_UPDATED}}, {{apilink|t=Event|CREATE_NEIGHBORHOOD_RESULT}}, {{apilink|t=Event|HOUSE_EDITOR_MODE_CHANGE_FAILURE}}, {{apilink|t=Event|HOUSE_EXTERIOR_POSITION_FAILURE}}, {{apilink|t=Event|HOUSE_RESERVATION_RESPONSE_RECIEVED}}, {{apilink|t=Event|HOUSE_RESET_FAILED}}, {{apilink|t=Event|HOUSING_BLUEPRINT_COLLECTION_FAILURE}}, {{apilink|t=Event|HOUSING_BLUEPRINT_CONTENTS_FAILURE}}, {{apilink|t=Event|HOUSING_BLUEPRINT_DELETE_FAILURE}}, {{apilink|t=Event|HOUSING_BLUEPRINT_EXPORT_FAILURE}}, {{apilink|t=Event|HOUSING_BLUEPRINT_IMPORT_FAILURE}}, {{apilink|t=Event|HOUSING_BLUEPRINT_RENAME_FAILURE}}, {{apilink|t=Event|HOUSING_DECOR_DYE_FAILURE}}, {{apilink|t=Event|HOUSING_DECOR_PLACE_FAILURE}}, {{apilink|t=Event|HOUSING_DECOR_SELECT_RESPONSE}}, {{apilink|t=Event|HOUSING_LAYOUT_ROOM_COMPONENT_THEME_SET_CHANGED}}, {{apilink|t=Event|HOUSING_ROOM_COMPONENT_CUSTOMIZATION_CHANGE_FAILED}}, {{apilink|t=Event|HOUSING_SET_EXTERIOR_HOUSE_SIZE_RESPONSE}}, {{apilink|t=Event|HOUSING_SET_EXTERIOR_HOUSE_TYPE_RESPONSE}}, {{apilink|t=Event|HOUSING_SET_FIXTURE_RESPONSE}}, {{apilink|t=Event|NEIGHBORHOOD_LIST_UPDATED}})</small>
+   + <font color="#00b400">BlueprintGenericImportError</font>
+   + <font color="#00b400">BlueprintStorageLimit</font>
+   + <font color="#00b400">BlueprintTypeInvalid</font>
+   + <font color="#00b400">BlueprintNotFound</font>
+   + <font color="#00b400">InvalidExteriorDocument</font>
+   + <font color="#00b400">BlueprintGenericExportError</font>
+   + <font color="#00b400">InvalidInteriorDocument</font>
+   + <font color="#00b400">BlueprintRequirementsUnmet</font>
+   + <font color="#00b400">RoomPlacementOutOfBounds</font>
+   + <font color="#00b400">BlueprintCodeInvalid</font>
+   + <font color="#00b400">InsufficientRoomBudget</font>
+   + <font color="#00b400">BlueprintLocationInvalid</font>
+   + <font color="#00b400">BlueprintNameInvalid</font>
+   + <font color="#00b400">BlueprintVersionInvalid</font>
+ [[Enum.NamePlateStyle]]
+   + <font color="#00b400">Classic</font>
+ [[Enum.PingResult]] <small>({{apilink|t=Function|C_PingSecure.SendHitTestPing|noparens=1}}, {{apilink|t=Function|C_PingSecure.SendPlayerItemPing|noparens=1}}, {{apilink|t=Function|C_PingSecure.SendPlayerSpellPing|noparens=1}}, {{apilink|t=Function|C_PingSecure.SendUnitPing|noparens=1}}, {{apilink|t=Function|C_PingSecure.SetHitTestTargetAndSendPing|noparens=1}})</small>
+   + <font color="#00b400">FailedSilent</font>
+ [[Enum.PingSubjectType]] <small>({{apilink|t=Function|C_Ping.GetDefaultPingOptions|noparens=1}}, {{apilink|t=Function|C_Ping.GetTextureKitForType|noparens=1}}, {{apilink|t=Function|C_Ping.SendMacroPing|noparens=1}}, {{apilink|t=Function|C_PingSecure.SendHitTestPing|noparens=1}}, {{apilink|t=Function|C_PingSecure.SendPlayerItemPing|noparens=1}}, {{apilink|t=Function|C_PingSecure.SendPlayerSpellPing|noparens=1}}, {{apilink|t=Function|C_PingSecure.SendUnitPing|noparens=1}}, {{apilink|t=Function|C_PingSecure.SetHitTestTargetAndSendPing|noparens=1}})</small>
+   + <font color="#00b400">ActionReady</font>
+   + <font color="#00b400">ActionOnCooldown</font>
+   + <font color="#00b400">ActionUnavailable</font>
+ [[Enum.SecretAspect]] <small>({{apilink|t=Function|FrameScriptObject:HasSecretAspect|noparens=1}})</small>
+   + <font color="#00b400">RadialProgress</font>
+ [[Enum.TieredEntranceType]] <small>({{apilink|t=Function|C_DelvesUI.GetTieredEntranceType|noparens=1}})</small>
+   + <font color="#00b400">Lairs</font>
+ [[Enum.TooltipDataLineType]]
+   + <font color="#00b400">ItemSpellTriggerOnUse</font>
+   + <font color="#00b400">ItemSpellTriggerOnEquip</font>
+   + <font color="#00b400">ItemSpellTriggerOnProc</font>
+
+===Structures===
+ [[Structure AddPrivateAuraAnchorArgs|AddPrivateAuraAnchorArgs]] <small>({{apilink|t=Function|C_UnitAuras.AddPrivateAuraAnchor|noparens=1}})</small>
+   - <font color="#ff6767">showCountdownFrame</font>
+   + <font color="#00b400">showDispelIcon</font>
+   + <font color="#00b400">showCooldownEdge</font>
+   + <font color="#00b400">showCooldownFrame</font>
+ [[Structure BNetAccountInfo|BNetAccountInfo]] <small>({{apilink|t=Function|C_BattleNet.GetAccountInfoByGUID|noparens=1}}, {{apilink|t=Function|C_BattleNet.GetAccountInfoByID|noparens=1}}, {{apilink|t=Function|C_BattleNet.GetFriendAccountInfo|noparens=1}})</small>
+   + <font color="#00b400">friendLevel</font>
+   + <font color="#00b400">friendTags</font>
+ [[Structure BNetGameAccountInfo|BNetGameAccountInfo]] <small>({{apilink|t=Function|C_BattleNet.GetAccountInfoByGUID|noparens=1}}, {{apilink|t=Function|C_BattleNet.GetAccountInfoByID|noparens=1}}, {{apilink|t=Function|C_BattleNet.GetFriendAccountInfo|noparens=1}}, {{apilink|t=Function|C_BattleNet.GetFriendGameAccountInfo|noparens=1}}, {{apilink|t=Function|C_BattleNet.GetGameAccountInfoByGUID|noparens=1}}, {{apilink|t=Function|C_BattleNet.GetGameAccountInfoByID|noparens=1}})</small>
+   + <font color="#00b400">classFilename</font>
+ [[Structure ChatMessageEventParams|ChatMessageEventParams]]
+   + <font color="#00b400">discordInfo</font>
+ [[Structure ClubMemberInfo|ClubMemberInfo]] <small>({{apilink|t=Function|C_Club.GetInfoFromLastCommunityChatLine|noparens=1}}, {{apilink|t=Function|C_Club.GetInvitationInfo|noparens=1}}, {{apilink|t=Function|C_Club.GetInvitationsForClub|noparens=1}}, {{apilink|t=Function|C_Club.GetInvitationsForSelf|noparens=1}}, {{apilink|t=Function|C_Club.GetMemberInfo|noparens=1}}, {{apilink|t=Function|C_Club.GetMemberInfoForSelf|noparens=1}}, {{apilink|t=Function|C_Club.GetMessageInfo|noparens=1}}, {{apilink|t=Function|C_Club.GetMessagesBefore|noparens=1}}, {{apilink|t=Function|C_Club.GetMessagesInRange|noparens=1}}, {{apilink|t=Function|C_Club.GetTickets|noparens=1}}, {{apilink|t=Event|CLUB_INVITATION_ADDED_FOR_SELF}}, {{apilink|t=Event|CLUB_TICKET_CREATED}})</small>
+   + <font color="#00b400">discordInfo</font>
+ [[Structure CooldownViewerCooldown|CooldownViewerCooldown]] <small>({{apilink|t=Function|C_CooldownViewer.GetCooldownViewerCooldownInfo|noparens=1}})</small>
+   + <font color="#00b400">spellCategoryID</font>
+   + <font color="#00b400">equipSlot</font>
+   + <font color="#00b400">isInvisible</font>
+ [[Structure HousingDecorInstanceInfo|HousingDecorInstanceInfo]] <small>({{apilink|t=Function|C_HousingBasicMode.GetHoveredDecorInfo|noparens=1}}, {{apilink|t=Function|C_HousingBasicMode.GetSelectedDecorInfo|noparens=1}}, {{apilink|t=Function|C_HousingCleanupMode.GetHoveredDecorInfo|noparens=1}}, {{apilink|t=Function|C_HousingCustomizeMode.GetHoveredDecorInfo|noparens=1}}, {{apilink|t=Function|C_HousingCustomizeMode.GetSelectedDecorInfo|noparens=1}}, {{apilink|t=Function|C_HousingDecor.GetDecorInstanceInfoForGUID|noparens=1}}, {{apilink|t=Function|C_HousingDecor.GetHoveredDecorInfo|noparens=1}}, {{apilink|t=Function|C_HousingDecor.GetSelectedDecorInfo|noparens=1}}, {{apilink|t=Function|C_HousingExpertMode.GetHoveredDecorInfo|noparens=1}}, {{apilink|t=Function|C_HousingExpertMode.GetSelectedDecorInfo|noparens=1}})</small>
+   + <font color="#00b400">canAttachPet</font>
+ [[Structure LfgEntryData|LfgEntryData]] <small>({{apilink|t=Function|C_LFGList.GetActiveEntryInfo|noparens=1}})</small>
+   + <font color="#00b400">censored</font>
+ [[Structure LfgSearchResultData|LfgSearchResultData]] <small>({{apilink|t=Function|C_LFGList.GetSearchResultInfo|noparens=1}})</small>
+   + <font color="#00b400">censored</font>
+ [[Structure PetJournalPetInfo|PetJournalPetInfo]] <small>({{apilink|t=Function|C_PetJournal.GetPetInfoTableByPetID|noparens=1}}, {{apilink|t=Function|C_PetJournal.GetPetInfoTableBySpeciesID|noparens=1}})</small>
+   # <font color="#ecbc2a">[3].Nilable false -> true</font>
+   # <font color="#ecbc2a">[4].Nilable false -> true</font>
+   # <font color="#ecbc2a">[5].Nilable false -> true</font>
+   # <font color="#ecbc2a">[6].Nilable false -> true</font>
+   # <font color="#ecbc2a">[7].Nilable false -> true</font>
+   # <font color="#ecbc2a">[9].Type number -> luaIndex</font>
+   # <font color="#ecbc2a">[14].Nilable false -> true</font>
+   + <font color="#00b400">canAttachToDecor</font>
+   + <font color="#00b400">creatureModelScale</font>
+ [[Structure PlaySoundParams|PlaySoundParams]] <small>({{apilink|t=Function|C_Sound.PlaySoundWithOptions|noparens=1}})</small>
+   + <font color="#00b400">volumeOverride</font>
+ [[Structure PlayerChoiceInfo|PlayerChoiceInfo]] <small>({{apilink|t=Function|C_PlayerChoice.GetCurrentPlayerChoiceInfo|noparens=1}})</small>
+   + <font color="#00b400">hideAnswerArt</font>
+ [[Structure TieredEntranceTierInfo|TieredEntranceTierInfo]] <small>({{apilink|t=Function|C_DelvesUI.GetActiveDelveTier|noparens=1}}, {{apilink|t=Function|C_DelvesUI.GetDelveEntranceTiers|noparens=1}})</small>
+   + <font color="#00b400">overrideTooltipSpellID</font>
+   + <font color="#00b400">isLFG</font>
+ [[Structure UnitPrivateAuraAnchorInfo|UnitPrivateAuraAnchorInfo]]
+   - <font color="#ff6767">showCountdownFrame</font>
+   + <font color="#00b400">showDispelIcon</font>
+   + <font color="#00b400">showCooldownEdge</font>
+   + <font color="#00b400">showCooldownFrame</font>
+
+==Deprecated API==
+[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_Deprecated/Deprecated_12_1_0.lua Blizzard_Deprecated/Deprecated_12_1_0.lua]
+* {{tlygo|build=12.0.7|getglobal}}
+* {{tlygo|build=12.0.7|setglobal}}
+<syntaxhighlight lang="lua">
+function getglobal(var)
+	return _G[var];
+end
+
+local forceinsecure = forceinsecure;
+function setglobal(var, val)
+	if forceinsecure then
+		forceinsecure();
+	end
+	
+	_G[var] = val;
+end
+</syntaxhighlight>
+
+[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedBattleNet/Deprecated_BattleNet.lua Blizzard_DeprecatedBattleNet/Deprecated_BattleNet.lua]
+* {{api|t=a|BNSendVerifiedBattleTagInvite}} -> {{api|t=a|C_BattleNet.SendVerifiedBattleNetFriendInvite}}
+* {{api|t=a|BNGetFriendInviteInfo}} -> {{api|t=a|C_BattleNet.GetFriendInviteInfo}}
+<syntaxhighlight lang="lua">
+BNSendVerifiedBattleTagInvite = function()
+	C_BattleNet.SendVerifiedBattleNetFriendInvite();
+end
+
+BNGetFriendInviteInfo = function(inviteIndex)
+	local inviteInfo = C_BattleNet.GetFriendInviteInfo(inviteIndex);
+	if not inviteInfo then
+		return;
+	end
+	
+	local isBattleTag = inviteInfo.friendLevel == Enum.BattleNetFriendLevel.BattleTag;
+	return inviteInfo.inviteID, inviteInfo.accountName, isBattleTag, nil, inviteInfo.creationTimestamp;
+end
+</syntaxhighlight>
+
+[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedHousing/Deprecated_Housing.lua Blizzard_DeprecatedHousing/Deprecated_Housing.lua]
+* {{api|t=a|C_DyeColor.GetDyeColorForItem}} -> {{api|t=a|C_DyeColor.GetDyeColorsForItem}}
+* {{api|t=a|C_DyeColor.GetDyeColorForItemLocation}} -> {{api|t=a|C_DyeColor.GetDyeColorsForItemLocation}}
+<syntaxhighlight lang="lua">
+-- Old: Returned an arbitrary default int value when not in an owned house or plot
+-- New: Returns nil when not in an owned house or plot
+local originalGetSpentPlacementBudget = C_HousingDecor.GetSpentPlacementBudget;
+C_HousingDecor.GetSpentPlacementBudget = function()
+	return originalGetSpentPlacementBudget() or 0;
+end
+
+-- Old: Returned an arbitrary default int value when not in an owned house or plot
+-- New: Returns nil when not in an owned house or plot
+local originalGetMaxPlacementBudget = C_HousingDecor.GetMaxPlacementBudget;
+C_HousingDecor.GetMaxPlacementBudget = function()
+	return originalGetMaxPlacementBudget() or 0;
+end
+
+-- Old: Returned an arbitrary default int value when not in an owned house
+-- New: Returns nil when not in an owned house
+local originalGetSpentRoomPlacementBudget = C_HousingLayout.GetSpentPlacementBudget;
+C_HousingLayout.GetSpentPlacementBudget = function()
+	return originalGetSpentRoomPlacementBudget() or 0;
+end
+
+-- Old: Returned an arbitrary default int value when not in an owned house
+-- New: Returns nil when not in an owned house or plot
+local originalGetRoomPlacementBudget = C_HousingLayout.GetRoomPlacementBudget;
+C_HousingLayout.GetRoomPlacementBudget = function()
+	return originalGetRoomPlacementBudget() or 0;
+end
+
+-- API was updated to be plural, to account for one dye item being usable for multiple Dye Colors
+C_DyeColor.GetDyeColorForItem = function(itemLinkOrID)
+	local dyeColors = C_DyeColor.GetDyeColorsForItem(itemLinkOrID);
+	if dyeColors and #dyeColors > 0 then
+		return dyeColors[1];
+	end
+
+	return nil;
+end
+
+-- API was updated to be plural, to account for one dye item being usable for multiple Dye Colors
+C_DyeColor.GetDyeColorForItemLocation = function(itemLocation)
+	local dyeColors = C_DyeColor.GetDyeColorsForItemLocation(itemLocation);
+	if dyeColors and #dyeColors > 0 then
+		return dyeColors[1];
+	end
+
+	return nil;
+end
+
+-- API was renamed to be consistent with other similar APIs
+C_Housing.IsInsideOwnHouse = C_Housing.IsInsideOwnedHouse;
+</syntaxhighlight>
+
+[https://github.com/Gethe/wow-ui-source/blob/12.1.0/Interface/AddOns/Blizzard_DeprecatedRaidWarning/Deprecated_RaidWarning.lua Blizzard_DeprecatedRaidWarning/Deprecated_RaidWarning.lua]
+* {{tlygo|build=12.0.7|RaidNotice_AddMessage}} -> {{tlygo|RaidWarningUtil.AddMessage}}
+* {{tlygo|build=12.0.7|RaidNotice_Clear}} -> {{tlygo|RaidWarningFrameMixin:ClearMessages}}
+<syntaxhighlight lang="lua">
+RaidNotice_AddMessage = function(_noticeFrame, textString, colorInfo, displayTime)
+	RaidWarningUtil.AddMessage(textString, colorInfo, displayTime);
+end;
+
+RaidNotice_Clear = function(noticeFrame)
+	noticeFrame:ClearMessages();
+end;
+
+RaidNotice_UpdateSlot = function(slotFrame, timings, elapsedTime, hasFading)
+	if not slotFrame.textScalingMinHeight then
+		local minHeight = timings["RAID_NOTICE_MIN_HEIGHT"] or timings.minHeight;
+		local maxHeight = timings["RAID_NOTICE_MAX_HEIGHT"] or timings.maxHeight;
+		local scaleUp = timings["RAID_NOTICE_SCALE_UP_TIME"] or timings.scaleUpTime;
+		local scaleDown = timings["RAID_NOTICE_SCALE_DOWN_TIME"] or timings.scaleDownTime;
+		FadingFrame_SetTextScaling(slotFrame, minHeight, maxHeight, scaleUp, scaleDown);
+	end
+	FadingFrame_UpdateTextScaling(slotFrame, elapsedTime);
+	if hasFading then
+		FadingFrame_OnUpdate(slotFrame);
+	end
+end;
+
+RaidNotice_FadeInit = function(slotFrame)
+	FadingFrame_OnLoad(slotFrame);
+	FadingFrame_SetFadeInTime(slotFrame, 0.2);
+	FadingFrame_SetHoldTime(slotFrame, 0.2);
+	FadingFrame_SetFadeOutTime(slotFrame, 3.0);
+end;
+</syntaxhighlight>

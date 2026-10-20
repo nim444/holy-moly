@@ -1,0 +1,52 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/WOW_PROJECT_ID | revision 6920573 (2026-10-17T06:26:22Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{wowapitype}}
+The <code>WOW_PROJECT_ID</code> constants can be used to determine the current client.
+
+==WOW_PROJECT_ID==
+<onlyinclude>{| class="sortable darktable zebra col1-center"
+! Value !! Constant !! Description !! FrameXML
+|-
+|  || <code><font color="#ecbc2a">WOW_PROJECT_ID</font></code> || ||
+|-
+| 1 || <code>WOW_PROJECT_MAINLINE</code> || [[Retail]] || <code class="plainlinks">[https://github.com/Gethe/wow-ui-source/blob/10.2.6/Interface/SharedXML/ProjectConstants.lua#L1 ProjectConstants.lua]</code>
+|-
+| 2 || <code>WOW_PROJECT_CLASSIC</code> || [[Classic Era]]<br>[[World_of_Warcraft:_Classic_20th_Anniversary_Edition|Classic 20th Anniversary]] || <code class="plainlinks">[https://github.com/Gethe/wow-ui-source/blob/1.15.2/Interface/SharedXML/ProjectConstants.lua#L2 ProjectConstants.lua]</code>
+|-
+| 3 || <code>WOW_PROJECT_WOWLABS</code> || [[Plunderstorm]] || <code class="plainlinks">[https://github.com/Gethe/wow-ui-source/blob/10.2.6/Interface/SharedXML/WoWLabs/ProjectConstants.lua ProjectConstants.lua]</code>
+|-
+| 5 || <code>WOW_PROJECT_BURNING_CRUSADE_CLASSIC</code> || [[Burning Crusade Classic]]<br>[[World_of_Warcraft:_Burning_Crusade_Classic_Anniversary_Edition|Burning Crusade Anniversary]] || <code class="plainlinks">[https://github.com/Gethe/wow-ui-source/blob/2.5.4/Interface_TBC/FrameXML/Constants.lua#L1046 Constants.lua]</code>
+|-
+| 11 || <code>WOW_PROJECT_WRATH_CLASSIC</code> || [[Wrath Classic]]<br>[[Titan Reforged - Chrono]] || <code class="plainlinks">[https://github.com/Gethe/wow-ui-source/blob/3.80.2/Interface/AddOns/Blizzard_FrameXMLBase/Wrath/Constants.lua#L124 Constants.lua]</code>
+|-
+| 14 || <code>WOW_PROJECT_CATACLYSM_CLASSIC</code> || [[Cataclysm Classic]] || <code class="plainlinks">[https://github.com/Gethe/wow-ui-source/blob/4.4.0/Interface/AddOns/Blizzard_FrameXMLBase/Cata/Constants.lua#L173 Constants.lua]</code>
+|-
+| 18 || <code>WOW_PROJECT_CAMELOT</code> || [[World of Warcraft: Forever]] || <code class="plainlinks">[https://github.com/Gethe/wow-ui-source/blob/1.60.1/Interface/AddOns/Blizzard_ProjectConstants/Camelot/ProjectConstants.lua ProjectConstants.lua]</code>
+|-
+| 19 || <code>WOW_PROJECT_MISTS_CLASSIC</code> || [[Mists of Pandaria Classic]] || <code class="plainlinks">[https://github.com/Gethe/wow-ui-source/blob/5.5.4/Interface/AddOns/Blizzard_FrameXMLBase/Mists/Constants.lua#L161 Constants.lua]</code>
+|}</onlyinclude>
+
+<syntaxhighlight lang="lua">
+if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+	-- midnight
+elseif WOW_PROJECT_ID == WOW_PROJECT_CAMELOT then
+	-- forever
+elseif WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
+	-- mists
+elseif WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+	-- tbc
+elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+	-- vanila
+end
+</syntaxhighlight>
+
+==Patch changes==
+* {{Patch 1.60.1|note=Added <code>WOW_PROJECT_CAMELOT</code>.}}
+* {{Patch 10.2.6|note=Added <code>WOW_PROJECT_WOWLABS</code>.}}
+* {{Patch 4.4.0|note=Added <code>WOW_PROJECT_CATACLYSM_CLASSIC</code>.}}
+* {{Patch 3.4.0|note=<small>(2022-09-01)</small> Added <code>WOW_PROJECT_WRATH_CLASSIC</code> in build 3.4.0 (45435)<sup>[https://github.com/Gethe/wow-ui-source/commit/2d9e615ca6f200275e9cb744625f1267d4886135#diff-239a2f4f8604d0b3956f4ee003b618690f95fbfb2c116e0d5fdc4e5cff41cb27]</sup>}}
+* {{Patch 3.4.0|note=Streamlined expansion enums between retail and classic.<sup>[https://github.com/Stanzilla/WoWUIBugs/issues/251]</sup>}}
+
+==See also==
+{{api search}}
+
+{{apinavbox|Authoring}}

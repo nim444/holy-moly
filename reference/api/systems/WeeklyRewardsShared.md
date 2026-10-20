@@ -1,0 +1,3 @@
+# WeeklyRewardsShared
+
+Type: None

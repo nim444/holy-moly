@@ -1,0 +1,14 @@
+## Interface: 16001
+## AllowLoadGameType: forever
+## Title: Holy Moly
+## Notes: The Priest's companion for WoW Forever: healing, shields, dispels, deaths and mana per fight, HoT and shield timers, a heal report and a buff check.
+## Author: nim444
+## Version: 0.3.0
+## IconTexture: Interface\AddOns\HolyMoly\Media\Icon
+## AddonCompartmentFunc: HolyMoly_OnAddonCompartmentClick
+## SavedVariables: HolyMolyDB
+
+HolyMoly.lua
+Mana.lua
+HotTimers.lua
+BuffCheck.lua

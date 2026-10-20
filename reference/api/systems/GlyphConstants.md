@@ -1,0 +1,3 @@
+# GlyphConstants
+
+Type: None

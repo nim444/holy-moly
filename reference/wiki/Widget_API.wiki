@@ -1,0 +1,615 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Widget_API | revision 6860115 (2026-09-04T22:46:14Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{apinav}} {{widget|page=list}} {{tocright}}
+Widgets are [[Wikipedia:Graphical_widget|graphical widgets]] created in Lua with {{api|CreateFrame}}() or via [[XML schema|XML]]. Widget objects can be extended with templates, mixins and [[Intrinsic_frame|intrinsics]]. The user interface may be inspected with <code>[[MACRO framestack|/fstack]]</code>, <code>[[MACRO_tableinspect|/tinspect]]</code> and development addons like [https://www.curseforge.com/wow/addons/devtool DevTool].
+<gallery>
+Widget_Hierarchy.png|Widget hierarchy
+API_framestack_02.png|/fstack and /tinspect
+</gallery>
+{{i-note|This page is up to date as of PTR [[Patch_12.1.5/API_changes|Patch 12.1.5]] (69594) Aug 28 2026}}
+
+==Base==
+Widget objects inherit their methods as shown in the above widget hierarchy diagram.
+
+===''{{uiobject|FrameScriptObject}}''===
+{{:UIOBJECT_FrameScriptObject}}
+
+===''{{uiobject|Object}}''===
+{{:UIOBJECT_Object|method}}
+
+===''{{uiobject|ScriptRegion}}''===
+{{:UIOBJECT_ScriptRegion|method}}
+
+===''{{uiobject|ScriptRegionResizing}}''===
+{{:UIOBJECT_ScriptRegionResizing|method}}
+
+===''{{uiobject|AnimatableObject}}''===
+{{:UIOBJECT_AnimatableObject|method}}
+
+===''{{uiobject|Region}}''===
+{{:UIOBJECT_Region}}
+
+==Textures==
+===''{{uiobject|TextureBase}}''===
+{{:UIOBJECT_TextureBase}}
+
+==={{uiobject|Texture}}===
+{{:UIOBJECT_Texture}}
+
+==={{uiobject|MaskTexture}}===
+
+==={{uiobject|Line}}===
+{{:UIOBJECT_Line}}
+
+==={{api|t=o|VectorGraphics}}===
+{{:UIOBJECT VectorGraphics}}
+
+==Fonts==
+===''FontInstance''===
+{{:UIOBJECT_FontInstance}}
+
+==={{uiobject|Font}}===
+{{:UIOBJECT_Font}}
+
+==={{uiobject|FontString}}===
+{{:UIOBJECT_FontString}}
+
+==Animations==
+==={{uiobject|AnimationGroup}}===
+{{:UIOBJECT_AnimationGroup|method}}
+
+==={{uiobject|Animation}}===
+{{:UIOBJECT_Animation|method}}
+
+==={{uiobject|Alpha}}===
+{{:UIOBJECT_Alpha|method}}
+
+==={{uiobject|FlipBook}}===
+{{:UIOBJECT_FlipBook|method}}
+
+==={{uiobject|Path}}===
+{{:UIOBJECT_Path|method}}
+
+==={{uiobject|ControlPoint}}===
+{{:UIOBJECT_ControlPoint|method}}
+
+==={{uiobject|RadialProgress}}===
+{{:UIOBJECT_RadialProgress|method}}
+
+==={{uiobject|Rotation}}===
+{{:UIOBJECT_Rotation|method}}
+
+==={{uiobject|Scale}}===
+{{:UIOBJECT_Scale|method}}
+
+==={{uiobject|TextureCoordTranslation}}===
+{{:UIOBJECT_TextureCoordTranslation|method}}
+
+==={{uiobject|Translation}}===
+{{:UIOBJECT_Translation|method}}
+
+==={{uiobject|VertexColor}}===
+{{:UIOBJECT_VertexColor|method}}
+
+==Frames==
+==={{uiobject|Frame}}===
+{{:UIOBJECT_Frame|method}}
+
+==={{uiobject|Button}}===
+{{:UIOBJECT_Button|method}}
+
+==={{uiobject|CheckButton}}===
+{{:UIOBJECT_CheckButton|method}}
+
+==={{uiobject|Model}}===
+{{:UIOBJECT_Model|method}}
+
+==={{uiobject|PlayerModel}}===
+{{:UIOBJECT_PlayerModel|method}}
+
+==={{uiobject|CinematicModel}}===
+{{:UIOBJECT_CinematicModel|method}}
+
+==={{uiobject|DressUpModel}}===
+{{:UIOBJECT_DressUpModel|method}}
+
+==={{uiobject|TabardModel}}===
+{{:UIOBJECT_TabardModel|method}}
+
+==={{uiobject|ModelScene}}===
+{{:UIOBJECT_ModelScene|method}}
+
+==={{uiobject|ModelSceneActor}}===
+{{:UIOBJECT_ModelSceneActor|method}}
+
+==={{uiobject|EditBox}}===
+{{:UIOBJECT_EditBox|method}}
+
+==={{uiobject|MessageFrame}}===
+{{:UIOBJECT_MessageFrame}}
+
+==={{uiobject|SimpleHTML}}===
+{{:UIOBJECT_SimpleHTML}}
+
+==={{uiobject|GameTooltip}}===
+In patch 10.0.2 any addons that are creating GameTooltip frames should now ensure they inherit [[GameTooltipTemplate]]. This template has been updated to include the new [https://github.com/Ketho/wow-ui-source-df/search?q=GameTooltipDataMixin GameTooltipDataMixin] mixin, which provides automatic updates of tooltip contents from the {{api|t=e|TOOLTIP_DATA_UPDATE}} event as well as a subset of backwards-compatible methods for retrieving or populating tooltip contents from the new C_TooltipInfo APIs.
+<syntaxhighlight lang="lua">
+CreateFrame("GameTooltip") -- inherits Frame
+</syntaxhighlight>
+: {{apilink|t=w|GameTooltip:AddAtlas|arg=atlas [, textureInfoTable]}}
+: {{apilink|t=w|GameTooltip:AddDoubleLine|arg=leftText, rightText [, leftR, leftG, leftB [, rightR, rightG, rightB]]}}
+: {{apilink|t=w|GameTooltip:AddFontStrings|arg=leftstring, rightstring}}
+: {{apilink|t=w|GameTooltip:AddLine|arg=tooltipText [, r, g, b, wrapText]}}
+: {{apilink|t=w|GameTooltip:AddTexture|arg=texture}}
+: {{apilink|t=w|GameTooltip:AppendText|arg=text}}
+: {{apilink|t=w|GameTooltip:ClearLines}}
+: {{apilink|t=w|GameTooltip:ClearPadding}}
+: {{apilink|t=w|GameTooltip:CopyTooltip}}
+: {{apilink|t=w|GameTooltip:FadeOut}}
+: {{apilink|t=w|GameTooltip:GetAnchorType|ret=anchorType}}
+: {{apilink|t=w|GameTooltip:GetCustomLineSpacing|ret=spacing}}
+: {{apilink|t=w|GameTooltip:GetLeftLine|arg=line|ret=leftFontString}}
+: {{apilink|t=w|GameTooltip:GetMinimumWidth|ret=width, force}}
+: {{apilink|t=w|GameTooltip:GetOwner|ret=owner}}
+: {{apilink|t=w|GameTooltip:GetPadding|ret=right, bottom, left, top}}
+: {{apilink|t=w|GameTooltip:GetRightLine|arg=line|ret=rightFontString}}
+: {{apilink|t=w|GameTooltip:IsOwned|arg=frame|ret=bool}}
+: {{apilink|t=w|GameTooltip:NumLines|ret=lines}}
+: {{apilink|t=w|GameTooltip:SetAllowShowWithNoLines|arg=[bool]}}
+: {{apilink|t=w|GameTooltip:SetAnchorType|arg=anchorType [, Xoffset, Yoffset]}}
+: {{apilink|t=w|GameTooltip:SetCustomLineSpacing|arg=[spacing]}}
+: {{apilink|t=w|GameTooltip:SetCustomWordWrapMinWidth|arg=[width}}
+: {{apilink|t=w|GameTooltip:SetFrameStack|arg=[showHidden, showRegion, highlightIndexChanged]}}
+: {{apilink|t=w|GameTooltip:SetMinimumWidth|arg=width [, force]}}
+: {{apilink|t=w|GameTooltip:SetObjectTooltipPosition}}
+: {{apilink|t=w|GameTooltip:SetOwner|arg=owner, anchor [, ofsX, ofsY]}}
+: {{apilink|t=w|GameTooltip:SetPadding|arg=right, bottom [, left, top]}}
+: {{apilink|t=w|GameTooltip:SetShrinkToFitWrapped}}
+: {{apilink|t=w|GameTooltip:SetText|arg=text [, r, g, b, alpha, textWrap]}}
+
+<syntaxhighlight lang="lua">
+-- mixins GameTooltipDataMixin, TooltipDataHandlerMixin and data accessors
+CreateFrame("GameTooltip", nil, nil, "GameTooltipTemplate")
+</syntaxhighlight>
+See also [[:Category:API_systems/TooltipInfo|C_TooltipInfo]]
+: {{apilink|t=w|GameTooltip:SetAchievementByID|arg=achievementID}}
+: {{apilink|t=w|GameTooltip:SetAction|arg=actionID}}
+: {{apilink|t=w|GameTooltip:SetArtifactItem}}
+: {{apilink|t=w|GameTooltip:SetArtifactPowerByID|arg=powerID}}
+: {{apilink|t=w|GameTooltip:SetAzeriteEssence|arg=essenceID [, rank]}}
+: {{apilink|t=w|GameTooltip:SetAzeriteEssenceSlot|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetAzeritePower|arg=itemID, itemLevel, powerID [, owningItemLink]}}
+: {{apilink|t=w|GameTooltip:SetBackpackToken|arg=index}}
+: {{apilink|t=w|GameTooltip:SetBagItem|arg=bagIndex, slotIndex}}
+: {{apilink|t=w|GameTooltip:SetBagItemChild|arg=bagIndex, slotIndex, equipSlotIndex}}
+: {{apilink|t=w|GameTooltip:SetBuybackItem|arg=index}}
+: {{apilink|t=w|GameTooltip:SetCompanionPet|arg=petGUID}}
+: {{apilink|t=w|GameTooltip:SetConduit|arg=conduitID, conduitRank}}
+: {{apilink|t=w|GameTooltip:SetCurrencyByID|arg=currencyID [, amount]}}
+: {{apilink|t=w|GameTooltip:SetCurrencyToken|arg=tokenIndex}}
+: {{apilink|t=w|GameTooltip:SetEnhancedConduit|arg=conduitID, rank}}
+: {{apilink|t=w|GameTooltip:SetEquipmentSet|arg=setID}}
+: {{apilink|t=w|GameTooltip:SetExistingSocketGem|arg=index [, toDestroy]}}
+: {{apilink|t=w|GameTooltip:SetGuildBankItem|arg=tab, slot}}
+: {{apilink|t=w|GameTooltip:SetHeirloomByItemID|arg=itemID}}
+: {{apilink|t=w|GameTooltip:SetHyperlink|arg=hyperlink [, optionalArg1, optionalArg2, hideVendorPrice]}}
+: {{apilink|t=w|GameTooltip:SetInboxItem|arg=messageIndex [, attachmentIndex]}}
+: {{apilink|t=w|GameTooltip:SetInstanceLockEncountersComplete|arg=index}}
+: {{apilink|t=w|GameTooltip:SetInventoryItem|arg=unit, slot [, hideUselessStats]}}
+: {{apilink|t=w|GameTooltip:SetInventoryItemByID|arg=itemID}}
+: {{apilink|t=w|GameTooltip:SetItemByGUID|arg=guid}}
+: {{apilink|t=w|GameTooltip:SetItemByID|arg=itemID [, quality]}}
+: {{apilink|t=w|GameTooltip:SetItemInteractionItem}}
+: {{apilink|t=w|GameTooltip:SetItemKey|arg=itemID, itemLevel, itemSuffix [, requiredLevel]}}
+: {{apilink|t=w|GameTooltip:SetLFGDungeonReward|arg=dungeonID, lootIndex}}
+: {{apilink|t=w|GameTooltip:SetLFGDungeonShortageReward|arg=dungeonID, shortageSeverity, lootIndex}}
+: {{apilink|t=w|GameTooltip:SetLootCurrency|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetLootItem|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetLootRollItem|arg=id}}
+: {{apilink|t=w|GameTooltip:SetMerchantCostItem|arg=slot, costIndex}}
+: {{apilink|t=w|GameTooltip:SetMerchantItem|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetMinimapMouseover}}
+: {{apilink|t=w|GameTooltip:SetMountBySpellID|arg=spellID [, checkIndoors]}}
+: {{apilink|t=w|GameTooltip:SetOwnedItemByID|arg=itemID}}
+: {{apilink|t=w|GameTooltip:SetPetAction|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetPossession|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetPvpBrawl|arg=[isSpecial]}}
+: {{apilink|t=w|GameTooltip:SetPvpTalent|arg=talentID [, isInspect, groupIndex, talentIndex]}}
+: {{apilink|t=w|GameTooltip:SetQuestCurrency|arg=type, currencyIndex}}
+: {{apilink|t=w|GameTooltip:SetQuestItem|arg=type, itemIndex [, allowCollectionText]}}
+: {{apilink|t=w|GameTooltip:SetQuestLogCurrency|arg=type, currencyIndex [, questID]}}
+: {{apilink|t=w|GameTooltip:SetQuestLogItem|arg=type, itemIndex [, questID, allowCollectionText]}}
+: {{apilink|t=w|GameTooltip:SetQuestLogSpecialItem|arg=questIndex}}
+: {{apilink|t=w|GameTooltip:SetQuestPartyProgress|arg=questID [, omitTitle, ignoreActivePlayer]}}
+: {{apilink|t=w|GameTooltip:SetRecipeRankInfo|arg=recipeID, rank}}
+: {{apilink|t=w|GameTooltip:SetRecipeReagentItem|arg=recipeSpellID, dataSlotIndex}}
+: {{apilink|t=w|GameTooltip:SetRecipeResultItem|arg=recipeID [, craftingReagents, recraftItemGUID, recipeLevel, overrideQualityID]}}
+: {{apilink|t=w|GameTooltip:SetRecipeResultItemForOrder|arg=recipeID [, craftingReagents, orderID, recipeLevel, overrideQualityID]}}
+: {{apilink|t=w|GameTooltip:SetRuneforgeResultItem|arg=itemGUID, itemLevel [, powerID, modifiers]}}
+: {{apilink|t=w|GameTooltip:SetSendMailItem|arg=[attachmentIndex]}}
+: {{apilink|t=w|GameTooltip:SetShapeshift|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetSlottedKeystone}}
+: {{apilink|t=w|GameTooltip:SetSocketedItem}}
+: {{apilink|t=w|GameTooltip:SetSocketedRelic|arg=slotIndex}}
+: {{apilink|t=w|GameTooltip:SetSocketGem|arg=index}}
+: {{apilink|t=w|GameTooltip:SetSpellBookItem|arg=index, spellBank}}
+: {{apilink|t=w|GameTooltip:SetSpellByID|arg=spellID [, isPet, showSubtext, dontOverride, difficultyID, isLink]}}
+: {{apilink|t=w|GameTooltip:SetTalent|arg=talentID [, isInspect, groupIndex]}}
+: {{apilink|t=w|GameTooltip:SetTotem|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetToyByItemID|arg=itemID}}
+: {{apilink|t=w|GameTooltip:SetTradePlayerItem|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetTradeTargetItem|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetTrainerService|arg=serviceIndex}}
+: {{apilink|t=w|GameTooltip:SetTraitEntry|arg=entryID [, rank]}}
+: {{apilink|t=w|GameTooltip:SetTransmogrifyItem|arg=transmogLocation}}
+: {{apilink|t=w|GameTooltip:SetUnit|arg=unit [, hideStatus]}}
+: {{apilink|t=w|GameTooltip:SetUnitAura|arg=unitToken, index [, filter]}}
+: {{apilink|t=w|GameTooltip:SetUnitBuff|arg=unitToken, index [, filter]}}
+: {{apilink|t=w|GameTooltip:SetUnitBuffByAuraInstanceID|arg=unitTokenString, auraInstanceID [, filter]}}
+: {{apilink|t=w|GameTooltip:SetUnitDebuff|arg=unitToken, index [, filter]}}
+: {{apilink|t=w|GameTooltip:SetUnitDebuffByAuraInstanceID|arg=unitTokenString, auraInstanceID [, filter]}}
+: {{apilink|t=w|GameTooltip:SetUpgradeItem}}
+: {{apilink|t=w|GameTooltip:SetVoidDepositItem|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetVoidItem|arg=tab, slot}}
+: {{apilink|t=w|GameTooltip:SetVoidWithdrawalItem|arg=slot}}
+: {{apilink|t=w|GameTooltip:SetWeeklyReward|arg=itemDBID}}
+: {{apilink|t=w|GameTooltip:SetWorldCursor}}
+: {{apilink|t=w|GameTooltip:SetWorldLootObject|arg=unitTokenString}}
+
+==={{uiobject|ColorSelect}}===
+{{:UIOBJECT_ColorSelect|method}}
+
+==={{uiobject|Cooldown}}===
+{{:UIOBJECT_Cooldown|method}}
+
+==={{uiobject|Minimap}}===
+{{:UIOBJECT_Minimap|method}}
+
+==={{uiobject|MovieFrame}}===
+{{:UIOBJECT_MovieFrame|method}}
+
+==={{uiobject|NamePlate}}===
+{{:UIOBJECT_NamePlate}}
+
+==={{uiobject|ScrollFrame}}===
+{{:UIOBJECT_ScrollFrame|method}}
+
+==={{uiobject|Slider}}===
+{{:UIOBJECT Slider|method}}
+
+==={{uiobject|StatusBar}}===
+{{:UIOBJECT StatusBar|method}}
+
+===FogOfWarFrame===
+: {{apilink|t=w|FogOfWarFrame:GetFogOfWarBackgroundAtlas|ret=atlas}}
+: {{apilink|t=w|FogOfWarFrame:GetFogOfWarBackgroundTexture|ret=asset}}
+: {{apilink|t=w|FogOfWarFrame:GetFogOfWarMaskAtlas|ret=atlas}}
+: {{apilink|t=w|FogOfWarFrame:GetFogOfWarMaskTexture|ret=asset}}
+: {{apilink|t=w|FogOfWarFrame:GetMaskScalar|ret=scalar}}
+: {{apilink|t=w|FogOfWarFrame:GetUiMapID|ret=uiMapID}}
+: {{apilink|t=w|FogOfWarFrame:SetFogOfWarBackgroundAtlas|arg=atlas}}
+: {{apilink|t=w|FogOfWarFrame:SetFogOfWarBackgroundTexture|arg=asset, horizontalTile, verticalTile}}
+: {{apilink|t=w|FogOfWarFrame:SetFogOfWarMaskAtlas|arg=atlas}}
+: {{apilink|t=w|FogOfWarFrame:SetFogOfWarMaskTexture|arg=asset}}
+: {{apilink|t=w|FogOfWarFrame:SetMaskScalar|arg=scalar}}
+: {{apilink|t=w|FogOfWarFrame:SetUiMapID|arg=uiMapID}}
+
+===UnitPositionFrame===
+: {{apilink|t=w|UnitPositionFrame:AddUnit|arg=unitTokenString, asset [, width, height, r, g, b, a, sublayer, showFacing]}}
+: {{apilink|t=w|UnitPositionFrame:ClearUnits}}
+: {{apilink|t=w|UnitPositionFrame:FinalizeUnits}}
+: {{apilink|t=w|UnitPositionFrame:GetMouseOverUnits|ret=...units}}
+: {{apilink|t=w|UnitPositionFrame:GetPlayerPingScale|ret=scale}}
+: {{apilink|t=w|UnitPositionFrame:GetUiMapID|ret=mapID}}
+: {{apilink|t=w|UnitPositionFrame:SetPlayerPingScale|arg=scale}}
+: {{apilink|t=w|UnitPositionFrame:SetPlayerPingTexture|arg=textureType, asset [, width, height]}}
+: {{apilink|t=w|UnitPositionFrame:SetUiMapID|arg=mapID}}
+: {{apilink|t=w|UnitPositionFrame:SetUnitColor|arg=unit, colorR, colorG, colorB, colorA}}
+: {{apilink|t=w|UnitPositionFrame:StartPlayerPing|arg=[duration, fadeDuration]}}
+: {{apilink|t=w|UnitPositionFrame:StopPlayerPing}}
+
+==={{api|t=sc|HousingFixturePointFrame}}===
+{{:ScriptObject HousingFixturePointFrame}}
+
+==={{api|t=sc|HousingLayoutPinFrame}}===
+{{:ScriptObject HousingLayoutPinFrame}}
+
+===''Blob''===
+: {{apilink|t=w|Blob:DrawAll}}
+: {{apilink|t=w|Blob:DrawBlob|arg=questID [, draw]}}
+: {{apilink|t=w|Blob:DrawNone}}
+: {{apilink|t=w|Blob:EnableMerging|arg=[enable]}}
+: {{apilink|t=w|Blob:EnableSmoothing|arg=[enable]}}
+: {{apilink|t=w|Blob:GetMapID|ret=uiMapID}}
+: {{apilink|t=w|Blob:SetBorderAlpha|arg=alpha}}
+: {{apilink|t=w|Blob:SetBorderScalar|arg=scalar}}
+: {{apilink|t=w|Blob:SetBorderTexture|arg=asset}}
+: {{apilink|t=w|Blob:SetFillAlpha|arg=alpha}}
+: {{apilink|t=w|Blob:SetFillTexture|arg=asset}}
+: {{apilink|t=w|Blob:SetMapID|arg=uiMapID}}
+: {{apilink|t=w|Blob:SetMergeThreshold|arg=threshold}}
+: {{apilink|t=w|Blob:SetNumSplinePoints|arg=numSplinePoints}}
+
+===ArchaeologyDigSiteFrame===
+Inherits all methods from <code>Blob</code>.
+
+===QuestPOIFrame===
+: {{apilink|t=w|QuestPOIFrame:GetNumTooltips|ret=numObjectives}}
+: {{apilink|t=w|QuestPOIFrame:GetTooltipIndex|arg=index|ret=objectiveIndex}}
+: {{apilink|t=w|QuestPOIFrame:UpdateMouseOverTooltip|arg=x, y|ret=questID, numObjectives}}
+
+===ScenarioPOIFrame===
+: {{apilink|t=w|ScenarioPOIFrame:GetScenarioTooltipText|ret=tooltipText}}
+: {{apilink|t=w|ScenarioPOIFrame:UpdateMouseOverTooltip|arg=x, y|ret=hasTooltip}}
+
+==Intrinsics==
+{{main|Intrinsic frame}}
+
+==={{api|t=i|AuraButton}}===
+{{#lst:INTRINSIC AuraButton|IntrinsicMethods}}
+
+==={{api|t=i|AuraContainer}}===
+{{#lst:INTRINSIC AuraContainer|IntrinsicMethods}}
+
+==={{api|t=i|ContainedAlertFrame}}===
+{{#lst:INTRINSIC ContainedAlertFrame|IntrinsicMethods}}
+
+==={{api|t=i|DropdownButton}}===
+{{#lst:INTRINSIC DropdownButton|IntrinsicMethods}}
+
+==={{api|t=i|DropDownToggleButton}}===
+{{#lst:INTRINSIC DropDownToggleButton|IntrinsicMethods}}
+
+==={{api|t=i|EventButton}}===
+{{#lst:INTRINSIC EventButton|IntrinsicMethods}}
+
+==={{api|t=i|EventEditBox}}===
+{{#lst:INTRINSIC EventEditBox|IntrinsicMethods}}
+
+==={{api|t=i|EventFrame}}===
+{{#lst:INTRINSIC EventFrame|IntrinsicMethods}}
+
+==={{api|t=i|EventScrollFrame}}===
+{{#lst:INTRINSIC EventScrollFrame|IntrinsicMethods}}
+
+==={{api|t=i|ItemButton}}===
+{{#lst:INTRINSIC ItemButton|IntrinsicMethods}}
+
+==={{api|t=i|ScrollingMessageFrame}}===
+{{#lst:INTRINSIC ScrollingMessageFrame|IntrinsicMethods}}
+
+==={{api|t=i|UIThemeContainerFrame}}===
+{{#lst:INTRINSIC UIThemeContainerFrame|IntrinsicMethods}}
+
+<!-- ==WorldFrame==
+{{:UIOBJECT WorldFrame|t=w}} -->
+<!--
+
+===SimpleHTML===
+[[UIOBJECT SimpleHTML|SimpleHTML]] has all the methods from [[#Frame|Frame]] and [[#FontInstance|FontInstance]], plus the following:
+: [[API SimpleHTML GetContentHeight|SimpleHTML:GetContentHeight]]()
+: [[API SimpleHTML GetHyperlinkFormat|SimpleHTML:GetHyperlinkFormat]]() - Set the string.format format to use for displaying hyperlinks - New in 1.11.
+: [[API SimpleHTML GetTextData|SimpleHTML:GetTextData]]()
+: [[API SimpleHTML SetHyperlinkFormat|SimpleHTML:SetHyperlinkFormat]](<span class="apiarg">format</span>) - Set the string.format format to use for displaying hyperlinks.
+: [[API SimpleHTML SetText|SimpleHTML:SetText]](<span class="apiarg">text</span>) - Set the HTML markup to be displayed (note: if there is ''any'' markup error, it will be displayed as plain text)
+
+===Slider===
+[[UIOBJECT Slider|Slider]] has all the methods from [[#Frame|Frame]], plus the following:
+: [[API Slider Disable|Slider:Disable]]() - Disables the slider
+: [[API Slider Enable|Slider:Enable]]() - Enables the slider
+: [[API Slider GetMinMaxValues|Slider:GetMinMaxValues]]() - Get the current bounds of the slider.
+: [[API Slider GetObeyStepOnDrag|Slider:GetObeyStepOnDrag]]() - Returns whether the slider constrains values to value steps when dragged.
+: [[API Slider GetOrientation|Slider:GetOrientation]]() - Returns "HORIZONTAL" or "VERTICAL".
+: [[API Slider GetStepsPerPage|Slider:GetStepsPerPage]]() - Returns the number of steps the slider's value changes by when the slider is clicked.
+: [[API Slider GetThumbTexture|Slider:GetThumbTexture]]() - Get the texture for this slider's thumb - New in 1.11.
+: [[API Slider GetValue|Slider:GetValue]]() - Get the current value of the slider.
+: [[API Slider GetValueStep|Slider:GetValueStep]]() - Get the current step size of the slider.
+: [[API Slider IsDraggingThumb|Slider:IsDraggingThumb]]()
+: [[API Slider IsEnabled|Slider:IsEnabled]]() - Returns enabled status of the slider.
+: [[API Slider SetEnabled|Slider:SetEnabled]]()
+: [[API Slider SetMinMaxValues|Slider:SetMinMaxValues]](<span class="apiarg">min, max</span>) - Set the bounds of the slider.
+: [[API Slider SetObeyStepOnDrag|Slider:SetObeyStepOnDrag]](<span class="apiarg">obeyStep</span>) - Sets whether the slider constrains values to to value steps when dragged.
+: [[API Slider SetOrientation|Slider:SetOrientation]](<span class="apiarg">orientation</span>) - "HORIZONTAL" or "VERTICAL".
+: [[API Slider SetStepsPerPage|Slider:SetStepsPerPage]](<span class="apiarg">steps</span>) - Controls slider behavior when the user clicks within the slider's tracking area.
+: [[API Slider SetThumbTexture|Slider:SetThumbTexture]](<span class="apiarg">texture or fileDataIDbool</span>)
+: [[API Slider SetValue|Slider:SetValue]](<span class="apiarg">value</span>) - Set the value of the slider. Also causes the thumb to show on the first call.
+: [[API Slider SetValueStep|Slider:SetValueStep]](<span class="apiarg">value</span>) - Set the step size of the slider.
+
+===StatusBar===
+[[UIOBJECT StatusBar|StatusBar]] has all the methods from [[#Frame|Frame]], plus the following:
+: [[API StatusBar GetFillStyle|StatusBar:GetFillStyle]]()
+: [[API StatusBar GetMinMaxValues|StatusBar:GetMinMaxValues]]() - Get the current bounds of the bar.
+: [[API StatusBar GetOrientation|StatusBar:GetOrientation]]()
+: [[API StatusBar GetReverseFill|StatusBar:GetReverseFill]]()
+: [[API StatusBar GetRotatesTexture|StatusBar:GetRotatesTexture]]()
+: [[API StatusBar GetStatusBarAtlas|StatusBar:GetStatusBarAtlas]]()
+: [[API StatusBar GetStatusBarColor|StatusBar:GetStatusBarColor]]()
+: [[API StatusBar GetStatusBarTexture|StatusBar:GetStatusBarTexture]]() - Returns the texture object for the bar - Before 1.11 it returned the filename.
+: [[API StatusBar GetValue|StatusBar:GetValue]]() - Get the current value of the bar.
+: [[API StatusBar SetFillStyle|StatusBar:SetFillStyle]](<span class="apiarg">style</span>) - Set the style in which the bar will be filled.
+: [[API StatusBar SetMinMaxValues|StatusBar:SetMinMaxValues]](<span class="apiarg">min, max</span>) - Set the bounds of the bar.
+: [[API StatusBar SetOrientation|StatusBar:SetOrientation]](<span class="apiarg">orientation</span>) - "HORIZONTAL" or "VERTICAL".
+: [[API StatusBar SetReverseFill|StatusBar:SetReverseFill]](<span class="apiarg">state</span>) - Sets the fill direction.
+: [[API StatusBar SetRotatesTexture|StatusBar:SetRotatesTexture]]()
+: [[API StatusBar SetStatusBarAtlas|StatusBar:SetStatusBarAtlas]](<span class="apiarg">atlasName</span>)
+: [[API StatusBar SetStatusBarColor|StatusBar:SetStatusBarColor]](<span class="apiarg">r, g, b[, alpha]</span>) - Set the color of the bar.
+: [[API StatusBar SetStatusBarTexture|StatusBar:SetStatusBarTexture]](<span class="apiarg">texture or fileDataIDbool [, layer[, subLayer]]</span>) - Sets the texture of the bar - Added texture as valid arg in 1.11.
+: [[API StatusBar SetValue|StatusBar:SetValue]](<span class="apiarg">value</span>) - Set the value of the bar. -->
+
+<!--
+==AnimationGroup==
+[[UIOBJECT AnimationGroup|AnimationGroup]]s (inherits from [[#ParentedObject|ParentedObject]] and [[#ScriptObject|ScriptObject]], created with {{api|t=w|Region:CreateAnimationGroup}}) control how various animations are actually applied to a region.<sup>[https://wowprogramming.com/docs/widgets/AnimationGroup.html]</sup>
+<br>{{ref web|url=https://www.wowinterface.com/forums/showthread.php?t=35104|author=zork|date=2010-09-22|title=3.1.0 Animation roundup}}
+: [[API AnimationGroup CreateAnimation|AnimationGroup:CreateAnimation]](<span class="apiarg">animationType, [name[,inheritsFrom]]</span>) - Create and return an Animation as a child of this group.
+: [[API AnimationGroup Finish|AnimationGroup:Finish]]() - Notify this group to stop playing once the current loop cycle is done. Does nothing if this group is not playing.
+: [[API AnimationGroup GetAnimations|AnimationGroup:GetAnimations]]()
+: [[API AnimationGroup GetDuration|AnimationGroup:GetDuration]]() - Gets the total duration across all child Animations that the group will take to complete one loop cycle.
+: [[API AnimationGroup GetLoopState|AnimationGroup:GetLoopState]]() - Gets the current loop state of the group. Output is [NONE, FORWARD, or REVERSE].
+: [[API AnimationGroup GetLooping|AnimationGroup:GetLooping]]() -  Gets the type of looping for the group.
+: [[API AnimationGroup GetProgress|AnimationGroup:GetProgress]]() - Returns the progress of this animation as a unit value [0,1].
+: [[API AnimationGroup IsDone|AnimationGroup:IsDone]]() - Returns true if the group has finished playing.
+: [[API AnimationGroup IsPaused|AnimationGroup:IsPaused]]() - Returns true if the group is paused.
+: [[API AnimationGroup IsPendingFinish|AnimationGroup:IsPendingFinish]]()
+: [[API AnimationGroup IsPlaying|AnimationGroup:IsPlaying]]() - Returns true if the group is playing.
+: [[API AnimationGroup IsSetToFinalAlpha|AnimationGroup:IsSetToFinalAlpha]]()
+: [[API AnimationGroup Pause|AnimationGroup:Pause]]() - Pause the animations in this group.
+: [[API AnimationGroup Play|AnimationGroup:Play]]() - Start playing the animations in this group.
+: [[API AnimationGroup RemoveAnimations|AnimationGroup:RemoveAnimations]]()
+: [[API AnimationGroup Restart|AnimationGroup:Restart]]()
+: [[API AnimationGroup SetLooping|AnimationGroup:SetLooping]](<span class="apiarg">loopType</span>) - Sets the type of looping for the group. Input is [NONE, REPEAT, or BOUNCE].
+: [[API AnimationGroup SetPlaying|AnimationGroup:SetPlaying]](<span class="apiarg">play</span>)
+: [[API AnimationGroup SetToFinalAlpha|AnimationGroup:SetToFinalAlpha]]() - Apply the animations final resulting alpha to all animating regions.
+: [[API AnimationGroup Stop|AnimationGroup:Stop]]() - Stop all animations in this group.
+
+====Alpha====
+This animation changes the alpha value of its parent region.
+
+[[UIOBJECT Alpha|Alpha]] has all the methods from [[#Animation|Animation]], plus the following:
+: [[API Alpha GetFromAlpha|Alpha:GetFromAlpha]]() - Gets the start value that the alpha of this animation's parent Region changes by.
+: [[API Alpha GetToAlpha|Alpha:GetToAlpha]]() - Gets the end value that the alpha of this animation's parent Region changes by.
+: [[API Alpha SetFromAlpha|Alpha:SetFromAlpha]](<span class="apiarg">fromAlpha</span>) - Sets the start value from which the alpha of this animation's parent Region changes by.
+: [[API Alpha SetToAlpha|Alpha:SetToAlpha]](<span class="apiarg">toAlpha</span>) - Sets the end value from which the alpha of this animation's parent Region changes by.
+
+====Scale====
+This is an affine transformation that scales a parent Region about an origin. The scale can be non-uniform.
+
+[[UIOBJECT Scale|Scale]] has all the methods from [[#Animation|Animation]], plus the following:
+: [[API Scale GetFromScale|Scale:GetFromScale]]() - Gets the X scalar and the Y scalar that the animation will scale from if set.
+: [[API Scale GetOrigin|Scale:GetOrigin]]() - Gets the point, X offset, and Y offset of the animation's origin of rotation for its parent Region.
+: [[API Scale GetScale|Scale:GetScale]]() - Gets the X scalar and the Y scalar that the animation's parent Region should scale by.
+: [[API Scale GetToScale|Scale:GetToScale]]() - Gets the X scalar and the Y scalar that the animation will scale to if set.
+: [[API Scale SetFromScale|Scale:SetFromScale]](<span class="apiarg">x, y</span>) - Sets the X scalar and the Y scalar that the animation will scale from.
+: [[API Scale SetOrigin|Scale:SetOrigin]](<span class="apiarg">point, offsetX, offsetY</span>) - Sets the animation's origin of rotation for its parent Region.
+: [[API Scale SetScale|Scale:SetScale]](<span class="apiarg">x, y</span>) - Sets the X scalar and the Y scalar that the animation's parent Region should scale by.
+: [[API Scale SetToScale|Scale:SetToScale]](<span class="apiarg">x, y</span>) - Sets the X scalar and the Y scalar that the animation will scale to.
+
+====Translation====
+This is an affine transformation that moves a parent Region by an offset.
+[[UIOBJECT Translation|Translation]] has all the methods from [[#Animation|Animation]], plus the following:
+: [[API Translation GetOffset|Translation:GetOffset]]() - Gets the offset that the animation's parent Region would travel.
+: [[API Translation SetOffset|Translation:SetOffset]](<span class="apiarg">x, y</span>) - Sets the offset that the animation's parent Region would travel.
+
+====Path====
+This is a set of translations, which lets you move a frame smoothly along a path.
+
+[[UIOBJECT Path|Path]] has all the methods from [[#Animation|Animation]], plus the following:
+: [[API Path CreateControlPoint|Path:CreateControlPoint]](<span class="apiarg">[name [, template [, order]]]</span>) - Creates a new control point.
+: [[API Path GetControlPoints|Path:GetControlPoints]]() - Gets the control points of the Path.
+: [[API Path GetCurve|Path:GetCurve]]() - Gets the current curve type.
+: [[API Path GetMaxOrder|Path:GetMaxOrder]]() - Gets the maximum order of the Path.
+: [[API Path SetCurve|Path:SetCurve]](<span class="apiarg">curveType</span>) - Sets the curve type, which can be "SMOOTH" or "NONE".
+
+====Rotation====
+This is an affine transformation that rotates a parent Region about an origin.
+
+[[UIOBJECT Rotation|Rotation]] has all the methods from [[#Animation|Animation]], plus the following:
+: [[API Rotation GetDegrees|Rotation:GetDegrees]]() - Gets the amount of degrees that the animation's parent Region would rotate.
+: [[API Rotation GetOrigin|Rotation:GetOrigin]]() - Gets the point, X offset, and Y offset of the animation's origin of rotation for its parent Region.
+: [[API Rotation GetRadians|Rotation:GetRadians]]() - Gets the amount of radians that the animation's parent Region would travel.
+: [[API Rotation SetDegrees|Rotation:SetDegrees]](<span class="apiarg">degrees</span>) - Sets the amount of degrees that the animation's parent Region would rotate.
+: [[API Rotation SetOrigin|Rotation:SetOrigin]](<span class="apiarg">point, offsetX, offsetY</span>) - Sets the animation's origin of rotation for its parent Region.
+: [[API Rotation SetRadians|Rotation:SetRadians]](<span class="apiarg">radians</span>) - Sets the amount of radians that the animation's parent Region would travel.
+
+====TextureCoordTranslation====
+[[UIOBJECT TextureCoordTranslation|TextureCoordTranslation]] has all the methods from [[#Animation|Animation]] but does not have any other methods.
+
+==ControlPoint==
+[[UIOBJECT ControlPoint|ControlPoint]] can be created from [[API Path CreateControlPoint|Path:CreateControlPoint]] and has all the methods from [[#UIObject|UIObject]], plus the following:
+: [[API ControlPoint GetOffset|ControlPoint:GetOffset]]()
+: [[API ControlPoint GetOrder|ControlPoint:GetOrder]]()
+: [[API ControlPoint SetOffset|ControlPoint:SetOffset]]()
+: [[API ControlPoint SetOrder|ControlPoint:SetOrder]](<span class="apiarg">order</span>)
+: [[API ControlPoint SetParent|ControlPoint:SetParent]]()
+
+===MaskTexture===
+[[UIOBJECT MaskTexture|MaskTexture]] has the same methods as {{api|t=o|Texture}} except the texture mask API. It is created from {{api|t=w|Frame:CreateMaskTexture}}.
+
+===ColorSelect===
+[[UIOBJECT ColorSelect|ColorSelect]] has all the methods from [[#Frame|Frame]], plus the following:
+: [[API ColorSelect GetColorHSV|ColorSelect:GetColorHSV]]() - Get the HSV values of the selected color.
+: [[API ColorSelect GetColorRGB|ColorSelect:GetColorRGB]]() - Get the RGB values of the selected color.
+: [[API ColorSelect GetColorValueTexture|ColorSelect:GetColorValueTexture]]() - Get the texture used to show color value - new in 1.11.
+: [[API ColorSelect GetColorValueThumbTexture|ColorSelect:GetColorValueThumbTexture]]() - Get the texture for the color value thumb - New in 1.11.
+: [[API ColorSelect GetColorWheelTexture|ColorSelect:GetColorWheelTexture]]() - Get the texture for the color wheel - New in 1.11.
+: [[API ColorSelect GetColorWheelThumbTexture|ColorSelect:GetColorWheelThumbTexture]]() - Get the texture for the color wheel thumb - New in 1.11.
+: [[API ColorSelect SetColorHSV|ColorSelect:SetColorHSV]](<span class="apiarg">h, s, v</span>) - Set to a specific HSV color.
+: [[API ColorSelect SetColorRGB|ColorSelect:SetColorRGB]](<span class="apiarg">r, g, b</span>) - Set to a specific RGB color.
+: [[API ColorSelect SetColorValueTexture|ColorSelect:SetColorValueTexture]](<span class="apiarg">texturebool</span>) - Set the texture used to show color value - New in 1.11.
+: [[API ColorSelect SetColorValueThumbTexture|ColorSelect:SetColorValueThumbTexture]](<span class="apiarg">texturebool</span>) - Set the texture for the color value thumb - New in 1.11.
+: [[API ColorSelect SetColorWheelTexture|ColorSelect:SetColorWheelTexture]](<span class="apiarg">texturebool</span>) - Set the texture for the color wheel - New in 1.11.
+: [[API ColorSelect SetColorWheelThumbTexture|ColorSelect:SetColorWheelThumbTexture]](<span class="apiarg">texturebool</span>) - Set the texture for the color wheel thumb - New in 1.11.
+
+===EditBox===
+[[UIOBJECT EditBox|EditBox]] has all the methods from [[#Frame|Frame]] and [[#FontInstance|FontInstance]], plus the following:
+: [[API EditBox AddHistoryLine|EditBox:AddHistoryLine]](<span class="apiarg">text</span>) - Add text to the edit history.
+: [[API EditBox ClearFocus|EditBox:ClearFocus]]()
+: [[API EditBox ClearHistory|EditBox:ClearHistory]]()
+: [[API EditBox ClearHighlightText|EditBox:ClearHighlightText]]()
+: [[API EditBox Disable|EditBox:Disable]]()
+: [[API EditBox Enable|EditBox:Enable]]()
+: [[API EditBox GetAltArrowKeyMode|EditBox:GetAltArrowKeyMode]]() - Return whether only alt+arrow keys work for navigating the edit box, not arrow keys alone.
+: [[API EditBox GetBlinkSpeed|EditBox:GetBlinkSpeed]]() - Gets the blink speed of the EditBox in seconds - New in 1.11.
+: [[API EditBox GetCursorPosition|EditBox:GetCursorPosition]]() - Gets the position of the cursor inside the EditBox - New in 2.3.
+: [[API EditBox GetDisplayText|EditBox:GetDisplayText]]()
+: [[API EditBox GetHighlightColor|EditBox:GetHighlightColor]]()
+: [[API EditBox GetHistoryLines|EditBox:GetHistoryLines]]() - Get the number of history lines for this edit box
+: [[API EditBox GetInputLanguage|EditBox:GetInputLanguage]]() - Get the input language (locale based not in-game)
+: [[API EditBox GetMaxBytes|EditBox:GetMaxBytes]]() - Gets the maximum number bytes allowed in the EditBox - New in 1.11.
+: [[API EditBox GetMaxLetters|EditBox:GetMaxLetters]]() - Gets the maximum number of letters allowed in the EditBox - New in 1.11.
+: [[API EditBox GetNumLetters|EditBox:GetNumLetters]]() - Gets the number of letters in the box.
+: [[API EditBox GetNumber|EditBox:GetNumber]]()
+: [[API EditBox GetText|EditBox:GetText]]() - Get the current text contained in the edit box.
+: [[API EditBox GetTextInsets|EditBox:GetTextInsets]]() - Gets the text display insets for the EditBox - New in 1.11.
+: [[API EditBox GetUTF8CursorPosition|EditBox:GetUTF8CursorPosition]]()
+: [[API EditBox GetVisibleTextByteLimit|EditBox:GetVisibleTextByteLimit]]()
+: [[API EditBox HasFocus|EditBox:HasFocus]]() - Returns whether the edit box is currently being edited (has edit focus).
+: [[API EditBox HighlightText|EditBox:HighlightText]](<span class="apiarg">[startPos, endPos]</span>) - Set the highlight to all or some of the edit box text.
+: [[API EditBox Insert|EditBox:Insert]](<span class="apiarg">text</span>) - Insert text into the edit box.
+: [[API EditBox IsAutoFocus|EditBox:IsAutoFocus]]() - Determine if the EditBox has autofocus enabled - New in 1.11.
+: [[API EditBox IsCountInvisibleLetters|EditBox:IsCountInvisibleLetters]]()
+: [[API EditBox IsEnabled|EditBox:IsEnabled]]()
+: [[API EditBox IsInIMECompositionMode|EditBox:IsInIMECompositionMode]]()
+: [[API EditBox IsMultiLine|EditBox:IsMultiLine]]() - Determine if the EditBox accepts multiple lines - New in 1.11.
+: [[API EditBox IsNumeric|EditBox:IsNumeric]]() - Determine if the EditBox only accepts numeric input - New in 1.11.
+: [[API EditBox IsPassword|EditBox:IsPassword]]() - Determine if the EditBox performs password masking - New in 1.11.
+: [[API EditBox IsSecureText|EditBox:IsSecureText]]()
+: [[API EditBox SetAltArrowKeyMode|EditBox:SetAltArrowKeyMode]](<span class="apiarg">enable</span>) - Make only alt+arrow keys work for navigating the edit box, not arrow keys alone.
+: [[API EditBox SetAutoFocus|EditBox:SetAutoFocus]](<span class="apiarg">state</span>) - Set whether or not the editbox will attempt to get input focus when it gets shown (default: yes) - New in 1.11.
+: [[API EditBox SetBlinkSpeed|EditBox:SetBlinkSpeed]](<span class="apiarg">speed</span>)
+: [[API EditBox SetCountInvisibleLetters|EditBox:SetCountInvisibleLetters]](<span class="apiarg">state</span>) - Sets if invisible characters should count towards max letter count.
+: [[API EditBox SetCursorPosition|EditBox:SetCursorPosition]](<span class="apiarg">position</span>) - Set the position of the cursor within the EditBox - New in 2.3.
+: [[API EditBox SetEnabled|EditBox:SetEnabled]]()
+: [[API EditBox SetFocus|EditBox:SetFocus]]() - Move input focus (the cursor) to this editbox
+: [[API EditBox SetHighlightColor|EditBox:SetHighlightColor]]()
+: [[API EditBox SetHistoryLines|EditBox:SetHistoryLines]](numLines) - Set the number of history lines to remember.
+: [[API EditBox SetMaxBytes|EditBox:SetMaxBytes]](<span class="apiarg">maxBytes</span>) - Set the maximum byte size for entered text.
+: [[API EditBox SetMaxLetters|EditBox:SetMaxLetters]](<span class="apiarg">maxLetters</span>) - Set the maximum number of letters for entered text.
+: [[API EditBox SetMultiLine|EditBox:SetMultiLine]](<span class="apiarg">state</span>) - Set the EditBox's multi-line state - New in 1.11.
+: [[API EditBox SetNumber|EditBox:SetNumber]](<span class="apiarg">number</span>)
+: [[API EditBox SetNumeric|EditBox:SetNumeric]](<span class="apiarg">state</span>) - Set if the EditBox only accepts numeric input - New in 1.11.
+: [[API EditBox SetPassword|EditBox:SetPassword]](<span class="apiarg">state</span>) - Set the EditBox's password masking state - New in 1.11.
+: [[API EditBox SetSecureText|EditBox:SetSecureText]]()
+: [[API EditBox SetSecurityDisablePaste|EditBox:SetSecurityDisablePaste]]()
+: [[API EditBox SetSecurityDisableSetText|EditBox:SetSecurityDisableSetText]]()
+: [[API EditBox SetText|EditBox:SetText]](<span class="apiarg">text</span>) - Set the text contained in the edit box.
+: [[API EditBox SetTextInsets|EditBox:SetTextInsets]](<span class="apiarg">l, r, t, b</span>)
+: [[API EditBox SetVisibleTextByteLimit|EditBox:SetVisibleTextByteLimit]](<span class="apiarg">maxVisibleBytes</span>)
+: [[API EditBox ToggleInputLanguage|EditBox:ToggleInputLanguage]]()
+
+===MessageFrame===
+[[UIOBJECT MessageFrame|MessageFrame]] has all the methods from [[#Frame|Frame]] and [[#FontInstance|FontInstance]], plus the following:
+: [[API MessageFrame AddMessage|MessageFrame:AddMessage]](<span class="apiarg">text, r, g, b, messageGroup, holdTime</span>) - Add a message to the frame which will fade eventually.
+: [[API MessageFrame Clear|MessageFrame:Clear]]() - Clear the messages from the frame - New in 1.11.
+: [[API MessageFrame GetFadeDuration|MessageFrame:GetFadeDuration]]() - Gets the fade duration in seconds - New in 1.11.
+: [[API MessageFrame GetFadePower|MessageFrame:GetFadePower]]()
+: [[API MessageFrame GetFading|MessageFrame:GetFading]]() - Get whether the frame is fading - New in 1.11.
+: [[API MessageFrame GetFontStringByID|MessageFrame:GetFontStringByID]](<span class="apiarg">messageID</span>)
+: [[API MessageFrame GetInsertMode|MessageFrame:GetInsertMode]]() - Get the insert mode for the frame - New in 1.11.
+: [[API MessageFrame GetTimeVisible|MessageFrame:GetTimeVisible]]() - Get the message visibility time in seconds - New in 1.11.
+: [[API MessageFrame HasMessageByID|MessageFrame:HasMessageByID]]()
+: [[API MessageFrame ResetMessageFadeByID|MessageFrame:ResetMessageFadeByID]](<span class="apiarg">messageID</span>)
+: [[API MessageFrame SetFadeDuration|MessageFrame:SetFadeDuration]](<span class="apiarg">seconds</span>) - Set the fade duration - New in 1.11.
+: [[API MessageFrame SetFadePower|MessageFrame:SetFadePower]](<span class="apiarg">power</span>)
+: [[API MessageFrame SetFading|MessageFrame:SetFading]](<span class="apiarg">status</span>) - Set whether the frame fades messages - New in 1.11.
+: [[API MessageFrame SetInsertMode|MessageFrame:SetInsertMode]](<span class="apiarg">TOP or BOTTOM</span>) - Set where new messages are inserted - New in 1.11.
+: [[API MessageFrame SetTimeVisible|MessageFrame:SetTimeVisible]](<span class="apiarg">seconds</span>) - Sets the message visibility time - New in 1.11.
+-->

@@ -1,0 +1,3 @@
+# CovenantSanctumConstants
+
+Type: None

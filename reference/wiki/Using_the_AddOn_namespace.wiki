@@ -1,0 +1,62 @@
+<!-- Source: https://warcraft.wiki.gg/wiki/Using_the_AddOn_namespace | revision 6474636 (2025-09-16T18:06:18Z) | fetched 2026-10-20 | CC BY-SA 4.0, warcraft.wiki.gg contributors -->
+{{UIHowTo}} __NOTOC__
+The addon namespace is a private table shared between Lua files in the same addon. <br>It allows for addons to access data between files without exposing or polluting variables to the global environment.
+ addonName, addonTable = ...
+
+==Vararg==
+;addonName : <span class="apitype">string</span> - The name of your addon as in the [[TOC_format|TOC]] file and folder name.
+;addonTable : <span class="apitype">table</span> - The shared addon table between the Lua files of an addon.
+
+==Example==
+This addon defines the "foo" key on the addon table in <code>FileA.lua</code> and accesses it in <code>FileB.lua</code>
+
+'''<span class="apialt">MyAddon.toc</span>'''
+ ## Interface: {{API_LatestInterface}}
+ ## Version: 1.0.0
+ ## Title: Test
+ 
+ FileA.lua
+ FileB.lua
+
+'''<span class="apialt">FileA.lua</span>'''
+* Note that the underscore "_" here is used as a [https://stackoverflow.com/a/34476033/1297035 throwaway variable] when we don't really care about it.
+<syntaxhighlight lang="lua">
+local _, ns = ...
+ns.foo = "Banana"
+</syntaxhighlight>
+
+'''<span class="apialt">FileB.lua</span>'''
+<syntaxhighlight lang="lua">
+local addonName, ns = ...
+print(addonName, ns.foo) -- prints "MyAddon" and "Banana"
+</syntaxhighlight>
+
+==Global variable==
+You can also simply use a ''unique'' global variable accross your files.
+
+'''<span class="apialt">FileA.lua</span>'''
+<syntaxhighlight lang="lua">
+MyAddon = {}
+MyAddon.apples = 0
+
+function MyAddon:DoSomething(increment)
+	self.apples = self.apples + increment
+end
+
+MyAddon:DoSomething(2)
+</syntaxhighlight>
+'''<span class="apialt">FileB.lua</span>'''
+<syntaxhighlight lang="lua">
+MyAddon:DoSomething(3)
+print(MyAddon.apples) -- 5
+</syntaxhighlight>
+
+==Patch changes==
+* {{Patch 3.3.0|note=Added.}}
+
+==References==
+* {{ref web|url=https://www.wowinterface.com/forums/showthread.php?t=33560#2|author=haste|date=2010-06-28|title=WoWInterface: ns ?!}}
+* {{ref web|url=https://www.wowinterface.com/forums/showthread.php?t=49349#3|author=Phanx|date=2014-06-01|accessdate=2019-04-22|title=WoWInterface - trying to understand modules through namespace|archiveurl=}}
+<!-- * {{ref web|url=https://us.battle.net/forums/en/wow/topic/20742244205|author=Gello|date=2016-02-07|accessdate=2019-04-22|title=UI and Macro - XML: Loading, Namespaces, Globals and Tips|archiveurl=}}
+* {{ref web|url=https://stackoverflow.com/questions/13565828/lua-wow-and|author=Bryce Fischer|date=2011-11-26|accessdate=2019-04-22|title=Stackoverflow - Lua, WOW and “…”|archiveurl=}}
+* Lua Reference Manual: [https://www.lua.org/manual/5.1/manual.html#pdf-loadfile loadfile], [https://www.lua.org/manual/5.1/manual.html#2.5.9 vararg] -->
