@@ -3,6 +3,13 @@
 What goes into each field of CurseForge's Create Project form (Create > Start a Project, game World of Warcraft,
 class Addons). Checked against the form on 20 Oct 2026.
 
+**Status (20 Oct 2026):** the project exists as ID 1756266 (author nim4), unlisted, at
+https://www.curseforge.com/wow/addons/holy-moly; manage it at https://authors.curseforge.com/#/projects/1756266.
+File "Holy Moly 0.4.0" (Alpha, WoW Forever 1.60.1, publish manually once approved) and one screenshot
+(`docs/brand/sc1.png`) are uploaded and waiting for moderation. The create form's logo upload failed for a form
+whose first upload attempt came before the name was filled (`/_api/projects/null/upload-avatar`, 400); a manual
+upload after filling every field worked.
+
 | Field | Value |
 |---|---|
 | Project name | Holy Moly |
