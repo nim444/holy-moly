@@ -15,9 +15,9 @@ How a version gets from this repo to players. The repo is private until the step
 
 ## Going public
 
-- **CurseForge project:** create "Holy Moly" under your CurseForge account (the name was free on 20 Oct 2026),
-  category Healer or Class: Priest, game version Forever. The logo is `HolyMoly/Media/Icon.tga`; a larger version
-  for the project page can be drawn from the same shapes in `tools/make_icons.py`.
+- **CurseForge project:** every field of the Create Project form, the logo and the description are in
+  [curseforge-listing.md](curseforge-listing.md). Set the CurseForge username to nim444 first (Settings on
+  curseforge.com; new accounts get a random `user_...` name).
 - **Donations:** set the CurseForge project's donation link to PayPal, `https://paypal.me/nim4k`. The same link is
   in the README, `.github/FUNDING.yml` (GitHub's Sponsor button) and `## X-Donate` in the TOC.
 - **Screenshots:** the box, the tooltip after a fight, the timers panel and the settings page.

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Draw the addon's own textures as TGA files (for images the Forever client has no atlas for).
 
-Output: HolyMoly/Media/Trash.tga (32x32, the reset button) and HolyMoly/Media/Icon.tga (64x64, the logo shown
-in the AddOn List). Pass a directory to also write PNG previews there.
+Output: HolyMoly/Media/Trash.tga (32x32, the reset button), HolyMoly/Media/Icon.tga (64x64, the logo shown
+in the AddOn List) and docs/brand/logo-512.png (the same logo for the CurseForge project page, which needs at
+least 400x400). Pass a directory to also write PNG previews there.
 Run from the repo root: python3 tools/make_icons.py [preview-dir]
 """
 import math
@@ -13,6 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MEDIA = ROOT / "HolyMoly/Media"
+BRAND = ROOT / "docs/brand"
 SS = 6  # supersampling per axis, for smooth edges
 CLEAR = (0, 0, 0, 0)
 
@@ -83,19 +85,19 @@ def logo(x, y):
     return color
 
 
-def render(shader, size):
+def render(shader, size, ss=SS):
     pixels = []
     for py in range(size):
         for px in range(size):
             acc = [0.0, 0.0, 0.0, 0.0]
-            for sy in range(SS):
-                for sx in range(SS):
-                    r, g, b, a = shader(px + (sx + 0.5) / SS, py + (sy + 0.5) / SS)
+            for sy in range(ss):
+                for sx in range(ss):
+                    r, g, b, a = shader(px + (sx + 0.5) / ss, py + (sy + 0.5) / ss)
                     acc[0] += r * a
                     acc[1] += g * a
                     acc[2] += b * a
                     acc[3] += a
-            n = SS * SS
+            n = ss * ss
             alpha = acc[3] / n
             rgb = [round(c / acc[3]) if acc[3] else 0 for c in acc[:3]]
             pixels.append((*rgb, round(255 * alpha)))
@@ -127,6 +129,18 @@ def write_png(path, pixels, size, scale):
                      + chunk(b"IEND", b""))
 
 
+def write_rgba_png(path, pixels, size):
+    """A PNG that keeps the transparency, for upload sites."""
+    rows = b"".join(b"\x00" + b"".join(bytes(p) for p in pixels[y * size:(y + 1) * size]) for y in range(size))
+
+    def chunk(kind, data):
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+
+    ihdr = struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0)
+    path.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr) + chunk(b"IDAT", zlib.compress(rows, 9))
+                     + chunk(b"IEND", b""))
+
+
 def main():
     MEDIA.mkdir(parents=True, exist_ok=True)
     preview = Path(sys.argv[1]) if len(sys.argv) > 1 else None
@@ -136,6 +150,13 @@ def main():
         if preview:
             write_png(preview / f"{name}-preview.png", pixels, size, 256 // size)
         print(f"wrote {(MEDIA / f'{name}.tga').relative_to(ROOT)}")
+
+    # The project-page logo: the 64-unit logo drawn at 512 pixels.
+    BRAND.mkdir(parents=True, exist_ok=True)
+    big = 512
+    pixels = render(lambda x, y: logo(x * 64 / big, y * 64 / big), big, ss=3)
+    write_rgba_png(BRAND / "logo-512.png", pixels, big)
+    print(f"wrote {(BRAND / 'logo-512.png').relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
