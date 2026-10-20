@@ -47,15 +47,14 @@ function ns.AddRow(label, r, g, b, y)
 	return value
 end
 
-local classIcon = box:CreateTexture(nil, "ARTWORK")
-classIcon:SetSize(14, 14)
-classIcon:SetPoint("TOPLEFT", 9, -8)
-if C_Texture.GetAtlasInfo("classicon-priest") then
-	classIcon:SetAtlas("classicon-priest")
-end
+-- The Holy Moly logo (tools/make_icons.py), the same one the AddOn List shows.
+local logo = box:CreateTexture(nil, "ARTWORK")
+logo:SetSize(16, 16)
+logo:SetPoint("TOPLEFT", 8, -7)
+logo:SetTexture("Interface\\AddOns\\HolyMoly\\Media\\Icon")
 
 local title = box:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-title:SetPoint("LEFT", classIcon, "RIGHT", 4, 0)
+title:SetPoint("LEFT", logo, "RIGHT", 4, 0)
 title:SetText("Holy Moly")
 
 local divider = box:CreateTexture(nil, "ARTWORK")
