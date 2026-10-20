@@ -22,6 +22,10 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 - **Settings:** Options > AddOns > Holy Moly, `/holy config`, or right-click Holy Moly in the minimap's addon
   menu (a left-click shows or hides the box). `/holy reset | show | hide` also work.
 
+## Support
+
+Holy Moly is free. If it keeps your group alive and you want to say thanks: [paypal.me/nim4k](https://paypal.me/nim4k).
+
 ## Layout
 
 | Path | What |

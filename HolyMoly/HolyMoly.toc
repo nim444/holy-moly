@@ -6,6 +6,7 @@
 ## Version: 0.4.0
 ## IconTexture: Interface\AddOns\HolyMoly\Media\Icon
 ## AddonCompartmentFunc: HolyMoly_OnAddonCompartmentClick
+## X-Donate: https://paypal.me/nim4k
 ## SavedVariables: HolyMolyDB
 
 Settings.lua
