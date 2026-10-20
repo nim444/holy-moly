@@ -6,24 +6,30 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 ## What it does
 
 - **The box:** your healing, absorbs, dispels and group deaths since the last reset (from Blizzard's built-in
-  damage meter), a mana bar, and the mana your spells cost in the current or last fight, with mana per minute.
-  Drag it to move it; the trash button resets the totals (and Blizzard's meter).
-- **Hover the box** after a fight: healing per spell with icons and shares, and who you healed and how often.
-- **Speaker button:** yells your totals in one of a few Priest lines, then says the three others you healed most
-  ("Kept up: ...", by first name). Out of combat only, never when both totals are 0.
+  damage meter), a mana bar that glows red when mana runs low, and the mana your spells cost in the current or
+  last fight, with mana per minute. Drag it to move it; the trash button resets the totals (and Blizzard's
+  meter) after asking.
+- **Hover the box:** healing per spell with icons, shares and overheal, who you healed and how often, and your
+  recent fights with a comparison to the one before.
+- **Speaker button:** sends your totals in one of a few Priest lines, then the three others you healed most
+  ("Kept up: ...", by first name), as a yell, a say or to group chat. Out of combat only, never when both totals
+  are 0.
 - **Drink button** on the mana bar: yells a "wait, I need to drink" line with your mana percent.
-- **HoT and shield timers:** a panel under the box with your Renews, shields, other HoTs and Weakened Soul on each
-  group member, as icons with the game's own cooldown sweep.
+- **Timers panel** under the box: debuffs you can dispel (red border), then your Renews, shields, other HoTs and
+  Weakened Soul on each group member, as icons with the game's own cooldown sweep.
 - **Buff check:** out of combat, buttons for Priest buffs someone in the group is missing (Fortitude, Divine
   Spirit, Shadow Protection, Inner Fire, Fear Ward); a click casts it on the first one missing it.
-- `/holy reset | show | hide`, and the minimap addon menu toggles the box.
+- **Settings:** Options > AddOns > Holy Moly, `/holy config`, or right-click Holy Moly in the minimap's addon
+  menu (a left-click shows or hides the box). `/holy reset | show | hide` also work.
 
 ## Layout
 
 | Path | What |
 |---|---|
-| `HolyMoly/` | The addon. `HolyMoly.lua` (box, totals, report), `Mana.lua`, `HotTimers.lua`, `BuffCheck.lua`, `Media/` (logo and trash icon) |
+| `HolyMoly/` | The addon. `Settings.lua` (saved variables and the options page, loads first), `HolyMoly.lua` (box, totals, tooltip, report), `Mana.lua`, `HotTimers.lua`, `BuffCheck.lua`, `Media/` (logo and trash icon) |
 | `tools/make_icons.py` | Draws `Media/Icon.tga` (the logo) and `Media/Trash.tga` |
+| `tools/package.sh`, `.github/workflows/release.yml` | The release zip and the tag-triggered GitHub release; steps in [docs/PUBLISHING.md](docs/PUBLISHING.md) |
+| `CHANGELOG.md`, `LICENSE` | Release notes per version; MIT |
 | `docs/research/priest-addons.md` | What other Priest addons do, what is feasible in Forever, the feature backlog |
 | `reference/` | Offline developer references (below) |
 

@@ -102,7 +102,7 @@ local function Missing(buff, units)
 end
 
 local function Update()
-	if InCombatLockdown() then
+	if InCombatLockdown() or not ns.Get("buffCheck") then
 		bar:Hide()
 		return
 	end
@@ -174,3 +174,4 @@ frame:SetScript("OnEvent", function(_, event)
 	end
 	QueueUpdate()
 end)
+ns.OnSettingChanged("buffCheck", QueueUpdate)

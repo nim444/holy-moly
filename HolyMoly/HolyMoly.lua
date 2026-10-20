@@ -141,8 +141,10 @@ end
 local hiddenCasts = 0
 local pendingCasts, pendingCount = {}, 0
 
--- Your healing and shields per spell from the meter, most first: { { name = "Flash Heal", amount = 2100 }, ... }.
--- Spells whose numbers are secret (in combat) are left out.
+-- Your healing and shields per spell from the meter, most first:
+-- { { name = "Flash Heal", amount = 2100, over = 600, icon = ... }, ... }.
+-- "over" is the meter's overkillAmount, which for heals should be overhealing; Blizzard's own meter never shows
+-- it, so the tooltip only mentions it when it is above 0. Spells whose numbers are secret (in combat) are left out.
 local function SpellBreakdown()
 	local byName, list = {}, {}
 	for _, meterType in ipairs({ HEALING, ABSORBS }) do
@@ -154,11 +156,15 @@ local function SpellBreakdown()
 					if name then
 						local entry = byName[name]
 						if not entry then
-							entry = { name = name, amount = 0, icon = C_Spell.GetSpellTexture(spell.spellID) }
+							entry = { name = name, amount = 0, over = 0, icon = C_Spell.GetSpellTexture(spell.spellID) }
 							byName[name] = entry
 							list[#list + 1] = entry
 						end
 						entry.amount = entry.amount + spell.totalAmount
+						local over = meterType == HEALING and spell.overkillAmount
+						if over and not issecretvalue(over) then
+							entry.over = entry.over + over
+						end
 					end
 				end
 			end
@@ -258,17 +264,69 @@ castFrame:SetScript("OnEvent", function(_, event, ...)
 	end
 end)
 
+-- Recent fights: after each fight, its healing and shields from the meter's "Current" session (readable again
+-- once combat is over), how long it lasted and the mana it cost.
+local CURRENT = Enum.DamageMeterSessionType.Current
+local HISTORY_SIZE = 10
+local HISTORY_SHOWN = 5
+
+local function RecordFight()
+	local function Total(meterType)
+		local source = C_DamageMeter.GetCombatSessionSourceFromType(CURRENT, meterType, playerGUID)
+		local amount = source and canaccesstable(source) and source.totalAmount or 0
+		return not issecretvalue(amount) and amount or nil
+	end
+	local heal, absorb = Total(HEALING), Total(ABSORBS)
+	local seconds = C_DamageMeter.GetSessionDurationSeconds(CURRENT)
+	if not heal or not absorb or heal + absorb == 0 or not seconds or issecretvalue(seconds) then
+		return
+	end
+	table.insert(HolyMolyDB.history, 1, {
+		when = time(),
+		seconds = math.floor(seconds + 0.5),
+		heal = heal,
+		absorb = absorb,
+		mana = ns.LastFightMana(),
+	})
+	while #HolyMolyDB.history > HISTORY_SIZE do
+		table.remove(HolyMolyDB.history)
+	end
+end
+
 local function AddSection(heading)
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddLine(heading, NORMAL_FONT_COLOR:GetRGB())
 end
 
--- Hovering the box: healing per spell, then who you healed. Both are secret in combat, so they wait for the end.
+local function AddHistory()
+	local history = HolyMolyDB.history
+	if not ns.Get("history") or #history == 0 then
+		return
+	end
+	AddSection("Recent fights")
+	for i = 1, math.min(HISTORY_SHOWN, #history) do
+		local fight = history[i]
+		GameTooltip:AddDoubleLine(("%s  (%ds)"):format(date("%H:%M", fight.when), fight.seconds),
+			("%s healed, %s shielded"):format(ns.ShortNumber(fight.heal), ns.ShortNumber(fight.absorb)),
+			1, 1, 1, 1, 1, 1)
+	end
+	if #history >= 2 then
+		local function PerSecond(fight)
+			return (fight.heal + fight.absorb) / math.max(fight.seconds, 1)
+		end
+		local change = math.floor((PerSecond(history[1]) / PerSecond(history[2]) - 1) * 100 + 0.5)
+		GameTooltip:AddLine(("Last fight vs the one before: %+d%% healing per second"):format(change), 0.6, 0.8, 1)
+	end
+end
+
+-- Hovering the box: healing per spell, who you healed and recent fights. The first two are secret in combat, so
+-- they wait for the end.
 box:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
 	GameTooltip:SetText("Holy Moly")
 	if InCombatLockdown() then
 		GameTooltip:AddLine("Details are shown after the fight.", 1, 1, 1)
+		AddHistory()
 		GameTooltip:Show()
 		return
 	end
@@ -286,8 +344,11 @@ box:SetScript("OnEnter", function(self)
 			if entry.amount > 0 then
 				local name = entry.icon and ("|T%s:14:14|t %s"):format(entry.icon, entry.name) or entry.name
 				local share = math.floor(entry.amount / total * 100 + 0.5)
-				GameTooltip:AddDoubleLine(name, ("%s  (%d%%)"):format(ns.ShortNumber(entry.amount), share),
-					1, 1, 1, 1, 1, 1)
+				local value = ("%s  (%d%%)"):format(ns.ShortNumber(entry.amount), share)
+				if entry.over > 0 then
+					value = ("%s, %d%% over"):format(value, entry.over / (entry.amount + entry.over) * 100 + 0.5)
+				end
+				GameTooltip:AddDoubleLine(name, value, 1, 1, 1, 1, 1, 1)
 			end
 		end
 	end
@@ -305,6 +366,7 @@ box:SetScript("OnEnter", function(self)
 	if hiddenCasts > 0 then
 		GameTooltip:AddLine(hiddenCasts .. " casts were hidden by Blizzard and not counted.", 0.6, 0.6, 0.6, true)
 	end
+	AddHistory()
 	GameTooltip:Show()
 end)
 box:SetScript("OnLeave", GameTooltip_Hide)
@@ -315,6 +377,17 @@ local function ResetTotals()
 	ClearHealLog()
 	Refresh()
 end
+
+-- The trash button asks first, in Blizzard's own Yes/No dialog.
+StaticPopupDialogs.HOLYMOLY_RESET = {
+	text = "Reset Holy Moly's totals and heal list?\nThis also resets Blizzard's damage meter.",
+	button1 = YES,
+	button2 = NO,
+	OnAccept = ResetTotals,
+	timeout = 0,
+	whileDead = 1,
+	hideOnEscape = 1,
+}
 
 -- A small icon button from a texture file (a path) or one of Blizzard's atlases; falls back to a text label if
 -- the atlas is missing.
@@ -348,7 +421,9 @@ ns.IconButton = IconButton
 
 -- Forever has no trash-can atlas, so the icon is our own (tools/make_icons.py).
 local resetButton = IconButton("Interface\\AddOns\\HolyMoly\\Media\\Trash.tga", "Reset", "Reset totals",
-	"Also resets Blizzard's damage meter.", ResetTotals)
+	"Asks first. Also resets Blizzard's damage meter.", function()
+		StaticPopup_Show("HOLYMOLY_RESET")
+	end)
 resetButton:SetPoint("TOPRIGHT", -10, -8)
 
 -- One line is picked at random per yell (never the same twice in a row), so repeats don't read like spam.
@@ -437,7 +512,19 @@ local function KeptUpMessage()
 	return #names > 0 and ns.RandomLine(KEPT_UP_LINES):format(table.concat(names, ", ")) or nil
 end
 
-local function YellTotals()
+-- The chat for the "GROUP" setting: instance chat in a dungeon-finder group, else raid or party; nil when solo.
+local function GroupChannel()
+	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+		return "INSTANCE_CHAT"
+	elseif IsInRaid() then
+		return "RAID"
+	elseif IsInGroup() then
+		return "PARTY"
+	end
+end
+
+-- The speaker button: your totals, then who you kept up, to the chat picked in the settings.
+local function ReportTotals()
 	local ok, heal, absorb = pcall(function()
 		return PlayerTotal(HEALING) or 0, PlayerTotal(ABSORBS) or 0
 	end)
@@ -454,26 +541,38 @@ local function YellTotals()
 		print("Holy Moly: nothing healed or shielded yet.")
 		return
 	end
-	if not ns.SendChat(ns.RandomLine(YELL_LINES):format(ShortNumber(heal), ShortNumber(absorb)), "YELL") then
+	local first, second = "YELL", "SAY"
+	if ns.Get("reportChannel") == "SAY" then
+		first = "SAY"
+	elseif ns.Get("reportChannel") == "GROUP" then
+		first = GroupChannel()
+		second = first
+		if not first then
+			print("Holy Moly: you're not in a group. Options > AddOns > Holy Moly sets where the totals go.")
+			return
+		end
+	end
+	if not ns.SendChat(ns.RandomLine(YELL_LINES):format(ShortNumber(heal), ShortNumber(absorb)), first) then
 		return
 	end
-	-- Who you kept up goes out as a second, normal /say line, a second later. Outside instances the game only
-	-- accepts /say straight from a click, so there it goes out at once.
-	local keptUp = KeptUpMessage()
+	-- Who you kept up follows a second later. Outside instances the game only accepts /say straight from a click,
+	-- so there a /say line goes out at once; group chat can always wait.
+	local keptUp = ns.Get("keptUp") and KeptUpMessage()
 	if not keptUp then
 		return
 	end
-	if IsInInstance() then
+	if second ~= "SAY" or IsInInstance() then
 		C_Timer.After(KEPT_UP_DELAY, function()
-			ns.SendChat(keptUp, "SAY")
+			ns.SendChat(keptUp, second)
 		end)
 	else
-		ns.SendChat(keptUp, "SAY")
+		ns.SendChat(keptUp, second)
 	end
 end
 
-local yellButton = IconButton("voicechat-icon-speaker", "Yell", "Yell totals",
-	"Yells your totals, then says the three people you healed most. Out of combat only.", YellTotals)
+local yellButton = IconButton("voicechat-icon-speaker", "Yell", "Report totals",
+	"Sends your totals, then the three people you healed most. Out of combat only. Where it goes: "
+	.. "Options > AddOns > Holy Moly.", ReportTotals)
 yellButton:SetPoint("RIGHT", resetButton, "LEFT", -6, 0)
 
 local function SavePosition()
@@ -491,18 +590,26 @@ local function RestorePosition()
 	end
 end
 
-box:SetScript("OnDragStart", box.StartMoving)
+box:SetScript("OnDragStart", function(self)
+	if not ns.Get("lock") then
+		self:StartMoving()
+	end
+end)
 box:SetScript("OnDragStop", function(self)
 	self:StopMovingOrSizing()
 	SavePosition()
 end)
 
+ns.OnSettingChanged("scale", function(scale)
+	box:SetScale(scale)
+end)
+
 box:RegisterEvent("PLAYER_LOGIN")
+box:RegisterEvent("PLAYER_REGEN_ENABLED")
 box:RegisterEvent("DAMAGE_METER_RESET")
 box:SetScript("OnEvent", function(_, event)
 	if event == "PLAYER_LOGIN" then
-		HolyMolyDB = HolyMolyDB or {}
-		HolyMolyDB.healed = HolyMolyDB.healed or {}
+		-- Settings.lua has set up HolyMolyDB on ADDON_LOADED.
 		castFrame:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player")
 		castFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 		RestorePosition()
@@ -516,6 +623,11 @@ box:SetScript("OnEvent", function(_, event)
 			print("Holy Moly: Blizzard's damage meter is not available: " .. tostring(reason))
 		end
 		C_Timer.NewTicker(REFRESH_SECONDS, Refresh)
+	elseif event == "PLAYER_REGEN_ENABLED" then
+		-- Give the meter a moment to close the fight and lift the secrecy before reading it.
+		C_Timer.After(1, function()
+			pcall(RecordFight)
+		end)
 	elseif event == "DAMAGE_METER_RESET" then
 		-- Keep the log in step with the totals, also when Blizzard's own meter is reset.
 		ClearHealLog()
@@ -534,12 +646,19 @@ SlashCmdList.HOLYMOLY = function(msg)
 		box:Show()
 	elseif msg == "hide" then
 		box:Hide()
+	elseif msg == "config" or msg == "options" then
+		ns.OpenSettings()
 	else
-		print("Holy Moly: /holy reset | show | hide. Drag the box to move it.")
+		print("Holy Moly: /holy reset | show | hide | config. Drag the box to move it.")
 	end
 end
 
--- Clicking Holy Moly in the minimap's addon menu (## AddonCompartmentFunc) shows or hides the box.
-function HolyMoly_OnAddonCompartmentClick()
-	box:SetShown(not box:IsShown())
+-- Holy Moly in the minimap's addon menu (## AddonCompartmentFunc): a click shows or hides the box, a right-click
+-- opens the settings.
+function HolyMoly_OnAddonCompartmentClick(_, buttonName)
+	if buttonName == "RightButton" then
+		ns.OpenSettings()
+	else
+		box:SetShown(not box:IsShown())
+	end
 end

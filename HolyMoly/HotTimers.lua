@@ -1,5 +1,6 @@
 -- HoT and shield timers: a panel under the box with one row per group member who has your heals over time,
--- shields or Weakened Soul on them, each shown as an icon with a cooldown sweep.
+-- shields or Weakened Soul on them, or a debuff you can dispel, each shown as an icon with a cooldown sweep.
+-- Dispellable debuffs come first, with a red border.
 --
 -- In combat the aura details are secret, so nothing here reads them: the "RAID_IN_COMBAT" filter picks your own
 -- HoTs and shields, the icon goes straight to SetTexture, and the timer is the game's own duration object handed
@@ -9,8 +10,9 @@ local _, ns = ...
 
 local HOT_FILTER = "HELPFUL|PLAYER|RAID_IN_COMBAT"
 local WEAKENED_SOUL_FILTER = "HARMFUL|PLAYER" -- the only debuff a Priest puts on friends
+local DISPEL_FILTER = "HARMFUL|RAID" -- harmful auras you can dispel
 local MAX_ROWS = 10
-local MAX_ICONS = 5
+local MAX_ICONS = 6
 local ICON_SIZE = 18
 local ROW_HEIGHT = 20
 
@@ -44,6 +46,10 @@ local function GetRow(index)
 		local icon = CreateFrame("Frame", nil, row)
 		icon:SetSize(ICON_SIZE, ICON_SIZE)
 		icon:SetPoint("LEFT", row.name, "RIGHT", 2 + (i - 1) * (ICON_SIZE + 2), 0)
+		icon.border = icon:CreateTexture(nil, "BACKGROUND")
+		icon.border:SetPoint("TOPLEFT", -1, 1)
+		icon.border:SetPoint("BOTTOMRIGHT", 1, -1)
+		icon.border:SetColorTexture(1, 0.1, 0.1)
 		icon.texture = icon:CreateTexture(nil, "ARTWORK")
 		icon.texture:SetAllPoints()
 		icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
@@ -72,26 +78,33 @@ local function GroupUnits()
 	return units
 end
 
--- Your HoTs and shields on a unit, then Weakened Soul: a list of aura instance IDs.
+-- Debuffs you can dispel (when that setting is on), then your HoTs and shields, then Weakened Soul:
+-- { { id = auraInstanceID, dispel = true }, ... }
 local function TrackedAuras(unit)
-	local ids = {}
-	for _, filter in ipairs({ HOT_FILTER, WEAKENED_SOUL_FILTER }) do
+	local auras = {}
+	local function Add(filter, dispel)
 		for _, id in ipairs(C_UnitAuras.GetUnitAuraInstanceIDs(unit, filter) or {}) do
-			ids[#ids + 1] = id
+			auras[#auras + 1] = { id = id, dispel = dispel }
 		end
 	end
-	return ids
+	if ns.Get("dispels") then
+		Add(DISPEL_FILTER, true)
+	end
+	Add(HOT_FILTER, false)
+	Add(WEAKENED_SOUL_FILTER, false)
+	return auras
 end
 
-local function FillRow(row, unit, ids)
+local function FillRow(row, unit, auras)
 	-- In Forever the first return is the first name; in combat it may be secret, which SetText accepts.
 	row.name:SetText((UnitName(unit)))
 	for i, icon in ipairs(row.icons) do
-		local id = ids[i]
-		if id then
-			local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, id)
+		local tracked = auras[i]
+		if tracked then
+			local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, tracked.id)
 			icon.texture:SetTexture(aura and aura.icon)
-			icon.cooldown:SetCooldownFromDurationObject(C_UnitAuras.GetAuraDuration(unit, id))
+			icon.cooldown:SetCooldownFromDurationObject(C_UnitAuras.GetAuraDuration(unit, tracked.id))
+			icon.border:SetShown(tracked.dispel)
 			icon:Show()
 		else
 			icon:Hide()
@@ -102,15 +115,23 @@ end
 
 local function Update()
 	local shown = 0
+	if not ns.Get("timers") then
+		for _, row in ipairs(rows) do
+			row:Hide()
+		end
+		panel:SetHeight(1)
+		panel:Hide()
+		return
+	end
 	for _, unit in ipairs(GroupUnits()) do
 		if shown == MAX_ROWS then
 			break
 		end
 		if UnitExists(unit) then
-			local ids = TrackedAuras(unit)
-			if #ids > 0 then
+			local auras = TrackedAuras(unit)
+			if #auras > 0 then
 				shown = shown + 1
-				FillRow(GetRow(shown), unit, ids)
+				FillRow(GetRow(shown), unit, auras)
 			end
 		end
 	end
@@ -149,3 +170,5 @@ frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:RegisterEvent("GROUP_ROSTER_UPDATE")
 frame:RegisterEvent("UNIT_AURA")
 frame:SetScript("OnEvent", QueueUpdate)
+ns.OnSettingChanged("timers", QueueUpdate)
+ns.OnSettingChanged("dispels", QueueUpdate)

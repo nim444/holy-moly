@@ -42,9 +42,52 @@ local function ShowUsed()
 	end
 end
 
+-- Mana used in the last finished fight, for the fight history; nil before the first fight.
+function ns.LastFightMana()
+	return lastSpent
+end
+
+-- Low-mana warning: a pulsing red glow over the bar below the threshold. Mana can be secret in combat, so the code
+-- never compares it: the game evaluates a step curve (1 below the threshold, 0 above) on the mana percent and the
+-- result goes straight to SetAlpha, which accepts secrets.
+local warning = CreateFrame("Frame", nil, bar)
+warning:SetAllPoints()
+local glow = warning:CreateTexture(nil, "OVERLAY")
+glow:SetPoint("TOPLEFT", -2, 2)
+glow:SetPoint("BOTTOMRIGHT", 2, -2)
+glow:SetColorTexture(1, 0.1, 0.1, 0.6)
+local pulse = glow:CreateAnimationGroup()
+pulse:SetLooping("BOUNCE")
+local fade = pulse:CreateAnimation("Alpha")
+fade:SetFromAlpha(1)
+fade:SetToAlpha(0.2)
+fade:SetDuration(0.6)
+pulse:Play()
+
+local lowManaCurve = C_CurveUtil.CreateCurve()
+lowManaCurve:SetType(Enum.LuaCurveType.Step)
+
+local function UpdateWarning()
+	if not ns.Get("lowMana") then
+		warning:Hide()
+		return
+	end
+	warning:Show()
+	warning:SetAlpha(UnitPowerPercent("player", MANA, false, lowManaCurve))
+end
+
+ns.OnSettingChanged("lowManaPercent", function(percent)
+	lowManaCurve:ClearPoints()
+	lowManaCurve:AddPoint(0, 1)
+	lowManaCurve:AddPoint(percent / 100, 0)
+	UpdateWarning()
+end)
+ns.OnSettingChanged("lowMana", UpdateWarning)
+
 local function UpdateBar()
 	bar:SetMinMaxValues(0, UnitPowerMax("player", MANA))
 	bar:SetValue(UnitPower("player", MANA))
+	UpdateWarning()
 end
 
 -- The drink button next to the bar yells one of these; %s is " (23% mana)" when your mana is readable (out of
