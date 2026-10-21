@@ -4,8 +4,8 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
-- Heal buttons: a grid with a button for each party or raid member, faint while they are fine and with a red
-  border under 30% health (set in the options). Left click casts Flash Heal on them, right click a bigger heal,
+- Heal buttons: a grid with a button for each party or raid member, the missing health in red, faint while they
+  are fine and with a red border under 30% health (set in the options). Left click casts Flash Heal on them, right click a bigger heal,
   also in combat. Drag the grid by its title.
 - Buff check: the button also shows when a buff has under 5 minutes left, so you can rebuff before it drops; the
   tooltip lists who is running out and how long they have.

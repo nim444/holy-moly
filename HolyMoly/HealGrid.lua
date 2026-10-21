@@ -164,6 +164,10 @@ local function CreateUnitButton(parent, unit, index)
 	health:SetPoint("BOTTOMRIGHT", -1, 1)
 	health:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 	health:SetStatusBarColor(0.1, 0.75, 0.25)
+	-- The missing health shows red behind the green.
+	local missing = health:CreateTexture(nil, "BACKGROUND")
+	missing:SetAllPoints()
+	missing:SetColorTexture(0.65, 0.08, 0.08, 0.9)
 	button.health = health
 
 	local name = health:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
