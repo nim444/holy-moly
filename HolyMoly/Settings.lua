@@ -107,7 +107,7 @@ local function RegisterPanel()
 	Checkbox("timers", "HoT and shield timers", "The panel under the box with your heals over time and shields on each person.")
 	Checkbox("dispels", "Show debuffs you can dispel", "Adds debuffs you can remove to the timers panel, with a red border.")
 	Checkbox("buffCheck", "Buff check", "Out of combat, buttons for Priest buffs someone in the group is missing or has under 5 minutes left on.")
-	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Left click casts Flash Heal, right click a bigger heal. Works in combat.")
+	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Left click casts Flash Heal, right click a bigger heal, middle click Renew. Works in combat.")
 	Slider("healGridPercent", "Low-health threshold", "The health percent where a heal button lights up.", 10, 60, 5,
 		function(value) return ("%d%%"):format(value) end)
 	Checkbox("lowMana", "Low-mana warning", "The mana bar glows red below the threshold, also in combat.")

@@ -1,6 +1,6 @@
 -- Heal grid: a button for each party or raid member that lights up with a red border when they drop under the
 -- threshold (30% by default) and stays faint above it. A left click casts Flash Heal on them, a right click a bigger
--- heal. Works in combat.
+-- heal, a middle click Renew. Works in combat.
 --
 -- Forever keeps everyone's health secret from addons, so the code never compares it: the game evaluates two step
 -- curves on each health percent and the results go straight to SetAlpha. The buttons are secure unit buttons with
@@ -15,6 +15,7 @@ local _, ns = ...
 -- The first spell of each list the player knows goes on that mouse button.
 local LEFT_SPELLS = { "Flash Heal", "Lesser Heal" }
 local RIGHT_SPELLS = { "Greater Heal", "Heal", "Lesser Heal" }
+local MIDDLE_SPELLS = { "Renew" }
 local BUTTON_WIDTH, BUTTON_HEIGHT, GAP = 60, 22, 2
 local COLUMNS = 5
 local FADED_ALPHA = 0.4
@@ -85,7 +86,7 @@ local fadeCurve = C_CurveUtil.CreateCurve()
 fadeCurve:SetType(Enum.LuaCurveType.Step)
 
 local buttons = {}
-local leftSpell, rightSpell
+local leftSpell, rightSpell, middleSpell
 
 local function UpdateButton(button)
 	local unit = button.unit
@@ -137,6 +138,9 @@ local function ShowTooltip(self)
 	if rightSpell then
 		GameTooltip:AddLine("Right click: " .. rightSpell, 0.6, 0.8, 1)
 	end
+	if middleSpell then
+		GameTooltip:AddLine("Middle click: " .. middleSpell, 0.6, 0.8, 1)
+	end
 	GameTooltip:Show()
 end
 
@@ -146,10 +150,11 @@ local function CreateUnitButton(parent, unit, index)
 	button:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT)
 	local column, row = (index - 1) % COLUMNS, math.floor((index - 1) / COLUMNS)
 	button:SetPoint("TOPLEFT", column * (BUTTON_WIDTH + GAP), -row * (BUTTON_HEIGHT + GAP))
-	button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
 	button:SetAttribute("unit", unit)
 	button:SetAttribute("type1", "spell")
 	button:SetAttribute("type2", "spell")
+	button:SetAttribute("type3", "spell")
 
 	-- Everything you see sits on a plain child frame, whose alpha can change in combat.
 	local content = CreateFrame("Frame", nil, button)
@@ -201,10 +206,11 @@ local function FirstKnown(spells)
 end
 
 local function ApplySpells()
-	leftSpell, rightSpell = FirstKnown(LEFT_SPELLS), FirstKnown(RIGHT_SPELLS)
+	leftSpell, rightSpell, middleSpell = FirstKnown(LEFT_SPELLS), FirstKnown(RIGHT_SPELLS), FirstKnown(MIDDLE_SPELLS)
 	for _, button in ipairs(buttons) do
 		button:SetAttribute("spell1", leftSpell)
 		button:SetAttribute("spell2", rightSpell)
+		button:SetAttribute("spell3", middleSpell)
 	end
 end
 

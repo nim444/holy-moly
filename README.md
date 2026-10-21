@@ -22,7 +22,8 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   who needs it, missing before running out.
 - **Heal buttons:** a grid of your party or raid, one button per person with name and health bar. Faint while
   they are fine, a red border under 30% health (Forever hides health from addons, so the game itself applies the
-  threshold). Left click casts Flash Heal, right click Greater Heal (or the biggest heal you know), in combat too.
+  threshold). Left click casts Flash Heal, right click Greater Heal (or the biggest heal you know), middle click Renew,
+  in combat too.
   It has its own position: drag it by its title.
 - **Settings:** Options > AddOns > Holy Moly, `/holy config`, or right-click Holy Moly in the minimap's addon
   menu (a left-click shows or hides the box). `/holy reset | show | hide` also work.
