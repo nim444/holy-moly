@@ -7,6 +7,11 @@ One section per release, newest first. The release workflow uses the section who
 - Heal buttons: a grid with a button for each party or raid member, the missing health in red, faint while they
   are fine and with a red border under 30% health (set in the options). Left click casts Flash Heal on them, right click a bigger heal,
   middle click Renew, also in combat. Drag the grid by its title.
+- What each click on a heal button casts can be changed in the settings (any Priest heal you know, the biggest
+  heal, or targeting).
+- Minimap button with the Holy Moly logo: a click shows or hides the box, a right-click opens the settings; drag it
+  around the minimap. It can be turned off in the settings.
+- The settings page is grouped into sections: box, reports, heal buttons, timers and buffs, mana.
 - Buff check: the button also shows when a buff has under 5 minutes left, so you can rebuff before it drops; the
   tooltip lists who is running out and how long they have.
 

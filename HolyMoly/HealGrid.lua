@@ -1,6 +1,6 @@
 -- Heal grid: a button for each party or raid member that lights up with a red border when they drop under the
--- threshold (30% by default) and stays faint above it. A left click casts Flash Heal on them, a right click a bigger
--- heal, a middle click Renew. Works in combat.
+-- threshold (30% by default) and stays faint above it. A left click casts Flash Heal on them, a right click the
+-- biggest heal, a middle click Renew; each click can be changed in the settings. Works in combat.
 --
 -- Forever keeps everyone's health secret from addons, so the code never compares it: the game evaluates two step
 -- curves on each health percent and the results go straight to SetAlpha. The buttons are secure unit buttons with
@@ -12,10 +12,14 @@
 
 local _, ns = ...
 
--- The first spell of each list the player knows goes on that mouse button.
-local LEFT_SPELLS = { "Flash Heal", "Lesser Heal" }
-local RIGHT_SPELLS = { "Greater Heal", "Heal", "Lesser Heal" }
-local MIDDLE_SPELLS = { "Renew" }
+-- "Biggest heal" in the click settings: the first of these the player knows.
+local BIGGEST_HEALS = { "Greater Heal", "Heal", "Lesser Heal" }
+-- The mouse buttons by attribute suffix, with the setting that picks what each does.
+local CLICKS = {
+	{ suffix = 1, key = "healLeft", label = "Left click" },
+	{ suffix = 2, key = "healRight", label = "Right click" },
+	{ suffix = 3, key = "healMiddle", label = "Middle click" },
+}
 local BUTTON_WIDTH, BUTTON_HEIGHT, GAP = 60, 22, 2
 local COLUMNS = 5
 local FADED_ALPHA = 0.4
@@ -86,7 +90,6 @@ local fadeCurve = C_CurveUtil.CreateCurve()
 fadeCurve:SetType(Enum.LuaCurveType.Step)
 
 local buttons = {}
-local leftSpell, rightSpell, middleSpell
 
 local function UpdateButton(button)
 	local unit = button.unit
@@ -132,14 +135,10 @@ end
 local function ShowTooltip(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip:SetUnit(self.unit)
-	if leftSpell then
-		GameTooltip:AddLine("Left click: " .. leftSpell, 0.6, 0.8, 1)
-	end
-	if rightSpell then
-		GameTooltip:AddLine("Right click: " .. rightSpell, 0.6, 0.8, 1)
-	end
-	if middleSpell then
-		GameTooltip:AddLine("Middle click: " .. middleSpell, 0.6, 0.8, 1)
+	for _, click in ipairs(CLICKS) do
+		if click.text then
+			GameTooltip:AddLine(click.label .. ": " .. click.text, 0.6, 0.8, 1)
+		end
 	end
 	GameTooltip:Show()
 end
@@ -152,9 +151,6 @@ local function CreateUnitButton(parent, unit, index)
 	button:SetPoint("TOPLEFT", column * (BUTTON_WIDTH + GAP), -row * (BUTTON_HEIGHT + GAP))
 	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
 	button:SetAttribute("unit", unit)
-	button:SetAttribute("type1", "spell")
-	button:SetAttribute("type2", "spell")
-	button:SetAttribute("type3", "spell")
 
 	-- Everything you see sits on a plain child frame, whose alpha can change in combat.
 	local content = CreateFrame("Frame", nil, button)
@@ -205,12 +201,24 @@ local function FirstKnown(spells)
 	end
 end
 
+-- What a click setting does: an action type and, for a spell, its name (nil when no spell fits).
+local function ClickAction(choice)
+	if choice == "TARGET" then
+		return "target"
+	elseif choice == "BIGGEST" then
+		return "spell", FirstKnown(BIGGEST_HEALS)
+	end
+	return "spell", choice
+end
+
 local function ApplySpells()
-	leftSpell, rightSpell, middleSpell = FirstKnown(LEFT_SPELLS), FirstKnown(RIGHT_SPELLS), FirstKnown(MIDDLE_SPELLS)
-	for _, button in ipairs(buttons) do
-		button:SetAttribute("spell1", leftSpell)
-		button:SetAttribute("spell2", rightSpell)
-		button:SetAttribute("spell3", middleSpell)
+	for _, click in ipairs(CLICKS) do
+		local actionType, spell = ClickAction(ns.Get(click.key))
+		click.text = actionType == "target" and "Target" or spell
+		for _, button in ipairs(buttons) do
+			button:SetAttribute("type" .. click.suffix, actionType)
+			button:SetAttribute("spell" .. click.suffix, spell)
+		end
 	end
 end
 
@@ -246,6 +254,11 @@ ns.OnSettingChanged("healGridPercent", function(percent)
 	fadeCurve:AddPoint(percent / 100, FADED_ALPHA)
 	QueueUpdate()
 end)
+for _, click in ipairs(CLICKS) do
+	ns.OnSettingChanged(click.key, function()
+		OutOfCombat(ApplySpells)
+	end)
+end
 ns.OnSettingChanged("healGrid", function()
 	OutOfCombat(function()
 		grid:SetShown(ns.Get("healGrid"))
