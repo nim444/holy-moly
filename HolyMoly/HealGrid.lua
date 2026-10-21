@@ -201,14 +201,15 @@ local function FirstKnown(spells)
 	end
 end
 
--- What a click setting does: an action type and, for a spell, its name (nil when no spell fits).
+-- What a click setting does: an action type and, for a spell, its name (nil when no spell fits). A spell the
+-- player hasn't learned yet (Flash Heal before level 20) falls back to the biggest heal until it is learned.
 local function ClickAction(choice)
 	if choice == "TARGET" then
 		return "target"
-	elseif choice == "BIGGEST" then
-		return "spell", FirstKnown(BIGGEST_HEALS)
+	elseif choice ~= "BIGGEST" and ns.Knows(choice) then
+		return "spell", choice
 	end
-	return "spell", choice
+	return "spell", FirstKnown(BIGGEST_HEALS)
 end
 
 local function ApplySpells()

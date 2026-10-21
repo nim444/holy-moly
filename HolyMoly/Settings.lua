@@ -108,8 +108,10 @@ local function ClickChoices(key)
 	return function()
 		local choices = { { "BIGGEST", "Biggest heal you know" }, { "TARGET", "Target them" } }
 		for _, spell in ipairs(CLICK_SPELLS) do
-			if spell == ns.Get(key) or ns.Knows(spell) then
+			if ns.Knows(spell) then
 				choices[#choices + 1] = { spell, spell }
+			elseif spell == ns.Get(key) then
+				choices[#choices + 1] = { spell, spell .. " (not learned yet: biggest heal)" }
 			end
 		end
 		return choices

@@ -8,7 +8,7 @@ One section per release, newest first. The release workflow uses the section who
   are fine and with a red border under 30% health (set in the options). Left click casts Flash Heal on them, right click a bigger heal,
   middle click Renew, also in combat. Drag the grid by its title.
 - What each click on a heal button casts can be changed in the settings (any Priest heal you know, the biggest
-  heal, or targeting).
+  heal, or targeting). A spell not learned yet, like Flash Heal before level 20, casts the biggest heal instead.
 - Minimap button with the Holy Moly logo: a click shows or hides the box, a right-click opens the settings; drag it
   around the minimap. It can be turned off in the settings.
 - The settings page is grouped into sections: box, reports, heal buttons, timers and buffs, mana.
