@@ -31,6 +31,23 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   minimap's addon menu. `/holy reset | show | hide` also work; `/holy check`
   prints what each heal-button click is set to and, for a minute, the spell and rank each click really casts.
 
+## Screenshots
+
+In a raid: the heal buttons for all 40 with the click spells in the tooltip, the timers panel and the box.
+
+![Heal buttons in a raid](docs/screenshots/raid-heal-buttons.png)
+
+| | |
+|---|---|
+| ![The box's tooltip after a fight](docs/screenshots/tooltip-after-fight.png) | ![Box, timers panel, buff check and heal buttons in a party](docs/screenshots/heal-buttons-party.png) |
+| Hover the box after a fight: healing per spell, who you healed, recent fights. | In a party: the box, the timers panel, a buff check button and the heal buttons. |
+| ![Buff check](docs/screenshots/buff-check.png) | ![Heal buttons with missing health in red](docs/screenshots/heal-buttons-hover.png) |
+| Buff check: a missing Inner Fire, one click to cast it. | Heal buttons: missing health in red, the click spells on hover. |
+
+The speaker button's report in party chat and the "kept up" line:
+
+![Report in chat](docs/screenshots/report-in-chat.png)
+
 ## Support
 
 Holy Moly is free. If it keeps your group alive and you want to say thanks: [paypal.me/nim4k](https://paypal.me/nim4k).
@@ -43,6 +60,7 @@ Holy Moly is free. If it keeps your group alive and you want to say thanks: [pay
 | `tools/make_icons.py` | Draws `Media/Icon.tga` (the logo) and `Media/Trash.tga` |
 | `tools/package.sh`, `.github/workflows/release.yml` | The release zip and the tag-triggered GitHub release; steps in [docs/PUBLISHING.md](docs/PUBLISHING.md) |
 | `CHANGELOG.md`, `LICENSE` | Release notes per version; MIT |
+| `docs/screenshots/` | Screenshots from the Forever beta, used here and on CurseForge |
 | `docs/research/priest-addons.md` | What other Priest addons do, what is feasible in Forever, the feature backlog |
 | `reference/` | Offline developer references (below) |
 

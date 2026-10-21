@@ -20,7 +20,9 @@ How a version gets from this repo to players. The repo is private until the step
   curseforge.com; new accounts get a random `user_...` name).
 - **Donations:** set the CurseForge project's donation link to PayPal, `https://paypal.me/nim4k`. The same link is
   in the README, `.github/FUNDING.yml` (GitHub's Sponsor button) and `## X-Donate` in the TOC.
-- **Screenshots:** the box, the tooltip after a fight, the timers panel and the settings page.
+- **Screenshots:** in `docs/screenshots/` (raid and party heal buttons, the tooltip after a fight, buff check, timers,
+  the chat report). Still missing: the settings page. They show other players' names and chat; crop those that
+  should not be public.
 - **What stays in the public repo:**
   - `reference/blizzard/` is a copy of a Blizzard forum thread; remove it before going public and keep only the
     link.
