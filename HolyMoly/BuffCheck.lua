@@ -1,5 +1,6 @@
 -- Buff check: out of combat, a row of spell buttons under the box, one for each Priest buff someone in the group
--- is missing. A click casts it on the first person missing it, in range first. Hidden in combat.
+-- is missing or has under five minutes left on. A click casts it on the first person who needs it: missing before
+-- running out, in range first. Hidden in combat.
 --
 -- The buttons use Blizzard's InsecureActionButtonTemplate, which casts only out of combat. Unlike a secure button
 -- it doesn't lock its parent in combat, so the box can still be dragged and hidden then.
@@ -16,6 +17,7 @@ local BUFFS = {
 }
 local BUTTON_SIZE = 24
 local CHECK_SECONDS = 2
+local REBUFF_SECONDS = 5 * 60
 
 local bar = CreateFrame("Frame", nil, ns.box)
 bar:SetPoint("TOPLEFT", ns.timerPanel, "BOTTOMLEFT", 0, -4)
@@ -43,7 +45,12 @@ local function GetButton(index)
 	button:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
 		GameTooltip:SetText(self.spell)
-		GameTooltip:AddLine("Missing on: " .. table.concat(self.missing, ", "), 1, 1, 1, true)
+		if #self.missing > 0 then
+			GameTooltip:AddLine("Missing on: " .. table.concat(self.missing, ", "), 1, 1, 1, true)
+		end
+		if #self.expiring > 0 then
+			GameTooltip:AddLine("Running out on: " .. table.concat(self.expiring, ", "), 1, 0.82, 0, true)
+		end
 		GameTooltip:AddLine("Click to cast on " .. self.targetName .. ".", 0.6, 0.8, 1)
 		GameTooltip:Show()
 	end)
@@ -72,33 +79,44 @@ local function Knows(spell)
 	return info ~= nil and C_SpellBook.IsSpellKnown(info.spellID)
 end
 
-local function HasBuff(unit, buff)
-	if C_UnitAuras.GetAuraDataBySpellName(unit, buff.spell, "HELPFUL") then
-		return true
-	end
-	for _, name in ipairs(buff.also or {}) do
-		if C_UnitAuras.GetAuraDataBySpellName(unit, name, "HELPFUL") then
-			return true
+-- Seconds left on a unit's buff (the longest of its versions): nil when it is missing, math.huge when it doesn't
+-- run out or the game keeps the time secret.
+local function TimeLeft(unit, buff)
+	local left
+	for _, name in ipairs({ buff.spell, unpack(buff.also or {}) }) do
+		local aura = C_UnitAuras.GetAuraDataBySpellName(unit, name, "HELPFUL")
+		if aura then
+			local expires = aura.expirationTime
+			local seconds = (issecretvalue(expires) or expires == 0) and math.huge or expires - GetTime()
+			left = math.max(left or 0, seconds)
 		end
 	end
-	return false
+	return left
 end
 
--- Who is missing a buff, and the unit a click should cast on (the first one in range, else the first one).
-local function Missing(buff, units)
-	local names, target, targetName, targetInRange = {}, nil, nil, false
+-- Who needs a buff (missing it, or with under REBUFF_SECONDS left), and the unit a click should cast on: missing
+-- before running out, in range before out of range.
+local function Needs(buff, units)
+	local missing, expiring, target, targetName, targetInRange, targetRank = {}, {}, nil, nil, false, -1
 	for _, unit in ipairs(buff.selfOnly and { "player" } or units) do
-		if UnitExists(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit) and UnitIsVisible(unit)
-			and not HasBuff(unit, buff) then
-			local name = UnitName(unit)
-			names[#names + 1] = name
-			local inRange = UnitIsUnit(unit, "player") or C_Spell.IsSpellInRange(buff.spell, unit) == true
-			if not target or (inRange and not targetInRange) then
-				target, targetName, targetInRange = unit, name, inRange
+		if UnitExists(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit) and UnitIsVisible(unit) then
+			local left = TimeLeft(unit, buff)
+			if not left or left < REBUFF_SECONDS then
+				local name = UnitName(unit)
+				if left then
+					expiring[#expiring + 1] = format("%s (%d:%02d)", name, left / 60, left % 60)
+				else
+					missing[#missing + 1] = name
+				end
+				local inRange = UnitIsUnit(unit, "player") or C_Spell.IsSpellInRange(buff.spell, unit) == true
+				local rank = (inRange and 2 or 0) + (left and 0 or 1)
+				if rank > targetRank then
+					target, targetName, targetInRange, targetRank = unit, name, inRange, rank
+				end
 			end
 		end
 	end
-	return names, target, targetName, targetInRange
+	return missing, expiring, target, targetName, targetInRange
 end
 
 local function Update()
@@ -110,15 +128,17 @@ local function Update()
 	local shown = 0
 	for _, buff in ipairs(BUFFS) do
 		if Knows(buff.spell) then
-			local names, target, targetName, inRange = Missing(buff, units)
+			local missing, expiring, target, targetName, inRange = Needs(buff, units)
 			if target then
 				shown = shown + 1
 				local button = GetButton(shown)
-				button.spell, button.missing, button.targetName = buff.spell, names, targetName
+				button.spell, button.missing, button.expiring, button.targetName =
+					buff.spell, missing, expiring, targetName
 				button:SetAttribute("spell", buff.spell)
 				button:SetAttribute("unit", target)
 				button.icon:SetTexture(C_Spell.GetSpellTexture(buff.spell))
-				button.count:SetText(#names > 1 and #names or "")
+				local count = #missing + #expiring
+				button.count:SetText(count > 1 and count or "")
 				button:SetAlpha(inRange and 1 or 0.5)
 				button:Show()
 			end
@@ -169,7 +189,7 @@ frame:SetScript("OnEvent", function(_, event)
 		return
 	end
 	if event == "PLAYER_LOGIN" then
-		-- Range and visibility change without events; check them every few seconds.
+		-- Range, visibility and time left change without events; check them every few seconds.
 		C_Timer.NewTicker(CHECK_SECONDS, QueueUpdate)
 	end
 	QueueUpdate()

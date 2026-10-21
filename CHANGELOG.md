@@ -2,6 +2,11 @@
 
 One section per release, newest first. The release workflow uses the section whose heading matches the tag.
 
+## Unreleased
+
+- Buff check: the button also shows when a buff has under 5 minutes left, so you can rebuff before it drops; the
+  tooltip lists who is running out and how long they have.
+
 ## 0.4.0
 
 - Settings page in Options > AddOns > Holy Moly (also `/holy config`, or right-click Holy Moly in the minimap's

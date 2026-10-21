@@ -104,7 +104,7 @@ local function RegisterPanel()
 
 	Checkbox("timers", "HoT and shield timers", "The panel under the box with your heals over time and shields on each person.")
 	Checkbox("dispels", "Show debuffs you can dispel", "Adds debuffs you can remove to the timers panel, with a red border.")
-	Checkbox("buffCheck", "Buff check", "Out of combat, buttons for Priest buffs someone in the group is missing.")
+	Checkbox("buffCheck", "Buff check", "Out of combat, buttons for Priest buffs someone in the group is missing or has under 5 minutes left on.")
 	Checkbox("lowMana", "Low-mana warning", "The mana bar glows red below the threshold, also in combat.")
 	Slider("lowManaPercent", "Low-mana threshold", "The mana percent where the warning starts.", 10, 50, 5,
 		function(value) return ("%d%%"):format(value) end)

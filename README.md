@@ -17,8 +17,9 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 - **Drink button** on the mana bar: yells a "wait, I need to drink" line with your mana percent.
 - **Timers panel** under the box: debuffs you can dispel (red border), then your Renews, shields, other HoTs and
   Weakened Soul on each group member, as icons with the game's own cooldown sweep.
-- **Buff check:** out of combat, buttons for Priest buffs someone in the group is missing (Fortitude, Divine
-  Spirit, Shadow Protection, Inner Fire, Fear Ward); a click casts it on the first one missing it.
+- **Buff check:** out of combat, buttons for Priest buffs someone in the group is missing or has under 5 minutes
+  left on (Fortitude, Divine Spirit, Shadow Protection, Inner Fire, Fear Ward); a click casts it on the first one
+  who needs it, missing before running out.
 - **Settings:** Options > AddOns > Holy Moly, `/holy config`, or right-click Holy Moly in the minimap's addon
   menu (a left-click shows or hides the box). `/holy reset | show | hide` also work.
 
