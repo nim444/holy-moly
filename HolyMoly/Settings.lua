@@ -13,6 +13,8 @@ local DEFAULTS = {
 	timers = true,
 	dispels = true,
 	buffCheck = true,
+	healGrid = true,
+	healGridPercent = 30,
 	lowMana = true,
 	lowManaPercent = 20,
 	history = true,
@@ -91,7 +93,7 @@ end
 local function RegisterPanel()
 	category = Settings.RegisterVerticalLayoutCategory("Holy Moly")
 
-	Checkbox("lock", "Lock the box", "Stops the box from being dragged.")
+	Checkbox("lock", "Lock the box", "Stops the box and the heal buttons from being dragged.")
 	Slider("scale", "Box size", "Makes the box and everything under it bigger or smaller.", 0.6, 1.6, 0.05,
 		function(value) return ("%d%%"):format(value * 100 + 0.5) end)
 
@@ -105,6 +107,9 @@ local function RegisterPanel()
 	Checkbox("timers", "HoT and shield timers", "The panel under the box with your heals over time and shields on each person.")
 	Checkbox("dispels", "Show debuffs you can dispel", "Adds debuffs you can remove to the timers panel, with a red border.")
 	Checkbox("buffCheck", "Buff check", "Out of combat, buttons for Priest buffs someone in the group is missing or has under 5 minutes left on.")
+	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Left click casts Flash Heal, right click a bigger heal. Works in combat.")
+	Slider("healGridPercent", "Low-health threshold", "The health percent where a heal button lights up.", 10, 60, 5,
+		function(value) return ("%d%%"):format(value) end)
 	Checkbox("lowMana", "Low-mana warning", "The mana bar glows red below the threshold, also in combat.")
 	Slider("lowManaPercent", "Low-mana threshold", "The mana percent where the warning starts.", 10, 50, 5,
 		function(value) return ("%d%%"):format(value) end)

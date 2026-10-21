@@ -78,6 +78,7 @@ local function Knows(spell)
 	local info = C_Spell.GetSpellInfo(spell)
 	return info ~= nil and C_SpellBook.IsSpellKnown(info.spellID)
 end
+ns.Knows = Knows
 
 -- Seconds left on a unit's buff (the longest of its versions): nil when it is missing, math.huge when it doesn't
 -- run out or the game keeps the time secret.

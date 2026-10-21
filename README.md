@@ -20,6 +20,10 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 - **Buff check:** out of combat, buttons for Priest buffs someone in the group is missing or has under 5 minutes
   left on (Fortitude, Divine Spirit, Shadow Protection, Inner Fire, Fear Ward); a click casts it on the first one
   who needs it, missing before running out.
+- **Heal buttons:** a grid of your party or raid, one button per person with name and health bar. Faint while
+  they are fine, a red border under 30% health (Forever hides health from addons, so the game itself applies the
+  threshold). Left click casts Flash Heal, right click Greater Heal (or the biggest heal you know), in combat too.
+  It has its own position: drag it by its title.
 - **Settings:** Options > AddOns > Holy Moly, `/holy config`, or right-click Holy Moly in the minimap's addon
   menu (a left-click shows or hides the box). `/holy reset | show | hide` also work.
 
@@ -31,7 +35,7 @@ Holy Moly is free. If it keeps your group alive and you want to say thanks: [pay
 
 | Path | What |
 |---|---|
-| `HolyMoly/` | The addon. `Settings.lua` (saved variables and the options page, loads first), `HolyMoly.lua` (box, totals, tooltip, report), `Mana.lua`, `HotTimers.lua`, `BuffCheck.lua`, `Media/` (logo and trash icon) |
+| `HolyMoly/` | The addon. `Settings.lua` (saved variables and the options page, loads first), `HolyMoly.lua` (box, totals, tooltip, report), `Mana.lua`, `HotTimers.lua`, `BuffCheck.lua`, `HealGrid.lua`, `Media/` (logo and trash icon) |
 | `tools/make_icons.py` | Draws `Media/Icon.tga` (the logo) and `Media/Trash.tga` |
 | `tools/package.sh`, `.github/workflows/release.yml` | The release zip and the tag-triggered GitHub release; steps in [docs/PUBLISHING.md](docs/PUBLISHING.md) |
 | `CHANGELOG.md`, `LICENSE` | Release notes per version; MIT |
