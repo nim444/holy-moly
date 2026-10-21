@@ -647,8 +647,10 @@ SlashCmdList.HOLYMOLY = function(msg)
 		box:Hide()
 	elseif msg == "config" or msg == "options" then
 		ns.OpenSettings()
+	elseif msg == "check" then
+		ns.CheckHealButtons()
 	else
-		print("Holy Moly: /holy reset | show | hide | config. Drag the box to move it.")
+		print("Holy Moly: /holy reset | show | hide | config | check. Drag the box to move it.")
 	end
 end
 

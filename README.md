@@ -28,7 +28,8 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 - **Minimap button:** a click shows or hides the box, a right-click opens the settings; drag it around the
   minimap.
 - **Settings:** Options > AddOns > Holy Moly, `/holy config`, or right-click the minimap button or Holy Moly in the
-  minimap's addon menu. `/holy reset | show | hide` also work.
+  minimap's addon menu. `/holy reset | show | hide` also work; `/holy check`
+  prints what each heal-button click is set to and, for a minute, the spell and rank each click really casts.
 
 ## Support
 

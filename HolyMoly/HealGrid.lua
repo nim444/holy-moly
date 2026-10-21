@@ -93,6 +93,11 @@ fadeCurve:SetType(Enum.LuaCurveType.Step)
 
 local buttons = {}
 
+-- /holy check: for a minute, each heal-button click prints the spell it really cast (see ns.CheckHealButtons).
+local CHECK_SECONDS = 60
+local checkUntil = 0
+local ReportClick
+
 local function UpdateButton(button)
 	local unit = button.unit
 	button.name:SetText(UnitName(unit))
@@ -191,6 +196,14 @@ local function CreateUnitButton(parent, unit, index)
 	button:HookScript("OnEnter", ShowTooltip)
 	button:HookScript("OnLeave", GameTooltip_Hide)
 	button:HookScript("OnShow", QueueUpdate)
+	button:HookScript("PostClick", function(_, mouseButton)
+		if GetTime() < checkUntil then
+			local clickTime = GetTime()
+			C_Timer.After(0.3, function()
+				ReportClick(mouseButton, clickTime)
+			end)
+		end
+	end)
 	RegisterUnitWatch(button)
 	buttons[#buttons + 1] = button
 end
@@ -224,6 +237,47 @@ local function ApplySpells()
 			button:SetAttribute("type" .. click.suffix, actionType)
 			button:SetAttribute("spell" .. click.suffix, spell)
 		end
+	end
+end
+
+local CLICK_LABELS = { LeftButton = "Left click", RightButton = "Right click", MiddleButton = "Middle click" }
+
+-- Prints what each click is set to, read back from a button's secure attributes, and starts the cast check.
+function ns.CheckHealButtons()
+	local button = buttons[1]
+	if not button then
+		print("Holy Moly: the heal buttons aren't built yet (they are made out of combat).")
+		return
+	end
+	for _, click in ipairs(CLICKS) do
+		local actionType = button:GetAttribute("type" .. click.suffix)
+		local spell = button:GetAttribute("spell" .. click.suffix)
+		local detail = actionType == "spell" and (tostring(spell) .. (spell and ns.Knows(spell) and "" or " (not known!)"))
+			or tostring(actionType)
+		print(("Holy Moly check: %s = %s"):format(click.label, detail))
+	end
+	checkUntil = GetTime() + CHECK_SECONDS
+	print("Holy Moly check: for the next minute, each heal-button click prints the spell it cast.")
+end
+
+-- The player's last cast, from UNIT_SPELLCAST_SENT, which comes in the same moment as the click that cast it.
+local sentTarget, sentSpellID, sentTime = nil, nil, 0
+local checkFrame = CreateFrame("Frame")
+checkFrame:RegisterUnitEvent("UNIT_SPELLCAST_SENT", "player")
+checkFrame:SetScript("OnEvent", function(_, _, _, target, _, spellID)
+	sentTarget, sentSpellID, sentTime = target, spellID, GetTime()
+end)
+
+function ReportClick(mouseButton, clickTime)
+	local label = CLICK_LABELS[mouseButton] or mouseButton
+	if sentTime < clickTime then
+		print(("Holy Moly check: %s cast nothing (not ready, out of range, no mana or not known)."):format(label))
+	elseif issecretvalue(sentTarget) or issecretvalue(sentSpellID) then
+		print(("Holy Moly check: %s cast a spell the game keeps hidden right now."):format(label))
+	else
+		local rank = C_Spell.GetSpellSubtext(sentSpellID)
+		print(("Holy Moly check: %s cast %s%s (spell %d) on %s."):format(label, C_Spell.GetSpellName(sentSpellID) or "?",
+			rank and rank ~= "" and (" " .. rank) or "", sentSpellID, sentTarget or "?"))
 	end
 end
 

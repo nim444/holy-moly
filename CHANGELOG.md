@@ -10,6 +10,8 @@ One section per release, newest first. The release workflow uses the section who
 - What each click on a heal button casts can be changed in the settings (any Priest heal you know, the biggest
   heal, or targeting). Until Flash Heal is learned (level 20) it casts Lesser Heal; any other spell not learned yet casts the
   biggest heal.
+- `/holy check`: prints what each heal-button click is set to and, for a minute, the spell and rank each click
+  really casts.
 - Minimap button with the Holy Moly logo: a click shows or hides the box, a right-click opens the settings; drag it
   around the minimap. It can be turned off in the settings.
 - The settings page is grouped into sections: box, reports, heal buttons, timers and buffs, mana.
