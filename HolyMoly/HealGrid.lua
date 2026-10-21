@@ -14,6 +14,8 @@ local _, ns = ...
 
 -- "Biggest heal" in the click settings: the first of these the player knows.
 local BIGGEST_HEALS = { "Greater Heal", "Heal", "Lesser Heal" }
+-- What a click casts while its spell isn't learned yet; any other unlearned spell casts the biggest heal.
+local STAND_INS = { ["Flash Heal"] = "Lesser Heal" }
 -- The mouse buttons by attribute suffix, with the setting that picks what each does.
 local CLICKS = {
 	{ suffix = 1, key = "healLeft", label = "Left click" },
@@ -202,12 +204,14 @@ local function FirstKnown(spells)
 end
 
 -- What a click setting does: an action type and, for a spell, its name (nil when no spell fits). A spell the
--- player hasn't learned yet (Flash Heal before level 20) falls back to the biggest heal until it is learned.
+-- player hasn't learned yet (Flash Heal before level 20) is replaced by its stand-in or the biggest heal until then.
 local function ClickAction(choice)
 	if choice == "TARGET" then
 		return "target"
 	elseif choice ~= "BIGGEST" and ns.Knows(choice) then
 		return "spell", choice
+	elseif STAND_INS[choice] and ns.Knows(STAND_INS[choice]) then
+		return "spell", STAND_INS[choice]
 	end
 	return "spell", FirstKnown(BIGGEST_HEALS)
 end

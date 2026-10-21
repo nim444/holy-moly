@@ -111,7 +111,7 @@ local function ClickChoices(key)
 			if ns.Knows(spell) then
 				choices[#choices + 1] = { spell, spell }
 			elseif spell == ns.Get(key) then
-				choices[#choices + 1] = { spell, spell .. " (not learned yet: biggest heal)" }
+				choices[#choices + 1] = { spell, spell .. " (not learned yet)" }
 			end
 		end
 		return choices
