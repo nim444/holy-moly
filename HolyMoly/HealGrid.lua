@@ -1,6 +1,7 @@
 -- Heal grid: a button for each party or raid member that lights up with a red border when they drop under the
 -- threshold (30% by default) and stays faint above it. A left click casts Flash Heal on them, a right click the
--- biggest heal, a middle click Renew; each click can be changed in the settings. Works in combat.
+-- biggest heal, a middle click Renew, the mouse's back button (button 4) Power Word: Shield; each can be changed in
+-- the settings. Works in combat.
 --
 -- Forever keeps everyone's health secret from addons, so the code never compares it: the game evaluates two step
 -- curves on each health percent and the results go straight to SetAlpha. The buttons are secure unit buttons with
@@ -21,6 +22,7 @@ local CLICKS = {
 	{ suffix = 1, key = "healLeft", label = "Left click" },
 	{ suffix = 2, key = "healRight", label = "Right click" },
 	{ suffix = 3, key = "healMiddle", label = "Middle click" },
+	{ suffix = 4, key = "healBack", label = "Back button" },
 }
 local BUTTON_WIDTH, BUTTON_HEIGHT, GAP = 60, 22, 2
 local COLUMNS = 5
@@ -156,7 +158,7 @@ local function CreateUnitButton(parent, unit, index)
 	button:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT)
 	local column, row = (index - 1) % COLUMNS, math.floor((index - 1) / COLUMNS)
 	button:SetPoint("TOPLEFT", column * (BUTTON_WIDTH + GAP), -row * (BUTTON_HEIGHT + GAP))
-	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
+	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up")
 	button:SetAttribute("unit", unit)
 
 	-- Everything you see sits on a plain child frame, whose alpha can change in combat.
@@ -240,7 +242,9 @@ local function ApplySpells()
 	end
 end
 
-local CLICK_LABELS = { LeftButton = "Left click", RightButton = "Right click", MiddleButton = "Middle click" }
+local CLICK_LABELS = {
+	LeftButton = "Left click", RightButton = "Right click", MiddleButton = "Middle click", Button4 = "Back button",
+}
 
 -- Prints what each click is set to, read back from a button's secure attributes, and starts the cast check.
 function ns.CheckHealButtons()
