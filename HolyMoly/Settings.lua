@@ -19,7 +19,7 @@ local DEFAULTS = {
 	healLeft = "Flash Heal", -- a spell name, "BIGGEST" (the biggest heal known) or "TARGET"
 	healRight = "BIGGEST",
 	healMiddle = "Renew",
-	healBack = "Power Word: Shield", -- the mouse's back button (button 4)
+	healShiftLeft = "Power Word: Shield",
 	lowMana = true,
 	lowManaPercent = 20,
 	history = true,
@@ -152,8 +152,8 @@ local function RegisterPanel()
 	Dropdown("healLeft", "Left click", "What a left click on a heal button casts.", ClickChoices("healLeft"))
 	Dropdown("healRight", "Right click", "What a right click on a heal button casts.", ClickChoices("healRight"))
 	Dropdown("healMiddle", "Middle click", "What a middle click on a heal button casts.", ClickChoices("healMiddle"))
-	Dropdown("healBack", "Back button (mouse 4)", "What the mouse's back side button casts on a heal button.",
-		ClickChoices("healBack"))
+	Dropdown("healShiftLeft", "Shift + left click", "What a left click with Shift held casts on a heal button.",
+		ClickChoices("healShiftLeft"))
 
 	Header("Timers and buffs")
 	Checkbox("timers", "HoT and shield timers", "The panel under the box with your heals over time and shields on each person.")

@@ -7,7 +7,7 @@ One section per release, newest first. The release workflow uses the section who
 - Heal buttons: a grid with a button for each party or raid member, the missing health in red, faint while they
   are fine and with a red border under 30% health (set in the options). Left click casts Flash Heal on them, right click a bigger heal,
   middle click Renew,
-  the mouse's back button (button 4) Power Word: Shield, also in combat. Drag the grid by its title.
+  Shift + left click Power Word: Shield, also in combat. Drag the grid by its title.
 - What each click on a heal button casts can be changed in the settings (any Priest heal you know, the biggest
   heal, or targeting). Until Flash Heal is learned (level 20) it casts Lesser Heal; any other spell not learned yet casts the
   biggest heal.

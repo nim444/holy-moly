@@ -1,7 +1,7 @@
 -- Heal grid: a button for each party or raid member that lights up with a red border when they drop under the
 -- threshold (30% by default) and stays faint above it. A left click casts Flash Heal on them, a right click the
--- biggest heal, a middle click Renew, the mouse's back button (button 4) Power Word: Shield; each can be changed in
--- the settings. Works in combat.
+-- biggest heal, a middle click Renew, a shift + left click Power Word: Shield; each can be changed in the settings.
+-- Works in combat.
 --
 -- Forever keeps everyone's health secret from addons, so the code never compares it: the game evaluates two step
 -- curves on each health percent and the results go straight to SetAlpha. The buttons are secure unit buttons with
@@ -17,12 +17,13 @@ local _, ns = ...
 local BIGGEST_HEALS = { "Greater Heal", "Heal", "Lesser Heal" }
 -- What a click casts while its spell isn't learned yet; any other unlearned spell casts the biggest heal.
 local STAND_INS = { ["Flash Heal"] = "Lesser Heal" }
--- The mouse buttons by attribute suffix, with the setting that picks what each does.
+-- The clicks by the secure attributes they set ("shift-" makes an attribute apply only with Shift held), with the
+-- setting that picks what each does.
 local CLICKS = {
-	{ suffix = 1, key = "healLeft", label = "Left click" },
-	{ suffix = 2, key = "healRight", label = "Right click" },
-	{ suffix = 3, key = "healMiddle", label = "Middle click" },
-	{ suffix = 4, key = "healBack", label = "Back button" },
+	{ type = "type1", spell = "spell1", key = "healLeft", label = "Left click" },
+	{ type = "type2", spell = "spell2", key = "healRight", label = "Right click" },
+	{ type = "type3", spell = "spell3", key = "healMiddle", label = "Middle click" },
+	{ type = "shift-type1", spell = "shift-spell1", key = "healShiftLeft", label = "Shift + left click" },
 }
 local BUTTON_WIDTH, BUTTON_HEIGHT, GAP = 60, 22, 2
 local COLUMNS = 5
@@ -158,7 +159,7 @@ local function CreateUnitButton(parent, unit, index)
 	button:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT)
 	local column, row = (index - 1) % COLUMNS, math.floor((index - 1) / COLUMNS)
 	button:SetPoint("TOPLEFT", column * (BUTTON_WIDTH + GAP), -row * (BUTTON_HEIGHT + GAP))
-	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp", "Button4Up")
+	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
 	button:SetAttribute("unit", unit)
 
 	-- Everything you see sits on a plain child frame, whose alpha can change in combat.
@@ -200,9 +201,9 @@ local function CreateUnitButton(parent, unit, index)
 	button:HookScript("OnShow", QueueUpdate)
 	button:HookScript("PostClick", function(_, mouseButton)
 		if GetTime() < checkUntil then
-			local clickTime = GetTime()
+			local clickTime, shift = GetTime(), IsShiftKeyDown()
 			C_Timer.After(0.3, function()
-				ReportClick(mouseButton, clickTime)
+				ReportClick(mouseButton, shift, clickTime)
 			end)
 		end
 	end)
@@ -236,15 +237,13 @@ local function ApplySpells()
 		local actionType, spell = ClickAction(ns.Get(click.key))
 		click.text = actionType == "target" and "Target" or spell
 		for _, button in ipairs(buttons) do
-			button:SetAttribute("type" .. click.suffix, actionType)
-			button:SetAttribute("spell" .. click.suffix, spell)
+			button:SetAttribute(click.type, actionType)
+			button:SetAttribute(click.spell, spell)
 		end
 	end
 end
 
-local CLICK_LABELS = {
-	LeftButton = "Left click", RightButton = "Right click", MiddleButton = "Middle click", Button4 = "Back button",
-}
+local CLICK_LABELS = { LeftButton = "Left click", RightButton = "Right click", MiddleButton = "Middle click" }
 
 -- Prints what each click is set to, read back from a button's secure attributes, and starts the cast check.
 function ns.CheckHealButtons()
@@ -254,8 +253,8 @@ function ns.CheckHealButtons()
 		return
 	end
 	for _, click in ipairs(CLICKS) do
-		local actionType = button:GetAttribute("type" .. click.suffix)
-		local spell = button:GetAttribute("spell" .. click.suffix)
+		local actionType = button:GetAttribute(click.type)
+		local spell = button:GetAttribute(click.spell)
 		local detail = actionType == "spell" and (tostring(spell) .. (spell and ns.Knows(spell) and "" or " (not known!)"))
 			or tostring(actionType)
 		print(("Holy Moly check: %s = %s"):format(click.label, detail))
@@ -272,8 +271,11 @@ checkFrame:SetScript("OnEvent", function(_, _, _, target, _, spellID)
 	sentTarget, sentSpellID, sentTime = target, spellID, GetTime()
 end)
 
-function ReportClick(mouseButton, clickTime)
+function ReportClick(mouseButton, shift, clickTime)
 	local label = CLICK_LABELS[mouseButton] or mouseButton
+	if shift then
+		label = "Shift + " .. label:lower()
+	end
 	if sentTime < clickTime then
 		print(("Holy Moly check: %s cast nothing (not ready, out of range, no mana or not known)."):format(label))
 	elseif issecretvalue(sentTarget) or issecretvalue(sentSpellID) then
