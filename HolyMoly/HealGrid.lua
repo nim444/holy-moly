@@ -32,8 +32,9 @@ local CLICKS = {
 	{ type = "type3", spell = "spell3", key = "healMiddle", label = "Middle click" },
 	{ type = "shift-type1", spell = "shift-spell1", key = "healShiftLeft", label = "Shift + left click" },
 }
-local BUTTON_WIDTH, BUTTON_HEIGHT, GAP = 60, 22, 2
-local COLUMNS = 5
+local BUTTON_WIDTH, BUTTON_HEIGHT, GAP = 120, 24, 2
+local PARTY_COLUMNS = 2 -- a party: the tank alone on the first row, everyone else two by two under them
+local RAID_COLUMNS = 5
 local FADED_ALPHA = 0.4
 local HANDLE_HEIGHT = 14
 local TANK_ICON_SIZE = 12
@@ -41,7 +42,7 @@ local WEAKENED_SOUL_FILTER = "HARMFUL|PLAYER" -- the only debuff a Priest puts o
 local WEAKENED_SOUL_ICON = "Interface\\Icons\\Spell_Holy_AshesToAshes"
 
 local grid = CreateFrame("Frame", "HolyMolyHealGrid", UIParent)
-grid:SetSize(COLUMNS * BUTTON_WIDTH + (COLUMNS - 1) * GAP, HANDLE_HEIGHT + 8 * (BUTTON_HEIGHT + GAP))
+grid:SetSize(PARTY_COLUMNS * BUTTON_WIDTH + (PARTY_COLUMNS - 1) * GAP, HANDLE_HEIGHT + 3 * (BUTTON_HEIGHT + GAP))
 grid:SetClampedToScreen(true)
 grid:SetMovable(true)
 
@@ -99,6 +100,12 @@ handle:SetScript("OnEnter", function(self)
 	GameTooltip:Show()
 end)
 handle:SetScript("OnLeave", GameTooltip_Hide)
+
+-- Health percent 0-100 for the text: the game evaluates it, the result stays secret and goes straight to text.
+local percentCurve = C_CurveUtil.CreateCurve()
+percentCurve:SetType(Enum.LuaCurveType.Linear)
+percentCurve:AddPoint(0, 0)
+percentCurve:AddPoint(1, 100)
 
 local lowCurve = C_CurveUtil.CreateCurve()
 lowCurve:SetType(Enum.LuaCurveType.Step)
@@ -163,18 +170,28 @@ local function UpdateButton(button)
 	button.health:SetMinMaxValues(0, UnitHealthMax(unit))
 	button.health:SetValue(UnitHealth(unit))
 	if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then
+		button.hp:SetText(UnitIsConnected(unit) and "Dead" or "Offline")
 		button.content:SetAlpha(FADED_ALPHA)
 		button.low:SetAlpha(0)
 	else
+		-- "1.2K 85%": secret values may be formatted and joined, and SetText takes the result; if this client
+		-- refuses, the text stays empty and the bar still works.
+		local ok, text = pcall(function()
+			return AbbreviateLargeNumbers(UnitHealth(unit)) .. " "
+				.. string.format("%.0f%%", UnitHealthPercent(unit, true, percentCurve))
+		end)
+		button.hp:SetText(ok and text or "")
 		button.content:SetAlpha(UnitHealthPercent(unit, true, fadeCurve))
 		button.low:SetAlpha(UnitHealthPercent(unit, true, lowCurve))
 	end
 end
 
 local reportedError = false
+local LayoutParty -- defined with the buttons below
 
 local function UpdateAll()
 	handle:SetShown(IsInGroup())
+	pcall(LayoutParty)
 	for _, button in ipairs(buttons) do
 		if button:IsVisible() then
 			local ok, err = pcall(UpdateButton, button)
@@ -212,12 +229,16 @@ local function ShowTooltip(self)
 	GameTooltip:Show()
 end
 
-local function CreateUnitButton(parent, unit, index)
+local function Place(button, column, row, width)
+	button:ClearAllPoints()
+	button:SetSize(width or BUTTON_WIDTH, BUTTON_HEIGHT)
+	button:SetPoint("TOPLEFT", column * (BUTTON_WIDTH + GAP), -row * (BUTTON_HEIGHT + GAP))
+end
+
+local function CreateUnitButton(parent, unit, index, columns)
 	local button = CreateFrame("Button", nil, parent, "SecureUnitButtonTemplate")
 	button.unit = unit
-	button:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT)
-	local column, row = (index - 1) % COLUMNS, math.floor((index - 1) / COLUMNS)
-	button:SetPoint("TOPLEFT", column * (BUTTON_WIDTH + GAP), -row * (BUTTON_HEIGHT + GAP))
+	Place(button, (index - 1) % columns, math.floor((index - 1) / columns))
 	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
 	button:SetAttribute("unit", unit)
 
@@ -241,8 +262,14 @@ local function CreateUnitButton(parent, unit, index)
 	button.health = health
 
 	local name = health:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	local hp = health:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	hp:SetPoint("RIGHT", -3, 0)
+	hp:SetJustifyH("RIGHT")
+	hp:SetWordWrap(false)
+	button.hp = hp
+
 	name:SetPoint("LEFT", 3, 0)
-	name:SetPoint("RIGHT", -3, 0)
+	name:SetPoint("RIGHT", hp, "LEFT", -3, 0)
 	name:SetJustifyH("LEFT")
 	name:SetWordWrap(false)
 	button.name = name
@@ -411,15 +438,64 @@ function ns.ClearTanks()
 	QueueUpdate()
 end
 
+local partyButtons = {}
+local lastLayout
+
+-- The party layout: the tank alone and full width on the first row, everyone else two by two under them; with no
+-- tank known, all two by two. Secure buttons can't move in combat, so this runs out of combat (on roster and role
+-- changes, and after a fight); a change during a fight waits for its end.
+function LayoutParty()
+	if InCombatLockdown() or #partyButtons == 0 then
+		return
+	end
+	local present, tank = {}, nil
+	for _, button in ipairs(partyButtons) do
+		if UnitExists(button.unit) then
+			local ok, isTank = pcall(IsTank, button.unit)
+			if ok and isTank and not tank then
+				tank = button
+			else
+				present[#present + 1] = button
+			end
+		end
+	end
+	local key = (tank and tank.unit or "-")
+	for _, button in ipairs(present) do
+		key = key .. "," .. button.unit
+	end
+	if key == lastLayout then
+		return
+	end
+	lastLayout = key
+	local row = 0
+	if tank then
+		Place(tank, 0, 0, PARTY_COLUMNS * BUTTON_WIDTH + (PARTY_COLUMNS - 1) * GAP)
+		row = 1
+	end
+	for i, button in ipairs(present) do
+		Place(button, (i - 1) % PARTY_COLUMNS, row + math.floor((i - 1) / PARTY_COLUMNS))
+	end
+	-- Buttons of people not in the group are hidden by the game; park them after the others.
+	local slot = #present
+	for _, button in ipairs(partyButtons) do
+		if not UnitExists(button.unit) then
+			Place(button, slot % PARTY_COLUMNS, row + math.floor(slot / PARTY_COLUMNS))
+			slot = slot + 1
+		end
+	end
+end
+
 -- One set of buttons for a party and one for a raid; the game shows the right one, also in combat.
 local function Build()
 	local party = CreateFrame("Frame", nil, grid)
 	party:SetPoint("TOPLEFT", 0, -HANDLE_HEIGHT)
 	party:SetSize(1, 1)
 	RegisterStateDriver(party, "visibility", "[group:raid] hide; [group:party] show; hide")
-	CreateUnitButton(party, "player", 1)
+	CreateUnitButton(party, "player", 1, PARTY_COLUMNS)
+	partyButtons[1] = buttons[#buttons]
 	for i = 1, 4 do
-		CreateUnitButton(party, "party" .. i, i + 1)
+		CreateUnitButton(party, "party" .. i, i + 1, PARTY_COLUMNS)
+		partyButtons[i + 1] = buttons[#buttons]
 	end
 
 	local raid = CreateFrame("Frame", nil, grid)
@@ -427,10 +503,11 @@ local function Build()
 	raid:SetSize(1, 1)
 	RegisterStateDriver(raid, "visibility", "[group:raid] show; hide")
 	for i = 1, 40 do
-		CreateUnitButton(raid, "raid" .. i, i)
+		CreateUnitButton(raid, "raid" .. i, i, RAID_COLUMNS)
 	end
 
 	ApplySpells()
+	LayoutParty()
 	QueueUpdate()
 end
 

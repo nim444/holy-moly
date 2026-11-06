@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons: twice as wide, with health and percent ("1.2K 85%"); in a party the tank gets the first row to themselves, everyone else two by two under them.
 - Heal buttons: Weakened Soul shows at the left of a button with its countdown, so you see when you can shield again.
 - Report: one line instead of two, the names in [brackets], and more lines to pick from.
 - Buff check: Fear Ward (3 minutes in Forever) shows once it is gone, not all the time.
