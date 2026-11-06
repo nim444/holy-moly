@@ -4,6 +4,8 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Report: one line instead of two, the names in [brackets], and more lines to pick from.
+- Buff check: Fear Ward (3 minutes in Forever) shows once it is gone, not all the time.
 - Heal buttons: their own size setting, apart from the box's.
 - Heal buttons: the tank has a blue border and a shield mark (the tank role, a raid's main tank, or whoever you
   mark with `/holy tank`; `/holy tank clear` clears the marks).

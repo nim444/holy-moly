@@ -11,8 +11,8 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   meter) after asking.
 - **Hover the box:** healing per spell with icons, shares and overheal, who you healed and how often, and your
   recent fights with a comparison to the one before.
-- **Speaker button:** sends your totals in one of a few Priest lines, then the three others you healed most
-  ("Kept up: ...", by first name), as a yell, a say or to group chat. Out of combat only, never when both totals
+- **Speaker button:** sends one line with your totals and the three others you healed most ("[Name]", by first
+  name), picked from a dozen Priest lines, as a yell, a say or to group chat. Out of combat only, never when both totals
   are 0.
 - **Drink button** on the mana bar: yells a "wait, I need to drink" line with your mana percent.
 - **Timers panel** under the box: debuffs you can dispel (red border), then your Renews, shields, other HoTs and

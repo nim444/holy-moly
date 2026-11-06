@@ -9,7 +9,7 @@ local DEFAULTS = {
 	lock = false,
 	scale = 1,
 	minimapButton = true,
-	reportChannel = "YELL", -- "YELL" (then /say), "SAY", or "GROUP" (party, raid or instance chat)
+	reportChannel = "YELL", -- "YELL", "SAY", or "GROUP" (party, raid or instance chat)
 	keptUp = true,
 	timers = true,
 	dispels = true,
@@ -140,11 +140,11 @@ local function RegisterPanel()
 
 	Header("Reports")
 	Dropdown("reportChannel", "Speaker button sends to", "Where your totals go when you click the speaker button.", {
-		{ "YELL", "Yell, then say who you kept up" },
+		{ "YELL", "Yell" },
 		{ "SAY", "Say" },
 		{ "GROUP", "Party, raid or instance chat" },
 	})
-	Checkbox("keptUp", "Name who you kept up", "After the totals, a second line with the three others you healed most.")
+	Checkbox("keptUp", "Name who you kept up", "Adds the three others you healed most to the report, as [Name].")
 
 	Header("Heal buttons")
 	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat.")

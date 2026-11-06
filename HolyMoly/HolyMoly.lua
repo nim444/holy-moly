@@ -425,13 +425,32 @@ local resetButton = IconButton("Interface\\AddOns\\HolyMoly\\Media\\Trash.tga", 
 	end)
 resetButton:SetPoint("TOPRIGHT", -10, -8)
 
--- One line is picked at random per yell (never the same twice in a row), so repeats don't read like spam.
--- {rt5} is the moon raid icon in chat, in every client language; the two %s are healing and shields.
-local YELL_LINES = {
-	"{rt5} The Light held: %s healed, %s shielded.",
-	"{rt5} %s healing, %s in shields. Stay close to the Priest.",
-	"{rt5} By the Light: %s healed and %s absorbed.",
-	"{rt5} Another fight survived: %s healed, %s shielded.",
+-- The report is one line, picked at random (never the same twice in a row), so repeats don't read like spam.
+-- {heal} and {shield} are the totals, {names} the people you healed most as "[Pestilen], [Razorgir], [Hauru]".
+-- {rt5} is the moon raid icon in chat, in every client language.
+local REPORT_LINES = {
+	"{rt5} The Light held: {heal} healed, {shield} shielded. Kept up: {names}.",
+	"{rt5} {heal} healing, {shield} in shields. Most healed: {names}. Stay close to the Priest.",
+	"{rt5} By the Light: {heal} healed, {shield} absorbed. Top patients: {names}.",
+	"{rt5} Another fight survived: {heal} healed, {shield} shielded. Thank the Priest, {names}.",
+	"{rt5} Healer bill: {heal} healed, {shield} shielded. Invoices go to {names}.",
+	"{rt5} {heal} healed and {shield} shielded. {names}, you can stop standing in the fire now.",
+	"{rt5} Mana well spent: {heal} healing, {shield} shields. Frequent flyers: {names}.",
+	"{rt5} Nobody dies on my watch: {heal} healed, {shield} absorbed. Mostly {names}.",
+	"{rt5} Holy numbers: {heal} healed, {shield} shielded. {names} owe me a drink.",
+	"{rt5} {heal} healing, {shield} in shields. {names}, the Light says you're welcome.",
+	"{rt5} Patch-up report: {heal} healed, {shield} shielded. Most patched: {names}.",
+	"{rt5} The Priest delivers: {heal} healed, {shield} absorbed. Special thanks to my regulars {names}.",
+}
+-- The same without names, for when nobody else was healed or "Name who you kept up" is off.
+local REPORT_LINES_NO_NAMES = {
+	"{rt5} The Light held: {heal} healed, {shield} shielded.",
+	"{rt5} {heal} healing, {shield} in shields. Stay close to the Priest.",
+	"{rt5} By the Light: {heal} healed and {shield} absorbed.",
+	"{rt5} Another fight survived: {heal} healed, {shield} shielded.",
+	"{rt5} Healer bill: {heal} healed, {shield} shielded. Payment in gold, please.",
+	"{rt5} Mana well spent: {heal} healing, {shield} shields.",
+	"{rt5} Nobody dies on my watch: {heal} healed, {shield} absorbed.",
 }
 
 -- 33143 -> "33.1k", 2000000 -> "2M"
@@ -482,19 +501,9 @@ local function IsMe(name)
 	return ok and not issecretvalue(same) and same == true
 end
 
--- The /say line after the yell names the three others you healed most (not yourself); %s is "Pestilen, Razorgir,
--- Hauru".
-local KEPT_UP_LINES = {
-	"Kept up: %s.",
-	"Most healed: %s.",
-	"Kept alive: %s.",
-	"Thanks for staying in range, %s.",
-	"Top patients: %s.",
-}
-local KEPT_UP_DELAY = 1
-
+-- The report names the three others you healed most (not yourself).
 -- nil when there is nobody to name.
-local function KeptUpMessage()
+local function KeptUpNames()
 	local ok, list = pcall(HealedTargets)
 	if not ok then
 		return nil
@@ -508,7 +517,7 @@ local function KeptUpMessage()
 			end
 		end
 	end
-	return #names > 0 and ns.RandomLine(KEPT_UP_LINES):format(table.concat(names, ", ")) or nil
+	return #names > 0 and ("[" .. table.concat(names, "], [") .. "]") or nil
 end
 
 -- The chat for the "GROUP" setting: instance chat in a dungeon-finder group, else raid or party; nil when solo.
@@ -540,37 +549,27 @@ local function ReportTotals()
 		print("Holy Moly: nothing healed or shielded yet.")
 		return
 	end
-	local first, second = "YELL", "SAY"
+	local channel = "YELL"
 	if ns.Get("reportChannel") == "SAY" then
-		first = "SAY"
+		channel = "SAY"
 	elseif ns.Get("reportChannel") == "GROUP" then
-		first = GroupChannel()
-		second = first
-		if not first then
+		channel = GroupChannel()
+		if not channel then
 			print("Holy Moly: you're not in a group. Options > AddOns > Holy Moly sets where the totals go.")
 			return
 		end
 	end
-	if not ns.SendChat(ns.RandomLine(YELL_LINES):format(ShortNumber(heal), ShortNumber(absorb)), first) then
-		return
-	end
-	-- Who you kept up follows a second later. Outside instances the game only accepts /say straight from a click,
-	-- so there a /say line goes out at once; group chat can always wait.
-	local keptUp = ns.Get("keptUp") and KeptUpMessage()
-	if not keptUp then
-		return
-	end
-	if second ~= "SAY" or IsInInstance() then
-		C_Timer.After(KEPT_UP_DELAY, function()
-			ns.SendChat(keptUp, second)
-		end)
-	else
-		ns.SendChat(keptUp, second)
-	end
+	local names = ns.Get("keptUp") and KeptUpNames()
+	local line = ns.RandomLine(names and REPORT_LINES or REPORT_LINES_NO_NAMES)
+	-- A function replacement, so a "%" in a name can't be read as a pattern.
+	line = line:gsub("{heal}", function() return ShortNumber(heal) end)
+		:gsub("{shield}", function() return ShortNumber(absorb) end)
+		:gsub("{names}", function() return names or "" end)
+	ns.SendChat(line, channel)
 end
 
 local yellButton = IconButton("voicechat-icon-speaker", "Yell", "Report totals",
-	"Sends your totals, then the three people you healed most. Out of combat only. Where it goes: "
+	"Sends your totals and the three people you healed most in one line. Out of combat only. Where it goes: "
 	.. "Options > AddOns > Holy Moly.", ReportTotals)
 yellButton:SetPoint("RIGHT", resetButton, "LEFT", -6, 0)
 

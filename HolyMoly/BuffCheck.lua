@@ -8,12 +8,14 @@
 local _, ns = ...
 
 -- Spell names as the English client shows them. "also" lists group versions that count as having the buff.
+-- "rebuff" is how many seconds before it runs out the button shows (5 minutes when not set); Fear Ward lasts only
+-- 3 minutes in Forever, so it shows once it is gone, not all the time.
 local BUFFS = {
 	{ spell = "Power Word: Fortitude", also = { "Prayer of Fortitude" } },
 	{ spell = "Divine Spirit", also = { "Prayer of Spirit" } },
 	{ spell = "Shadow Protection", also = { "Prayer of Shadow Protection" } },
 	{ spell = "Inner Fire", selfOnly = true },
-	{ spell = "Fear Ward", selfOnly = true },
+	{ spell = "Fear Ward", selfOnly = true, rebuff = 0 },
 }
 local BUTTON_SIZE = 24
 local CHECK_SECONDS = 2
@@ -99,10 +101,11 @@ end
 -- before running out, in range before out of range.
 local function Needs(buff, units)
 	local missing, expiring, target, targetName, targetInRange, targetRank = {}, {}, nil, nil, false, -1
+	local rebuff = buff.rebuff or REBUFF_SECONDS
 	for _, unit in ipairs(buff.selfOnly and { "player" } or units) do
 		if UnitExists(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit) and UnitIsVisible(unit) then
 			local left = TimeLeft(unit, buff)
-			if not left or left < REBUFF_SECONDS then
+			if not left or left < rebuff then
 				local name = UnitName(unit)
 				if left then
 					expiring[#expiring + 1] = format("%s (%d:%02d)", name, left / 60, left % 60)
