@@ -88,7 +88,13 @@ function ns.WeakenedSoul(unit)
 	if ok and aura and aura.auraInstanceID and not issecretvalue(aura.auraInstanceID) then
 		return aura.auraInstanceID
 	end
-	local isPlayer = UnitIsUnit(unit, "player")
+	-- In combat the game may keep "is this unit you" secret, and testing a secret value is an error (it showed as
+	-- "Lua Taint: HolyMoly" and hid the timer), so a secret answer counts as "not you".
+	local isPlayer = unit == "player"
+	if not isPlayer then
+		local ok, same = pcall(UnitIsUnit, unit, "player")
+		isPlayer = ok and not issecretvalue(same) and same == true
+	end
 	for _, id in ipairs(C_UnitAuras.GetUnitAuraInstanceIDs(unit, WEAKENED_SOUL_FILTER) or {}) do
 		local data = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, id)
 		local spellId, name = data and data.spellId, data and data.name

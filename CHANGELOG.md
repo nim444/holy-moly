@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Weakened Soul: shows on others in combat again (a secret "is this you" check broke it and caused a Lua taint message).
 - Heal buttons: the Weakened Soul timer sits on top of the button and the name no longer moves for it.
 - Heal buttons: names and health stay fully readable while a bar is faint.
 - Weakened Soul: other debuffs you put on yourself no longer show as Weakened Soul (heal buttons and timers panel).
