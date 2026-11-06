@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons: names and health stay fully readable while a bar is faint.
 - Weakened Soul: other debuffs you put on yourself no longer show as Weakened Soul (heal buttons and timers panel).
 - Heal buttons: a small Holy Moly icon to drag them instead of the "Holy Moly heals" title.
 - Heal buttons: twice as wide, with health and percent ("1.2K 85%"); in a party the tank gets the first row to themselves, everyone else two by two under them.

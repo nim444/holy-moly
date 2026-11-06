@@ -259,8 +259,17 @@ local function CreateUnitButton(parent, unit, index, columns)
 	missing:SetColorTexture(0.65, 0.08, 0.08, 0.9)
 	button.health = health
 
-	local name = health:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-	local hp = health:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	-- The text sits on its own frame on the button, not on the content, so the name and health stay readable while
+	-- the bar is faint (healthy people) or someone is dead.
+	local text = CreateFrame("Frame", nil, button)
+	text:SetAllPoints()
+	text:SetFrameLevel(health:GetFrameLevel() + 3)
+	local name = text:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	local hp = text:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	for _, fontString in ipairs({ name, hp }) do
+		fontString:SetShadowColor(0, 0, 0, 1)
+		fontString:SetShadowOffset(1, -1)
+	end
 	hp:SetPoint("RIGHT", -3, 0)
 	hp:SetJustifyH("RIGHT")
 	hp:SetWordWrap(false)
