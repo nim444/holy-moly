@@ -649,8 +649,12 @@ SlashCmdList.HOLYMOLY = function(msg)
 		ns.OpenSettings()
 	elseif msg == "check" then
 		ns.CheckHealButtons()
+	elseif msg == "tank" then
+		ns.ToggleTank()
+	elseif msg == "tank clear" then
+		ns.ClearTanks()
 	else
-		print("Holy Moly: /holy reset | show | hide | config | check. Drag the box to move it.")
+		print("Holy Moly: /holy reset | show | hide | config | check | tank | tank clear. Drag the box to move it.")
 	end
 end
 

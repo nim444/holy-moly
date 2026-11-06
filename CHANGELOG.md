@@ -4,6 +4,9 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons: their own size setting, apart from the box's.
+- Heal buttons: the tank has a blue border and a shield mark (the tank role, a raid's main tank, or whoever you
+  mark with `/holy tank`; `/holy tank clear` clears the marks).
 - Heal buttons: a grid with a button for each party or raid member, the missing health in red, faint while they
   are fine and with a red border under 30% health (set in the options). Left click casts Flash Heal on them, right click a bigger heal,
   middle click Renew,

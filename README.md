@@ -24,7 +24,9 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   they are fine, a red border under 30% health (Forever hides health from addons, so the game itself applies the
   threshold). Left click casts Flash Heal, right click Greater Heal (or the biggest heal you know), middle click Renew,
   Shift + left click Power Word: Shield, in combat too; each click can be changed in the settings.
-  It has its own position: drag it by its title.
+  The tank has a blue border and a shield mark: the tank role from the group finder, a raid's main tank, or whoever
+  you mark with `/holy tank` (target them first; again to unmark, `/holy tank clear` to clear all).
+  It has its own position and size: drag it by its title, set its size in the settings apart from the box.
 - **Minimap button:** a click shows or hides the box, a right-click opens the settings; drag it around the
   minimap.
 - **Settings:** Options > AddOns > Holy Moly, `/holy config`, or right-click the minimap button or Holy Moly in the

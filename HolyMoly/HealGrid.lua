@@ -3,6 +3,9 @@
 -- biggest heal, a middle click Renew, a shift + left click Power Word: Shield; each can be changed in the settings.
 -- Works in combat.
 --
+-- The tank's button gets a blue border and a shield mark, so you keep an eye on them: whoever the game gives the
+-- tank role (group finder) or the main tank assignment (raid), or whoever you marked with /holy tank.
+--
 -- Forever keeps everyone's health secret from addons, so the code never compares it: the game evaluates two step
 -- curves on each health percent and the results go straight to SetAlpha. The buttons are secure unit buttons with
 -- fixed units (player and party1-4 in a party, raid1-40 in a raid); the game shows and hides them as the group
@@ -29,6 +32,7 @@ local BUTTON_WIDTH, BUTTON_HEIGHT, GAP = 60, 22, 2
 local COLUMNS = 5
 local FADED_ALPHA = 0.4
 local HANDLE_HEIGHT = 14
+local TANK_ICON_SIZE = 12
 
 local grid = CreateFrame("Frame", "HolyMolyHealGrid", UIParent)
 grid:SetSize(COLUMNS * BUTTON_WIDTH + (COLUMNS - 1) * GAP, HANDLE_HEIGHT + 8 * (BUTTON_HEIGHT + GAP))
@@ -84,7 +88,8 @@ handle:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_TOP")
 	GameTooltip:SetText("Holy Moly heals")
 	GameTooltip:AddLine("A button lights up red when that person drops under " .. ns.Get("healGridPercent")
-		.. "% health. Drag here to move the grid (out of combat).", 1, 1, 1, true)
+		.. "% health. The tank has a blue border and a shield; /holy tank marks your target as tank. Drag here to"
+		.. " move the grid (out of combat).", 1, 1, 1, true)
 	GameTooltip:Show()
 end)
 handle:SetScript("OnLeave", GameTooltip_Hide)
@@ -101,8 +106,34 @@ local CHECK_SECONDS = 60
 local checkUntil = 0
 local ReportClick
 
+-- Is this unit the tank? The game's role, a raid's main tank, or a /holy tank mark (saved by GUID). Any value the
+-- game keeps secret counts as "no".
+local function IsTank(unit)
+	if UnitGroupRolesAssigned then
+		local role = UnitGroupRolesAssigned(unit)
+		if not issecretvalue(role) and role == "TANK" then
+			return true
+		end
+	end
+	if GetPartyAssignment then
+		local mainTank = GetPartyAssignment("MAINTANK", unit)
+		if not issecretvalue(mainTank) and mainTank then
+			return true
+		end
+	end
+	local guid = UnitGUID(unit)
+	return guid ~= nil and not issecretvalue(guid) and HolyMolyDB.tanks[guid] ~= nil
+end
+
+local function UpdateTank(button)
+	local ok, tank = pcall(IsTank, button.unit)
+	button.isTank = ok and tank
+	button.tank:SetAlpha(button.isTank and 1 or 0)
+end
+
 local function UpdateButton(button)
 	local unit = button.unit
+	UpdateTank(button)
 	button.name:SetText(UnitName(unit))
 	button.health:SetMinMaxValues(0, UnitHealthMax(unit))
 	button.health:SetValue(UnitHealth(unit))
@@ -145,6 +176,9 @@ end
 local function ShowTooltip(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	GameTooltip:SetUnit(self.unit)
+	if self.isTank then
+		GameTooltip:AddLine("Tank", 0.35, 0.65, 1)
+	end
 	for _, click in ipairs(CLICKS) do
 		if click.text then
 			GameTooltip:AddLine(click.label .. ": " .. click.text, 0.6, 0.8, 1)
@@ -195,6 +229,25 @@ local function CreateUnitButton(parent, unit, index)
 	low:SetBackdropBorderColor(1, 0.1, 0.1)
 	low:SetAlpha(0)
 	button.low = low
+
+	-- The tank mark sits on the button itself, not on the content, so it stays clear while the content is faint.
+	-- It shows and hides through its alpha, which is allowed in combat. The blue border is just outside the
+	-- button, so the red low-health border inside it still shows.
+	local tank = CreateFrame("Frame", nil, button, "BackdropTemplate")
+	tank:SetPoint("TOPLEFT", -2, 2)
+	tank:SetPoint("BOTTOMRIGHT", 2, -2)
+	tank:SetFrameLevel(low:GetFrameLevel() + 1)
+	tank:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 2 })
+	tank:SetBackdropBorderColor(0.25, 0.6, 1)
+	local shield = tank:CreateTexture(nil, "OVERLAY")
+	shield:SetSize(TANK_ICON_SIZE, TANK_ICON_SIZE)
+	shield:SetPoint("RIGHT", -2, 0)
+	if not (pcall(shield.SetAtlas, shield, "roleicon-tiny-tank") and shield:GetAtlas()) then
+		shield:SetTexture("Interface\\Icons\\Ability_Defend")
+	end
+	tank:SetAlpha(0)
+	button.tank = tank
+	button.isTank = false
 
 	button:HookScript("OnEnter", ShowTooltip)
 	button:HookScript("OnLeave", GameTooltip_Hide)
@@ -287,6 +340,35 @@ function ReportClick(mouseButton, shift, clickTime)
 	end
 end
 
+-- /holy tank: marks your target as the tank, or unmarks them. The mark is kept by GUID until /holy tank clear.
+function ns.ToggleTank()
+	if not UnitExists("target") or not UnitIsPlayer("target") then
+		print("Holy Moly: target the tank first, then type /holy tank.")
+		return
+	end
+	local guid = UnitGUID("target")
+	if guid == nil or issecretvalue(guid) then
+		print("Holy Moly: the game hides who your target is right now; try again out of combat.")
+		return
+	end
+	local name = UnitName("target")
+	name = (name and not issecretvalue(name)) and name or "your target"
+	if HolyMolyDB.tanks[guid] then
+		HolyMolyDB.tanks[guid] = nil
+		print("Holy Moly: " .. name .. " is no longer marked as tank.")
+	else
+		HolyMolyDB.tanks[guid] = name
+		print("Holy Moly: " .. name .. " is marked as tank.")
+	end
+	QueueUpdate()
+end
+
+function ns.ClearTanks()
+	wipe(HolyMolyDB.tanks)
+	print("Holy Moly: tank marks cleared.")
+	QueueUpdate()
+end
+
 -- One set of buttons for a party and one for a raid; the game shows the right one, also in combat.
 local function Build()
 	local party = CreateFrame("Frame", nil, grid)
@@ -329,9 +411,9 @@ ns.OnSettingChanged("healGrid", function()
 		grid:SetShown(ns.Get("healGrid"))
 	end)
 end)
-ns.OnSettingChanged("scale", function()
+ns.OnSettingChanged("healGridScale", function()
 	OutOfCombat(function()
-		grid:SetScale(ns.Get("scale"))
+		grid:SetScale(ns.Get("healGridScale"))
 	end)
 end)
 
@@ -345,6 +427,8 @@ frame:RegisterEvent("UNIT_HEALTH")
 frame:RegisterEvent("UNIT_MAXHEALTH")
 frame:RegisterEvent("UNIT_CONNECTION")
 frame:RegisterEvent("UNIT_NAME_UPDATE")
+-- Role changes; an event this client doesn't have would raise an error, so it is tried.
+pcall(frame.RegisterEvent, frame, "PLAYER_ROLES_ASSIGNED")
 frame:SetScript("OnEvent", function(_, event)
 	if event == "PLAYER_LOGIN" then
 		-- Settings.lua has set up HolyMolyDB on ADDON_LOADED.

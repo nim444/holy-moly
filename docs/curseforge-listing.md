@@ -62,6 +62,7 @@ buffs need a refresh. Built for Forever's addon rules: it works in combat withou
 - `/holy config` opens the settings (also Options > AddOns > Holy Moly, or right-click the minimap button).
 - `/holy show`, `/holy hide`, `/holy reset`.
 - `/holy check` shows what each heal-button click casts and, for a minute, prints each cast with its rank.
+- `/holy tank` marks your target as the tank on the heal buttons (again to unmark); `/holy tank clear` clears all.
 
 ## Good to know
 

@@ -15,6 +15,7 @@ local DEFAULTS = {
 	dispels = true,
 	buffCheck = true,
 	healGrid = true,
+	healGridScale = 1,
 	healGridPercent = 30,
 	healLeft = "Flash Heal", -- a spell name, "BIGGEST" (the biggest heal known) or "TARGET"
 	healRight = "BIGGEST",
@@ -132,7 +133,7 @@ local function RegisterPanel()
 
 	Header("Box")
 	Checkbox("lock", "Lock the box", "Stops the box and the heal buttons from being dragged.")
-	Slider("scale", "Size", "Makes the box, everything under it and the heal buttons bigger or smaller.", 0.6, 1.6,
+	Slider("scale", "Size", "Makes the box and everything under it bigger or smaller. The heal buttons have their own size.", 0.6, 1.6,
 		0.05, function(value) return Percent(value * 100 + 0.5) end)
 	Checkbox("history", "Recent fights", "Your last fights in the box's tooltip, with a comparison to the one before.")
 	Checkbox("minimapButton", "Minimap button", "Holy Moly's button on the minimap: a click shows or hides the box, a right-click opens these settings. Drag it around the minimap.")
@@ -147,6 +148,8 @@ local function RegisterPanel()
 
 	Header("Heal buttons")
 	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat.")
+	Slider("healGridScale", "Size", "Makes the heal buttons bigger or smaller, apart from the box.", 0.6, 2, 0.05,
+		function(value) return Percent(value * 100 + 0.5) end)
 	Slider("healGridPercent", "Low-health threshold", "The health percent where a heal button lights up.", 10, 60, 5,
 		Percent)
 	Dropdown("healLeft", "Left click", "What a left click on a heal button casts.", ClickChoices("healLeft"))
@@ -178,6 +181,7 @@ frame:SetScript("OnEvent", function(self, _, loaded)
 	HolyMolyDB.settings = HolyMolyDB.settings or {}
 	HolyMolyDB.healed = HolyMolyDB.healed or {}
 	HolyMolyDB.history = HolyMolyDB.history or {}
+	HolyMolyDB.tanks = HolyMolyDB.tanks or {}
 	local ok, err = pcall(RegisterPanel)
 	if not ok then
 		print("Holy Moly: the settings page could not be added: " .. tostring(err))
