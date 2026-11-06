@@ -7,8 +7,9 @@
 -- tank role (group finder) or the main tank assignment (raid), or whoever you marked with /holy tank.
 --
 -- Weakened Soul from your Power Word: Shield shows at the left of the button with its countdown; when it is gone
--- you can shield them again. Like the timers panel, it hands the game's own duration object to a Cooldown frame,
--- so it works in combat without reading secret values.
+-- you can shield them again. In combat Forever doesn't let addons read debuffs at all (asking is an error), so
+-- there the timer starts from your own cast: a heal-button click set to Power Word: Shield, confirmed by the cast
+-- going off. Out of combat it is read from the debuff itself.
 --
 -- Forever keeps everyone's health secret from addons, so the code never compares it: the game evaluates two step
 -- curves on each health percent and the results go straight to SetAlpha. The buttons are secure unit buttons with
@@ -143,8 +144,21 @@ local function UpdateTank(button)
 	button.tank:SetAlpha(button.isTank and 1 or 0)
 end
 
+local WEAKENED_SOUL_SECONDS = 15
+local SHIELD = "Power Word: Shield"
+
 local function UpdateWeakenedSoul(button)
 	local unit, soul = button.unit, button.soul
+	if button.soulUntil and GetTime() < button.soulUntil then
+		soul:SetAlpha(1)
+		return
+	end
+	button.soulUntil = nil
+	if InCombatLockdown() then
+		soul.cooldown:Clear()
+		soul:SetAlpha(0)
+		return
+	end
 	local id = ns.WeakenedSoul(unit)
 	if id then
 		soul.cooldown:SetCooldownFromDurationObject(C_UnitAuras.GetAuraDuration(unit, id))
@@ -230,6 +244,8 @@ local function Place(button, column, row, width)
 	button:SetSize(width or BUTTON_WIDTH, BUTTON_HEIGHT)
 	button:SetPoint("TOPLEFT", column * (BUTTON_WIDTH + GAP), -row * (BUTTON_HEIGHT + GAP))
 end
+
+local NoteShieldClick -- defined with the click settings below
 
 local function CreateUnitButton(parent, unit, index, columns)
 	local button = CreateFrame("Button", nil, parent, "SecureUnitButtonTemplate")
@@ -327,7 +343,8 @@ local function CreateUnitButton(parent, unit, index, columns)
 	button:HookScript("OnEnter", ShowTooltip)
 	button:HookScript("OnLeave", GameTooltip_Hide)
 	button:HookScript("OnShow", QueueUpdate)
-	button:HookScript("PostClick", function(_, mouseButton)
+	button:HookScript("PostClick", function(self, mouseButton)
+		NoteShieldClick(self, mouseButton, IsShiftKeyDown())
 		if GetTime() < checkUntil then
 			local clickTime, shift = GetTime(), IsShiftKeyDown()
 			C_Timer.After(0.3, function()
@@ -359,6 +376,45 @@ local function ClickAction(choice)
 	end
 	return "spell", FirstKnown(BIGGEST_HEALS)
 end
+
+-- A click on a heal button set to Power Word: Shield waits here until the cast goes off (UNIT_SPELLCAST_SUCCEEDED).
+local pendingShield
+local CLICK_KEYS = { LeftButton = "healLeft", RightButton = "healRight", MiddleButton = "healMiddle" }
+
+NoteShieldClick = function(button, mouseButton, shift)
+	local key = (shift and mouseButton == "LeftButton") and "healShiftLeft" or CLICK_KEYS[mouseButton]
+	for _, click in ipairs(CLICKS) do
+		if click.key == key and click.text == SHIELD then
+			pendingShield = { button = button, time = GetTime() }
+			return
+		end
+	end
+end
+
+local function StartWeakenedSoul(button)
+	button.soulUntil = GetTime() + WEAKENED_SOUL_SECONDS
+	button.soul.cooldown:SetCooldown(GetTime(), WEAKENED_SOUL_SECONDS)
+	button.soul:SetAlpha(1)
+	C_Timer.After(WEAKENED_SOUL_SECONDS + 0.1, QueueUpdate)
+end
+
+local shieldFrame = CreateFrame("Frame")
+shieldFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
+shieldFrame:SetScript("OnEvent", function(_, _, _, _, spellID)
+	local pending = pendingShield
+	if not pending or GetTime() - pending.time > 1.5 then
+		return
+	end
+	pendingShield = nil
+	-- The spell may be secret in combat; then the click right before it is taken at its word.
+	if spellID ~= nil and not issecretvalue(spellID) then
+		local name = C_Spell.GetSpellName(spellID)
+		if name and not issecretvalue(name) and name ~= SHIELD then
+			return
+		end
+	end
+	StartWeakenedSoul(pending.button)
+end)
 
 local function ApplySpells()
 	for _, click in ipairs(CLICKS) do

@@ -139,12 +139,16 @@ local function TrackedAuras(unit)
 		end
 	end
 	if ns.Get("dispels") then
-		Add(DISPEL_FILTER, true)
+		pcall(Add, DISPEL_FILTER, true)
 	end
 	Add(HOT_FILTER, false)
-	local ok, soul = pcall(ns.WeakenedSoul, unit)
-	if ok and soul then
-		auras[#auras + 1] = { id = soul, dispel = false }
+	-- In combat Forever refuses debuff reads from addons (an error each time), so Weakened Soul shows here out of
+	-- combat only; in combat the heal buttons time it from your own casts.
+	if not InCombatLockdown() then
+		local ok, soul = pcall(ns.WeakenedSoul, unit)
+		if ok and soul then
+			auras[#auras + 1] = { id = soul, dispel = false }
+		end
 	end
 	return auras
 end
