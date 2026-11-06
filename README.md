@@ -28,7 +28,7 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   you mark with `/holy tank` (target them first; again to unmark, `/holy tank clear` to clear all).
   Each shows health and percent; in a party the tank has the first row to themselves, the rest two by two.
   Weakened Soul shows at the left of a button with its countdown, so you see when you can shield them again.
-  It has its own position and size: drag it by its title, set its size in the settings apart from the box.
+  It has its own position and size: drag it by the small Holy Moly icon at its top left, set its size in the settings apart from the box.
 - **Minimap button:** a click shows or hides the box, a right-click opens the settings; drag it around the
   minimap.
 - **Settings:** Options > AddOns > Holy Moly, `/holy config`, or right-click the minimap button or Holy Moly in the

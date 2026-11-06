@@ -72,16 +72,16 @@ local function RestorePosition()
 	end
 end
 
--- Only the title strip takes the mouse, so the empty part of the grid doesn't block clicks on the world.
+-- The drag handle is a small Holy Moly icon at the top left; only it takes the mouse, so the empty part of the grid
+-- doesn't block clicks on the world.
 local handle = CreateFrame("Frame", nil, grid)
 handle:SetPoint("TOPLEFT")
-handle:SetPoint("TOPRIGHT")
-handle:SetHeight(HANDLE_HEIGHT)
+handle:SetSize(HANDLE_HEIGHT, HANDLE_HEIGHT)
 handle:EnableMouse(true)
 handle:RegisterForDrag("LeftButton")
-local title = handle:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-title:SetPoint("LEFT", 2, 0)
-title:SetText("Holy Moly heals")
+local handleIcon = handle:CreateTexture(nil, "OVERLAY")
+handleIcon:SetAllPoints()
+handleIcon:SetTexture("Interface\\AddOns\\HolyMoly\\Media\\Icon")
 handle:SetScript("OnDragStart", function()
 	if not ns.Get("lock") and not InCombatLockdown() then
 		grid:StartMoving()
@@ -96,7 +96,7 @@ handle:SetScript("OnEnter", function(self)
 	GameTooltip:SetText("Holy Moly heals")
 	GameTooltip:AddLine("A button lights up red when that person drops under " .. ns.Get("healGridPercent")
 		.. "% health. The tank has a blue border and a shield; /holy tank marks your target as tank. Drag here to"
-		.. " move the grid (out of combat).", 1, 1, 1, true)
+		.. " move the grid with this icon (out of combat).", 1, 1, 1, true)
 	GameTooltip:Show()
 end)
 handle:SetScript("OnLeave", GameTooltip_Hide)
