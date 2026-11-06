@@ -149,11 +149,9 @@ local function UpdateWeakenedSoul(button)
 	if id then
 		soul.cooldown:SetCooldownFromDurationObject(C_UnitAuras.GetAuraDuration(unit, id))
 		soul:SetAlpha(1)
-		button.name:SetPoint("LEFT", soul, "RIGHT", 2, 0)
 	else
 		soul.cooldown:Clear()
 		soul:SetAlpha(0)
-		button.name:SetPoint("LEFT", 3, 0)
 	end
 end
 
@@ -313,7 +311,8 @@ local function CreateUnitButton(parent, unit, index, columns)
 	local soul = CreateFrame("Frame", nil, button)
 	soul:SetSize(BUTTON_HEIGHT - 4, BUTTON_HEIGHT - 4)
 	soul:SetPoint("LEFT", 2, 0)
-	soul:SetFrameLevel(tank:GetFrameLevel() + 1)
+	-- On top of everything, the text included; the name doesn't move for it.
+	soul:SetFrameLevel(button:GetFrameLevel() + 10)
 	local soulTexture = soul:CreateTexture(nil, "ARTWORK")
 	soulTexture:SetAllPoints()
 	soulTexture:SetTexture(WEAKENED_SOUL_ICON)

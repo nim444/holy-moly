@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons: the Weakened Soul timer sits on top of the button and the name no longer moves for it.
 - Heal buttons: names and health stay fully readable while a bar is faint.
 - Weakened Soul: other debuffs you put on yourself no longer show as Weakened Soul (heal buttons and timers panel).
 - Heal buttons: a small Holy Moly icon to drag them instead of the "Holy Moly heals" title.
