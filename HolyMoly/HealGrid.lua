@@ -6,6 +6,10 @@
 -- The tank's button gets a blue border and a shield mark, so you keep an eye on them: whoever the game gives the
 -- tank role (group finder) or the main tank assignment (raid), or whoever you marked with /holy tank.
 --
+-- Weakened Soul from your Power Word: Shield shows at the left of the button with its countdown; when it is gone
+-- you can shield them again. Like the timers panel, it hands the game's own duration object to a Cooldown frame,
+-- so it works in combat without reading secret values.
+--
 -- Forever keeps everyone's health secret from addons, so the code never compares it: the game evaluates two step
 -- curves on each health percent and the results go straight to SetAlpha. The buttons are secure unit buttons with
 -- fixed units (player and party1-4 in a party, raid1-40 in a raid); the game shows and hides them as the group
@@ -33,6 +37,8 @@ local COLUMNS = 5
 local FADED_ALPHA = 0.4
 local HANDLE_HEIGHT = 14
 local TANK_ICON_SIZE = 12
+local WEAKENED_SOUL_FILTER = "HARMFUL|PLAYER" -- the only debuff a Priest puts on friends
+local WEAKENED_SOUL_ICON = "Interface\\Icons\\Spell_Holy_AshesToAshes"
 
 local grid = CreateFrame("Frame", "HolyMolyHealGrid", UIParent)
 grid:SetSize(COLUMNS * BUTTON_WIDTH + (COLUMNS - 1) * GAP, HANDLE_HEIGHT + 8 * (BUTTON_HEIGHT + GAP))
@@ -131,9 +137,28 @@ local function UpdateTank(button)
 	button.tank:SetAlpha(button.isTank and 1 or 0)
 end
 
+local function UpdateWeakenedSoul(button)
+	local unit, soul = button.unit, button.soul
+	local ids = C_UnitAuras.GetUnitAuraInstanceIDs(unit, WEAKENED_SOUL_FILTER)
+	local id = ids and ids[1]
+	if id then
+		soul.cooldown:SetCooldownFromDurationObject(C_UnitAuras.GetAuraDuration(unit, id))
+		soul:SetAlpha(1)
+		button.name:SetPoint("LEFT", soul, "RIGHT", 2, 0)
+	else
+		soul.cooldown:Clear()
+		soul:SetAlpha(0)
+		button.name:SetPoint("LEFT", 3, 0)
+	end
+end
+
 local function UpdateButton(button)
 	local unit = button.unit
 	UpdateTank(button)
+	-- Its own pcall, so a problem here never stops the health bar.
+	if not pcall(UpdateWeakenedSoul, button) then
+		button.soul:SetAlpha(0)
+	end
 	button.name:SetText(UnitName(unit))
 	button.health:SetMinMaxValues(0, UnitHealthMax(unit))
 	button.health:SetValue(UnitHealth(unit))
@@ -248,6 +273,23 @@ local function CreateUnitButton(parent, unit, index)
 	tank:SetAlpha(0)
 	button.tank = tank
 	button.isTank = false
+
+	-- Weakened Soul: an icon with the countdown at the left, on the button so it stays clear when the content is
+	-- faint; shown and hidden through its alpha, which is allowed in combat.
+	local soul = CreateFrame("Frame", nil, button)
+	soul:SetSize(BUTTON_HEIGHT - 4, BUTTON_HEIGHT - 4)
+	soul:SetPoint("LEFT", 2, 0)
+	soul:SetFrameLevel(tank:GetFrameLevel() + 1)
+	local soulTexture = soul:CreateTexture(nil, "ARTWORK")
+	soulTexture:SetAllPoints()
+	soulTexture:SetTexture(WEAKENED_SOUL_ICON)
+	soul.cooldown = CreateFrame("Cooldown", nil, soul, "CooldownFrameTemplate")
+	soul.cooldown:SetAllPoints()
+	soul.cooldown:SetReverse(true)
+	soul.cooldown:SetDrawEdge(false)
+	soul.cooldown:SetHideCountdownNumbers(false)
+	soul:SetAlpha(0)
+	button.soul = soul
 
 	button:HookScript("OnEnter", ShowTooltip)
 	button:HookScript("OnLeave", GameTooltip_Hide)
@@ -427,6 +469,7 @@ frame:RegisterEvent("UNIT_HEALTH")
 frame:RegisterEvent("UNIT_MAXHEALTH")
 frame:RegisterEvent("UNIT_CONNECTION")
 frame:RegisterEvent("UNIT_NAME_UPDATE")
+frame:RegisterEvent("UNIT_AURA")
 -- Role changes; an event this client doesn't have would raise an error, so it is tried.
 pcall(frame.RegisterEvent, frame, "PLAYER_ROLES_ASSIGNED")
 frame:SetScript("OnEvent", function(_, event)

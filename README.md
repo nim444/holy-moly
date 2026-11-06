@@ -26,6 +26,7 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   Shift + left click Power Word: Shield, in combat too; each click can be changed in the settings.
   The tank has a blue border and a shield mark: the tank role from the group finder, a raid's main tank, or whoever
   you mark with `/holy tank` (target them first; again to unmark, `/holy tank clear` to clear all).
+  Weakened Soul shows at the left of a button with its countdown, so you see when you can shield them again.
   It has its own position and size: drag it by its title, set its size in the settings apart from the box.
 - **Minimap button:** a click shows or hides the box, a right-click opens the settings; drag it around the
   minimap.
