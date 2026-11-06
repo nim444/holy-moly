@@ -9,7 +9,9 @@
 local _, ns = ...
 
 local HOT_FILTER = "HELPFUL|PLAYER|RAID_IN_COMBAT"
-local WEAKENED_SOUL_FILTER = "HARMFUL|PLAYER" -- the only debuff a Priest puts on friends
+local WEAKENED_SOUL_FILTER = "HARMFUL|PLAYER" -- debuffs you put on friends: Weakened Soul, but on yourself also others
+local WEAKENED_SOUL_ID = 6788
+local WEAKENED_SOUL_NAME = "Weakened Soul"
 local DISPEL_FILTER = "HARMFUL|RAID" -- harmful auras you can dispel
 local MAX_ROWS = 10
 local MAX_ICONS = 6
@@ -78,6 +80,52 @@ local function GroupUnits()
 	return units
 end
 
+-- The aura instance of Weakened Soul on a unit, or nil. A debuff you put on yourself (some items and quests do)
+-- also passes the "PLAYER" filter, so each one is checked by spell ID or name; when the game keeps both secret,
+-- it counts only on others, where Weakened Soul is the only debuff a Priest leaves.
+function ns.WeakenedSoul(unit)
+	local ok, aura = pcall(C_UnitAuras.GetUnitAuraBySpellID, unit, WEAKENED_SOUL_ID)
+	if ok and aura and aura.auraInstanceID and not issecretvalue(aura.auraInstanceID) then
+		return aura.auraInstanceID
+	end
+	local isPlayer = UnitIsUnit(unit, "player")
+	for _, id in ipairs(C_UnitAuras.GetUnitAuraInstanceIDs(unit, WEAKENED_SOUL_FILTER) or {}) do
+		local data = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, id)
+		local spellId, name = data and data.spellId, data and data.name
+		if spellId and not issecretvalue(spellId) then
+			if spellId == WEAKENED_SOUL_ID then
+				return id
+			end
+		elseif name and not issecretvalue(name) then
+			if name == WEAKENED_SOUL_NAME then
+				return id
+			end
+		elseif not isPlayer then
+			return id
+		end
+	end
+end
+
+-- /holy soul: what the game reports for each group member, to see why Weakened Soul does or doesn't show.
+function ns.DebugWeakenedSoul()
+	for _, unit in ipairs(GroupUnits()) do
+		if UnitExists(unit) then
+			local parts = {}
+			for _, id in ipairs(C_UnitAuras.GetUnitAuraInstanceIDs(unit, WEAKENED_SOUL_FILTER) or {}) do
+				local data = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, id)
+				local spellId = data and data.spellId
+				parts[#parts + 1] = (spellId == nil and "no data") or (issecretvalue(spellId) and "secret")
+					or tostring(spellId)
+			end
+			local ok, soul = pcall(ns.WeakenedSoul, unit)
+			local name = UnitName(unit)
+			print(("Holy Moly soul: %s: your debuffs [%s], Weakened Soul %s"):format(
+				(name and not issecretvalue(name)) and name or unit, table.concat(parts, ", "),
+				not ok and ("error: " .. tostring(soul)) or (soul and "found" or "not found")))
+		end
+	end
+end
+
 -- Debuffs you can dispel (when that setting is on), then your HoTs and shields, then Weakened Soul:
 -- { { id = auraInstanceID, dispel = true }, ... }
 local function TrackedAuras(unit)
@@ -91,7 +139,10 @@ local function TrackedAuras(unit)
 		Add(DISPEL_FILTER, true)
 	end
 	Add(HOT_FILTER, false)
-	Add(WEAKENED_SOUL_FILTER, false)
+	local ok, soul = pcall(ns.WeakenedSoul, unit)
+	if ok and soul then
+		auras[#auras + 1] = { id = soul, dispel = false }
+	end
 	return auras
 end
 

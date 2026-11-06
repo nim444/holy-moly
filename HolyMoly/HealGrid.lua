@@ -38,7 +38,6 @@ local RAID_COLUMNS = 5
 local FADED_ALPHA = 0.4
 local HANDLE_HEIGHT = 14
 local TANK_ICON_SIZE = 12
-local WEAKENED_SOUL_FILTER = "HARMFUL|PLAYER" -- the only debuff a Priest puts on friends
 local WEAKENED_SOUL_ICON = "Interface\\Icons\\Spell_Holy_AshesToAshes"
 
 local grid = CreateFrame("Frame", "HolyMolyHealGrid", UIParent)
@@ -146,8 +145,7 @@ end
 
 local function UpdateWeakenedSoul(button)
 	local unit, soul = button.unit, button.soul
-	local ids = C_UnitAuras.GetUnitAuraInstanceIDs(unit, WEAKENED_SOUL_FILTER)
-	local id = ids and ids[1]
+	local id = ns.WeakenedSoul(unit)
 	if id then
 		soul.cooldown:SetCooldownFromDurationObject(C_UnitAuras.GetAuraDuration(unit, id))
 		soul:SetAlpha(1)

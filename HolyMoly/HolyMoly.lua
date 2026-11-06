@@ -648,6 +648,8 @@ SlashCmdList.HOLYMOLY = function(msg)
 		ns.OpenSettings()
 	elseif msg == "check" then
 		ns.CheckHealButtons()
+	elseif msg == "soul" then
+		ns.DebugWeakenedSoul()
 	elseif msg == "tank" then
 		ns.ToggleTank()
 	elseif msg == "tank clear" then
