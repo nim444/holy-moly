@@ -92,15 +92,12 @@ function ns.WeakenedSoul(unit)
 	for _, id in ipairs(C_UnitAuras.GetUnitAuraInstanceIDs(unit, WEAKENED_SOUL_FILTER) or {}) do
 		local data = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, id)
 		local spellId, name = data and data.spellId, data and data.name
-		if spellId and not issecretvalue(spellId) then
-			if spellId == WEAKENED_SOUL_ID then
-				return id
-			end
-		elseif name and not issecretvalue(name) then
-			if name == WEAKENED_SOUL_NAME then
-				return id
-			end
-		elseif not isPlayer then
+		local idKnown = spellId ~= nil and not issecretvalue(spellId)
+		local nameKnown = name ~= nil and not issecretvalue(name)
+		-- Forever may give Weakened Soul its own spell ID, so the name counts as much as the Classic ID.
+		if (idKnown and spellId == WEAKENED_SOUL_ID) or (nameKnown and name == WEAKENED_SOUL_NAME) then
+			return id
+		elseif not idKnown and not nameKnown and not isPlayer then
 			return id
 		end
 	end
