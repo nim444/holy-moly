@@ -146,6 +146,34 @@ end
 
 local WEAKENED_SOUL_SECONDS = 15
 local SHIELD = "Power Word: Shield"
+local RENEW = "Renew"
+local RENEW_SECONDS = 15
+local RENEW_ICON = "Interface\\Icons\\Spell_Holy_Renew"
+
+-- Renew works like Weakened Soul: from your own click in combat, read from the buff out of combat.
+local function UpdateRenew(button)
+	local unit, renew = button.unit, button.renew
+	if button.renewUntil and GetTime() < button.renewUntil then
+		renew:SetAlpha(1)
+		return
+	end
+	button.renewUntil = nil
+	local aura
+	if not InCombatLockdown() then
+		local ok, data = pcall(C_UnitAuras.GetAuraDataBySpellName, unit, RENEW, "HELPFUL|PLAYER")
+		aura = ok and data and data.auraInstanceID
+		if aura and issecretvalue(aura) then
+			aura = nil
+		end
+	end
+	if aura then
+		renew.cooldown:SetCooldownFromDurationObject(C_UnitAuras.GetAuraDuration(unit, aura))
+		renew:SetAlpha(1)
+	else
+		renew.cooldown:Clear()
+		renew:SetAlpha(0)
+	end
+end
 
 local function UpdateWeakenedSoul(button)
 	local unit, soul = button.unit, button.soul
@@ -175,6 +203,9 @@ local function UpdateButton(button)
 	-- Its own pcall, so a problem here never stops the health bar.
 	if not pcall(UpdateWeakenedSoul, button) then
 		button.soul:SetAlpha(0)
+	end
+	if not pcall(UpdateRenew, button) then
+		button.renew:SetAlpha(0)
 	end
 	button.name:SetText(UnitName(unit))
 	button.health:SetMinMaxValues(0, UnitHealthMax(unit))
@@ -340,6 +371,22 @@ local function CreateUnitButton(parent, unit, index, columns)
 	soul:SetAlpha(0)
 	button.soul = soul
 
+	-- Renew: the same kind of icon, right of Weakened Soul.
+	local renew = CreateFrame("Frame", nil, button)
+	renew:SetSize(BUTTON_HEIGHT - 4, BUTTON_HEIGHT - 4)
+	renew:SetPoint("LEFT", soul, "RIGHT", 2, 0)
+	renew:SetFrameLevel(button:GetFrameLevel() + 10)
+	local renewTexture = renew:CreateTexture(nil, "ARTWORK")
+	renewTexture:SetAllPoints()
+	renewTexture:SetTexture(RENEW_ICON)
+	renew.cooldown = CreateFrame("Cooldown", nil, renew, "CooldownFrameTemplate")
+	renew.cooldown:SetAllPoints()
+	renew.cooldown:SetReverse(true)
+	renew.cooldown:SetDrawEdge(false)
+	renew.cooldown:SetHideCountdownNumbers(false)
+	renew:SetAlpha(0)
+	button.renew = renew
+
 	button:HookScript("OnEnter", ShowTooltip)
 	button:HookScript("OnLeave", GameTooltip_Hide)
 	button:HookScript("OnShow", QueueUpdate)
@@ -377,15 +424,16 @@ local function ClickAction(choice)
 	return "spell", FirstKnown(BIGGEST_HEALS)
 end
 
--- A click on a heal button set to Power Word: Shield waits here until the cast goes off (UNIT_SPELLCAST_SUCCEEDED).
+-- A click on a heal button set to Power Word: Shield or Renew waits here until the cast goes off
+-- (UNIT_SPELLCAST_SUCCEEDED).
 local pendingShield
 local CLICK_KEYS = { LeftButton = "healLeft", RightButton = "healRight", MiddleButton = "healMiddle" }
 
 NoteShieldClick = function(button, mouseButton, shift)
 	local key = (shift and mouseButton == "LeftButton") and "healShiftLeft" or CLICK_KEYS[mouseButton]
 	for _, click in ipairs(CLICKS) do
-		if click.key == key and click.text == SHIELD then
-			pendingShield = { button = button, time = GetTime() }
+		if click.key == key and (click.text == SHIELD or click.text == RENEW) then
+			pendingShield = { button = button, time = GetTime(), spell = click.text }
 			return
 		end
 	end
@@ -396,6 +444,13 @@ local function StartWeakenedSoul(button)
 	button.soul.cooldown:SetCooldown(GetTime(), WEAKENED_SOUL_SECONDS)
 	button.soul:SetAlpha(1)
 	C_Timer.After(WEAKENED_SOUL_SECONDS + 0.1, QueueUpdate)
+end
+
+local function StartRenew(button)
+	button.renewUntil = GetTime() + RENEW_SECONDS
+	button.renew.cooldown:SetCooldown(GetTime(), RENEW_SECONDS)
+	button.renew:SetAlpha(1)
+	C_Timer.After(RENEW_SECONDS + 0.1, QueueUpdate)
 end
 
 local shieldFrame = CreateFrame("Frame")
@@ -409,11 +464,15 @@ shieldFrame:SetScript("OnEvent", function(_, _, _, _, spellID)
 	-- The spell may be secret in combat; then the click right before it is taken at its word.
 	if spellID ~= nil and not issecretvalue(spellID) then
 		local name = C_Spell.GetSpellName(spellID)
-		if name and not issecretvalue(name) and name ~= SHIELD then
+		if name and not issecretvalue(name) and name ~= pending.spell then
 			return
 		end
 	end
-	StartWeakenedSoul(pending.button)
+	if pending.spell == RENEW then
+		StartRenew(pending.button)
+	else
+		StartWeakenedSoul(pending.button)
+	end
 end)
 
 local function ApplySpells()
