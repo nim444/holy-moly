@@ -426,31 +426,62 @@ local resetButton = IconButton("Interface\\AddOns\\HolyMoly\\Media\\Trash.tga", 
 resetButton:SetPoint("TOPRIGHT", -10, -8)
 
 -- The report is one line, picked at random (never the same twice in a row), so repeats don't read like spam.
--- {heal} and {shield} are the totals, {names} the people you healed most as "[Pestilen], [Razorgir], [Hauru]".
--- {rt5} is the moon raid icon in chat, in every client language.
+-- {heal} is the healing total, {names} the people you healed most as "[Pestilen, Razorgir, Hauru]".
+-- {rt1} is the star raid icon in chat, in every client language.
 local REPORT_LINES = {
-	"{rt5} The Light held: {heal} healed, {shield} shielded. Kept up: {names}.",
-	"{rt5} {heal} healing, {shield} in shields. Most healed: {names}. Stay close to the Priest.",
-	"{rt5} By the Light: {heal} healed, {shield} absorbed. Top patients: {names}.",
-	"{rt5} Another fight survived: {heal} healed, {shield} shielded. Thank the Priest, {names}.",
-	"{rt5} Healer bill: {heal} healed, {shield} shielded. Invoices go to {names}.",
-	"{rt5} {heal} healed and {shield} shielded. {names}, you can stop standing in the fire now.",
-	"{rt5} Mana well spent: {heal} healing, {shield} shields. Frequent flyers: {names}.",
-	"{rt5} Nobody dies on my watch: {heal} healed, {shield} absorbed. Mostly {names}.",
-	"{rt5} Holy numbers: {heal} healed, {shield} shielded. {names} owe me a drink.",
-	"{rt5} {heal} healing, {shield} in shields. {names}, the Light says you're welcome.",
-	"{rt5} Patch-up report: {heal} healed, {shield} shielded. Most patched: {names}.",
-	"{rt5} The Priest delivers: {heal} healed, {shield} absorbed. Special thanks to my regulars {names}.",
+	"{rt1} The Light held: {heal} healed. Kept up: {names}.",
+	"{rt1} {heal} healing done. Most healed: {names}. Stay close to the Priest.",
+	"{rt1} By the Light: {heal} healed. Top patients: {names}.",
+	"{rt1} Another fight survived: {heal} healed. Thank the Priest, {names}.",
+	"{rt1} Healer bill: {heal} healed. Invoices go to {names}.",
+	"{rt1} {heal} healed. {names}, you can stop standing in the fire now.",
+	"{rt1} Mana well spent: {heal} healing. Frequent flyers: {names}.",
+	"{rt1} Nobody dies on my watch: {heal} healed. Mostly {names}.",
+	"{rt1} Holy numbers: {heal} healed. {names} owe me a drink.",
+	"{rt1} {heal} healing. {names}, the Light says you're welcome.",
+	"{rt1} Patch-up report: {heal} healed. Most patched: {names}.",
+	"{rt1} The Priest delivers: {heal} healed. Special thanks to my regulars {names}.",
+	"{rt1} Clinic is closing: {heal} healed. Last patients out: {names}.",
+	"{rt1} {heal} healed. {names}, your insurance has been cancelled.",
+	"{rt1} Bandages used: all of them. {heal} healed, mostly {names}.",
+	"{rt1} {names} took the damage, I took the {heal} healing bill.",
+	"{rt1} Today's blood donors: {names}. Refilled for {heal}.",
+	"{rt1} Warranty repairs complete: {heal} healed on {names}.",
+	"{rt1} Loyalty card stamped for {names}. Total healed: {heal}.",
+	"{rt1} {heal} healed. {names}, try dodging next time.",
+	"{rt1} I've seen worse. Actually, no. {heal} healed on {names}.",
+	"{rt1} Prayers answered: {heal} worth. Most prayed for: {names}.",
+	"{rt1} Still breathing, thanks to {heal} healing: {names}.",
+	"{rt1} Ghost run cancelled for {names}. You're welcome: {heal} healed.",
+	"{rt1} Spirit Healer is out of work today. {heal} healed, {names} safe.",
+	"{rt1} Priest shift report: {heal} healed. Repeat offenders: {names}.",
+	"{rt1} {names}, that was {heal} healing. Tips are accepted in gold.",
+	"{rt1} Health restored: {heal}. Dignity restored for {names}: none.",
+	"{rt1} Graveyard stays empty: {heal} healed. Nearly filled by {names}.",
+	"{rt1} That's {heal} healing, and {names} didn't even say thanks.",
 }
 -- The same without names, for when nobody else was healed or "Name who you kept up" is off.
 local REPORT_LINES_NO_NAMES = {
-	"{rt5} The Light held: {heal} healed, {shield} shielded.",
-	"{rt5} {heal} healing, {shield} in shields. Stay close to the Priest.",
-	"{rt5} By the Light: {heal} healed and {shield} absorbed.",
-	"{rt5} Another fight survived: {heal} healed, {shield} shielded.",
-	"{rt5} Healer bill: {heal} healed, {shield} shielded. Payment in gold, please.",
-	"{rt5} Mana well spent: {heal} healing, {shield} shields.",
-	"{rt5} Nobody dies on my watch: {heal} healed, {shield} absorbed.",
+	"{rt1} The Light held: {heal} healed.",
+	"{rt1} {heal} healing done. Stay close to the Priest.",
+	"{rt1} By the Light: {heal} healed.",
+	"{rt1} Another fight survived: {heal} healed.",
+	"{rt1} Healer bill: {heal} healed. Payment in gold, please.",
+	"{rt1} Mana well spent: {heal} healing.",
+	"{rt1} Nobody dies on my watch: {heal} healed.",
+	"{rt1} Clinic is closing: {heal} healed today.",
+	"{rt1} Bandages used: all of them. {heal} healed.",
+	"{rt1} Holy numbers: {heal} healed.",
+	"{rt1} Priest shift report: {heal} healed. No complaints filed.",
+	"{rt1} Spirit Healer is out of work today: {heal} healed.",
+	"{rt1} Graveyard stays empty: {heal} healed.",
+	"{rt1} Prayers answered: {heal} worth of them.",
+	"{rt1} Warranty repairs complete: {heal} healed.",
+	"{rt1} Health restored: {heal}. Tips are accepted in gold.",
+	"{rt1} Still breathing, all of you: {heal} healed.",
+	"{rt1} Ghost runs cancelled today: {heal} healed.",
+	"{rt1} The Light sends its invoice: {heal} healed.",
+	"{rt1} Another day at the clinic: {heal} healed.",
 }
 
 -- 33143 -> "33.1k", 2000000 -> "2M"
@@ -517,7 +548,7 @@ local function KeptUpNames()
 			end
 		end
 	end
-	return #names > 0 and ("[" .. table.concat(names, "], [") .. "]") or nil
+	return #names > 0 and ("[" .. table.concat(names, ", ") .. "]") or nil
 end
 
 -- The chat for the "GROUP" setting: instance chat in a dungeon-finder group, else raid or party; nil when solo.
@@ -531,22 +562,22 @@ local function GroupChannel()
 	end
 end
 
--- The speaker button: your totals, then who you kept up, to the chat picked in the settings.
+-- The speaker button: your healing, then who you kept up, to the chat picked in the settings.
 local function ReportTotals()
-	local ok, heal, absorb = pcall(function()
-		return PlayerTotal(HEALING) or 0, PlayerTotal(ABSORBS) or 0
+	local ok, heal = pcall(function()
+		return PlayerTotal(HEALING) or 0
 	end)
 	if not ok then
 		print("Holy Moly error: " .. tostring(heal))
 		return
 	end
 	-- Chat refuses secret text from addons, and the totals are secret during combat.
-	if issecretvalue(heal) or issecretvalue(absorb) then
+	if issecretvalue(heal) then
 		print("Holy Moly: totals can't be yelled during combat; try again after the fight.")
 		return
 	end
-	if heal == 0 and absorb == 0 then
-		print("Holy Moly: nothing healed or shielded yet.")
+	if heal == 0 then
+		print("Holy Moly: nothing healed yet.")
 		return
 	end
 	local channel = "YELL"
@@ -563,13 +594,12 @@ local function ReportTotals()
 	local line = ns.RandomLine(names and REPORT_LINES or REPORT_LINES_NO_NAMES)
 	-- A function replacement, so a "%" in a name can't be read as a pattern.
 	line = line:gsub("{heal}", function() return ShortNumber(heal) end)
-		:gsub("{shield}", function() return ShortNumber(absorb) end)
 		:gsub("{names}", function() return names or "" end)
 	ns.SendChat(line, channel)
 end
 
 local yellButton = IconButton("voicechat-icon-speaker", "Yell", "Report totals",
-	"Sends your totals and the three people you healed most in one line. Out of combat only. Where it goes: "
+	"Sends your healing and the three people you healed most in one line. Out of combat only. Where it goes: "
 	.. "Options > AddOns > Holy Moly.", ReportTotals)
 yellButton:SetPoint("RIGHT", resetButton, "LEFT", -6, 0)
 
