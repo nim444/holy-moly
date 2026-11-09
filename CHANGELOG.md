@@ -4,7 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
-- Heal report: healing only (no shield number), a star instead of the moon, names together as `[A, B, C]`, and many more random lines.
+- Heal report: healing only (no shield number), a star instead of the moon and a second star between its two halves, names together as `[A, B, C]`, and many more random lines.
 - Heal buttons: a Renew timer next to Weakened Soul (15 s from your click in combat, read from the buff out of combat).
 - Weakened Soul in combat: the heal buttons time it from your own Power Word: Shield click (15 s), since Forever blocks debuff reads in combat; no more Lua errors from it.
 - Weakened Soul: shows on others in combat again (a secret "is this you" check broke it and caused a Lua taint message).
