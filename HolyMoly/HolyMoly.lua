@@ -459,6 +459,16 @@ local REPORT_LINES = {
 	"{rt1} Health restored: {heal}. {rt1} Dignity restored for {names}: none.",
 	"{rt1} Graveyard stays empty: {heal} healed. {rt1} Nearly filled by {names}.",
 	"{rt1} That's {heal} healing. {rt1} {names} didn't even say thanks.",
+	"{rt1} Your health bars called in sick: {heal} healed. {rt1} Doctor's notes for {names}.",
+	"{rt1} Emergency room closed: {heal} healed. {rt1} Sent home with a lollipop: {names}.",
+	"{rt1} I went to school for this: {heal} healed. {rt1} Student loans paid by {names}.",
+	"{rt1} Today's special: {heal} healing. {rt1} Back for seconds: {names}.",
+	"{rt1} Aggro is not a personality: {heal} healed. {rt1} Listen up, {names}.",
+	"{rt1} The floor is lava, apparently that's news: {heal} healed. {rt1} Looking at you, {names}.",
+	"{rt1} My mana bar filed for divorce: {heal} healed. {rt1} Named in the papers: {names}.",
+	"{rt1} Free healing ended five pulls ago: {heal} healed. {rt1} Collecting from {names}.",
+	"{rt1} Stop hugging the boss: {heal} healed. {rt1} Restraining order for {names}.",
+	"{rt1} Not a single thank-you card: {heal} healed. {rt1} Still waiting on {names}.",
 }
 -- The same without names, for when nobody else was healed or "Name who you kept up" is off.
 local REPORT_LINES_NO_NAMES = {
