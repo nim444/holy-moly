@@ -1,6 +1,6 @@
 # Publishing Holy Moly
 
-How a version gets from this repo to players. The repo is private until the steps under "Going public" are done.
+How a version gets from this repo to players. The repo is public since 11 Nov 2026 (the steps under "Going public").
 
 ## A release
 
@@ -20,14 +20,15 @@ How a version gets from this repo to players. The repo is private until the step
   curseforge.com; new accounts get a random `user_...` name).
 - **Donations:** set the CurseForge project's donation link to PayPal, `https://paypal.me/nim4k`. The same link is
   in the README, `.github/FUNDING.yml` (GitHub's Sponsor button) and `## X-Donate` in the TOC.
-- **Screenshots:** in `docs/screenshots/` (raid and party heal buttons, the tooltip after a fight, buff check, timers,
-  the chat report). Still missing: the settings page. They show other players' names and chat; crop those that
-  should not be public.
+- **Screenshots:** in `docs/screenshots/` (dungeon and raid heal buttons, the box with buff check and timers, the
+  tooltip after a fight, buff check, the chat report), cropped to the addon with every player name blurred; keep
+  doing that for new ones. Still missing: the settings page.
 - **What stays in the public repo:**
-  - `reference/blizzard/` is a copy of a Blizzard forum thread; remove it before going public and keep only the
-    link.
+  - `reference/blizzard/` (a copy of a Blizzard forum thread) is gitignored and was removed from the history before
+    going public; only the link stays.
   - `reference/wiki/` is CC BY-SA 4.0 with attribution headers on each file; it can stay.
   - `reference/api/` is generated from Blizzard's API documentation files and `reference/wow-ui-source/` only
     links to the public mirror; both are common in addon repos.
 - **License:** MIT (`LICENSE`). Change it before the first public release if another license is wanted.
-- **Make the repo public** on GitHub only after the points above.
+- **Made public** on GitHub on 11 Nov 2026, after the points above. The beta screenshots with names and the forum copy
+  were taken out of the whole history first (git filter-repo).

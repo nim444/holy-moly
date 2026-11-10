@@ -37,20 +37,27 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 
 ## Screenshots
 
-In a raid: the heal buttons for all 40 with the click spells in the tooltip, the timers panel and the box.
+From a level 34 dungeon run on WoW Forever: the heal buttons for a party, with the tank alone on the first row
+(blue border) and health and percent on each button.
 
-![Heal buttons in a raid](docs/screenshots/raid-heal-buttons.png)
+![Heal buttons in a dungeon party](docs/screenshots/dungeon-heal-buttons.png)
 
 | | |
 |---|---|
-| ![The box's tooltip after a fight](docs/screenshots/tooltip-after-fight.png) | ![Box, timers panel, buff check and heal buttons in a party](docs/screenshots/heal-buttons-party.png) |
-| Hover the box after a fight: healing per spell, who you healed, recent fights. | In a party: the box, the timers panel, a buff check button and the heal buttons. |
-| ![Buff check](docs/screenshots/buff-check.png) | ![Heal buttons with missing health in red](docs/screenshots/heal-buttons-hover.png) |
-| Buff check: a missing Inner Fire, one click to cast it. | Heal buttons: missing health in red, the click spells on hover. |
+| ![The box with buff check buttons under it](docs/screenshots/box-buff-check.png) | ![The box and the timers panel with a debuff to dispel](docs/screenshots/box-timers.png) |
+| The box after a few dungeons, buff check buttons under it. | The box and the timers panel: a debuff you can dispel, red border. |
+| ![The box's tooltip after a fight](docs/screenshots/tooltip-after-fight.png) | ![Buff check](docs/screenshots/buff-check.png) |
+| Hover the box after a fight: healing per spell, who you healed, recent fights. | Buff check: a missing Inner Fire, one click to cast it. |
+
+In a raid: the heal buttons for everyone, with the click spells in the tooltip.
+
+![Heal buttons in a raid](docs/screenshots/raid-heal-buttons.png)
 
 The speaker button's report in party chat and the "kept up" line:
 
 ![Report in chat](docs/screenshots/report-in-chat.png)
+
+Player names are blurred in all screenshots.
 
 ## Support
 
@@ -64,7 +71,7 @@ Holy Moly is free. If it keeps your group alive and you want to say thanks: [pay
 | `tools/make_icons.py` | Draws `Media/Icon.tga` (the logo) and `Media/Trash.tga` |
 | `tools/package.sh`, `.github/workflows/release.yml` | The release zip and the tag-triggered GitHub release; steps in [docs/PUBLISHING.md](docs/PUBLISHING.md) |
 | `CHANGELOG.md`, `LICENSE` | Release notes per version; MIT |
-| `docs/screenshots/` | Screenshots from the Forever beta, used here and on CurseForge |
+| `docs/screenshots/` | Screenshots from the Forever beta and launch (player names blurred), used here and on CurseForge |
 | `docs/research/priest-addons.md` | What other Priest addons do, what is feasible in Forever, the feature backlog |
 | `reference/` | Offline developer references (below) |
 
@@ -99,7 +106,7 @@ cast targets name people in full (`"Nima Ka"`); a single `|` in a chat message m
 | [reference/api/events.md](reference/api/events.md) | Every event with its payload | Generated |
 | `reference/wow-ui-source/` | Blizzard's UI code for the Forever client (FrameXML, Blizzard addons, API docs). Read it to see how Blizzard's own frames do things | Git submodule, `forever` branch of [Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source) |
 | `reference/wiki/` | Guide pages: getting started, TOC format, events, saved variables, widget API, secret values, secure templates and taint, and the API change logs for Forever 1.60.1 and Midnight 12.0.0 to 12.1.5 | [warcraft.wiki.gg](https://warcraft.wiki.gg), CC BY-SA 4.0 |
-| `reference/blizzard/` | Blizzard's WoW Forever beta development notes thread | [Blizzard forums](https://us.forums.blizzard.com/en/wow/t/2360696) |
+| `reference/blizzard/` | Blizzard's WoW Forever beta development notes thread; `tools/fetch_docs.py` saves it locally, it is not committed (gitignored) | [Blizzard forums](https://us.forums.blizzard.com/en/wow/t/2360696) |
 
 ## Refresh after a new Forever build
 
