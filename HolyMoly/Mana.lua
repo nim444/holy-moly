@@ -114,6 +114,48 @@ local drinkButton = ns.IconButton("Interface\\Icons\\INV_Drink_07", "Drink", "As
 drinkButton:SetSize(16, 16)
 drinkButton:SetPoint("LEFT", bar, "RIGHT", 6, 0)
 
+-- Low mana after a fight: when a fight ends with your mana under the low-mana threshold and you're in a group, one
+-- of these goes to the group chat (party, raid or instance) so they wait for you before the next pull; %d is your
+-- mana percent. Out of combat the mana is readable, so the number is real. At most once every TELL_GAP seconds.
+local WAIT_LINES = {
+	"{rt5} Hey, slow down! I'm at %d%% mana. Wait for me before the next pull.",
+	"{rt5} Healer on %d%% mana. The next pull waits for my drink, or you wait for the Spirit Healer.",
+	"{rt5} Mana check: %d%%. Pull now and you're healing yourselves.",
+	"{rt5} The Light runs on mana and I'm at %d%%. One drink before the next round, please.",
+	"{rt5} %d%% mana left. Tank, take a breath; I'm taking a drink.",
+	"{rt5} Out of holy juice: %d%% mana. Drinking, then we go.",
+	"{rt5} Hold up! %d%% mana. My drink is not optional.",
+	"{rt5} %d%% mana. Whoever pulls now has volunteered to tank the floor.",
+	"{rt5} Easy there, heroes. %d%% mana left; next round after my drink.",
+	"{rt5} Low battery: %d%% mana. Recharging, please hold.",
+	"{rt5} Go slow, friends: %d%% mana. Give me a moment before the next pull.",
+	"{rt5} Healing is paused at %d%% mana. Wait for the drink, then we ride.",
+}
+local TELL_GAP = 20
+local lastTold = 0
+
+local function TellLowMana()
+	if not ns.Get("lowManaTell") or InCombatLockdown() or UnitIsDeadOrGhost("player")
+		or GetTime() - lastTold < TELL_GAP then
+		return
+	end
+	local channel = ns.GroupChannel and ns.GroupChannel()
+	if not channel then
+		return
+	end
+	local mana, maxMana = UnitPower("player", MANA), UnitPowerMax("player", MANA)
+	if issecretvalue(mana) or issecretvalue(maxMana) or maxMana == 0 then
+		return
+	end
+	local percent = math.floor(mana / maxMana * 100 + 0.5)
+	if percent >= ns.Get("lowManaPercent") then
+		return
+	end
+	if ns.SendChat(ns.RandomLine(WAIT_LINES):format(percent), channel) then
+		lastTold = GetTime()
+	end
+end
+
 local function ManaCost(spellID)
 	local costs = C_Spell.GetSpellPowerCost(spellID)
 	for _, cost in ipairs(costs or {}) do
@@ -139,6 +181,8 @@ frame:SetScript("OnEvent", function(_, event, ...)
 			lastSpent, lastPerMinute = fightSpent, PerMinute(fightSpent, GetTime() - fightStart)
 		end
 		fightStart = nil
+		-- A moment after the fight, so a pull that follows at once (still in combat) skips it.
+		C_Timer.After(1, TellLowMana)
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 		local _, _, spellID = ...
 		if fightStart and not issecretvalue(spellID) then

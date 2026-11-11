@@ -4,6 +4,8 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Low mana: when a fight ends with your mana under the low-mana threshold, a random line in party, raid or instance chat asks the group to wait before the next pull, with your mana percent ("Ask the group to wait" in the settings, on by default, at most every 20 seconds).
+- Heal report: half the time it sends the bill: what the healing cost in mana, with tips in gold and mana potions, flasks and elixirs welcome as donations (20 new lines).
 - Heal buttons: a Preview button in the settings shows a sample party (tank, a low one with a gold flash, a dead one) in the chosen bar style, width, size and threshold, until the settings close; `/holy preview` shows it where the heal buttons sit, for screenshots.
 - Heal buttons: three bar styles in the settings: 1. Classic, 2. Gilded (our own textures: a brushed bar with a sheen in a thin gold frame, a spark at the edge of the health, a gold flash when your heal from a button lands), 3. Gilded with class colors. Gilded is the new default.
 - Heal buttons: Shift-click the minimap button, or type `/holy heals`, to turn them on or off (in combat it happens when the fight ends).

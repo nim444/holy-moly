@@ -27,6 +27,7 @@ local DEFAULTS = {
 	healShiftRight = "BIGGEST",
 	lowMana = true,
 	lowManaPercent = 20,
+	lowManaTell = true, -- after a fight under the threshold, ask the group to wait (Mana.lua)
 	history = true,
 }
 
@@ -228,6 +229,7 @@ local function RegisterPanel()
 	Header("Mana")
 	Checkbox("lowMana", "Low-mana warning", "The mana bar glows red below the threshold, also in combat.")
 	Slider("lowManaPercent", "Low-mana threshold", "The mana percent where the warning starts.", 10, 50, 5, Percent)
+	Checkbox("lowManaTell", "Ask the group to wait", "When a fight ends with your mana under the threshold, a random line in party, raid or instance chat asks them to wait for you before the next pull, with your mana percent. At most every 20 seconds.")
 
 	Settings.RegisterAddOnCategory(category)
 end

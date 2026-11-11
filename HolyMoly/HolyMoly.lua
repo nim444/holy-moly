@@ -494,6 +494,34 @@ local REPORT_LINES_NO_NAMES = {
 	"{rt1} Another day at the clinic: {heal} healed.",
 }
 
+-- Half the time the report sends the bill instead: what the healing cost in mana ({mana}, your own sum of spell costs
+-- in the last fight, from Mana.lua), with gold tips and mana potions, flasks and elixirs welcome. Only when that sum
+-- is known; otherwise the lines above.
+local MANA_BILL_LINES = {
+	"{rt1} {heal} healed for {mana} mana. {rt1} Invoice sent to {names}; tips accepted in gold.",
+	"{rt1} That healing cost me {mana} mana. {rt1} {names}, mana potions are welcome donations.",
+	"{rt1} {heal} healed, {mana} mana spent. {rt1} {names}, flasks and elixirs make lovely thank-you gifts.",
+	"{rt1} Healing isn't free: {mana} mana for {heal}. {rt1} {names}, tips in gold, potions also accepted.",
+	"{rt1} Mana bill: {mana} for {heal} healing. {rt1} Payable by {names} in gold or mana potions.",
+	"{rt1} {heal} healing, paid with {mana} of my mana. {rt1} Elixir donations from {names} gladly accepted.",
+	"{rt1} Invoice #{heal}: {mana} mana. {rt1} Due from {names}. Gold, potions or flasks.",
+	"{rt1} {names} cost me {mana} mana. {rt1} {heal} healed. The tip jar takes gold and mana potions.",
+	"{rt1} The Light charged {mana} mana for {heal} healing. {rt1} {names}, the collection plate is coming around.",
+	"{rt1} {heal} healed on {mana} mana. {rt1} {names}, I accept gold, potions, flasks and compliments.",
+	"{rt1} Priest services rendered: {heal} healing, {mana} mana. {rt1} Tips from {names} accepted in gold.",
+	"{rt1} {mana} mana poured into {names}. {rt1} {heal} healed. A mana potion says thank you best.",
+}
+local MANA_BILL_LINES_NO_NAMES = {
+	"{rt1} {heal} healed for {mana} mana. {rt1} Tips accepted in gold.",
+	"{rt1} Healing isn't free: {mana} mana for {heal}. {rt1} Mana potions welcome as donations.",
+	"{rt1} Mana bill: {mana} for {heal} healing. {rt1} Payable in gold, potions or flasks.",
+	"{rt1} {heal} healed, {mana} mana spent. {rt1} Elixirs and flasks make lovely thank-you gifts.",
+	"{rt1} Invoice #{heal}: {mana} mana. {rt1} Gold, potions or flasks accepted.",
+	"{rt1} The Light charged {mana} mana for {heal} healing. {rt1} The collection plate is coming around.",
+	"{rt1} {heal} healed on {mana} mana. {rt1} I accept gold, potions, flasks and compliments.",
+	"{rt1} Priest services rendered: {heal} healing, {mana} mana. {rt1} The tip jar takes gold.",
+}
+
 -- 33143 -> "33.1k", 2000000 -> "2M"
 local function ShortNumber(n)
 	if n >= 1e6 then
@@ -571,6 +599,7 @@ local function GroupChannel()
 		return "PARTY"
 	end
 end
+ns.GroupChannel = GroupChannel
 
 -- The speaker button: your healing, then who you kept up, to the chat picked in the settings.
 local function ReportTotals()
@@ -601,9 +630,17 @@ local function ReportTotals()
 		end
 	end
 	local names = ns.Get("keptUp") and KeptUpNames()
-	local line = ns.RandomLine(names and REPORT_LINES or REPORT_LINES_NO_NAMES)
+	local mana = ns.LastFightMana and ns.LastFightMana()
+	local lines
+	if mana and mana > 0 and math.random() < 0.5 then
+		lines = names and MANA_BILL_LINES or MANA_BILL_LINES_NO_NAMES
+	else
+		lines = names and REPORT_LINES or REPORT_LINES_NO_NAMES
+	end
+	local line = ns.RandomLine(lines)
 	-- A function replacement, so a "%" in a name can't be read as a pattern.
 	line = line:gsub("{heal}", function() return ShortNumber(heal) end)
+		:gsub("{mana}", function() return ShortNumber(mana or 0) end)
 		:gsub("{names}", function() return names or "" end)
 	ns.SendChat(line, channel)
 end

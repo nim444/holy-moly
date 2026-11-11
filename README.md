@@ -12,9 +12,12 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 - **Hover the box:** healing per spell with icons, shares and overheal, who you healed and how often, and your
   recent fights with a comparison to the one before.
 - **Speaker button:** sends one line with your totals and the three others you healed most ("[Name]", by first
-  name), picked from a dozen Priest lines, as a yell, a say or to group chat. Out of combat only, never when both totals
-  are 0.
-- **Drink button** on the mana bar: yells a "wait, I need to drink" line with your mana percent.
+  name), picked from dozens of Priest lines, as a yell, a say or to group chat; half the time it is the bill instead,
+  what the healing cost in mana, with tips in gold and mana potions, flasks and elixirs welcome. Out of combat only,
+  never when both totals are 0.
+- **Drink button** on the mana bar: yells a "wait, I need to drink" line with your mana percent. And when a fight
+  ends with your mana under the low-mana threshold, a line in group chat asks them to wait before the next pull
+  (a setting).
 - **Timers panel** under the box: debuffs you can dispel (red border), then your Renews, shields, other HoTs and
   Weakened Soul on each group member, as icons with the game's own cooldown sweep.
 - **Buff check:** out of combat, buttons for Priest buffs someone in the group is missing or has under 5 minutes
