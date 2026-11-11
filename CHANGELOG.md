@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons: Shift + right click and Shift + middle click, each with its own spell in the settings (Dispel Magic and Cure Disease to start).
 - Heal buttons: the health someone is missing ("-600") instead of their health and percent, hidden at full health, so you see what a heal has to fill.
 - Heal buttons: a class icon before each name.
 - Heal buttons: a Width setting (80 to 260, default 120) in Options > AddOns > Holy Moly; a change in combat waits for the fight to end.

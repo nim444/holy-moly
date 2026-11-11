@@ -1,7 +1,8 @@
 -- Heal grid: a button for each party or raid member that lights up with a red border when they drop under the
 -- threshold (30% by default) and stays faint above it. Each shows their class icon, their name and how much health
 -- they are missing ("-600", nothing at full health); the width is a setting. A left click casts Flash Heal on them, a right click the
--- biggest heal, a middle click Renew, a shift + left click Power Word: Shield; each can be changed in the settings.
+-- biggest heal, a middle click Renew, a shift + left click Power Word: Shield, a shift + right click Dispel Magic and a
+-- shift + middle click Cure Disease; each can be changed in the settings.
 -- Works in combat.
 --
 -- The tank's button gets a blue border and a shield mark, so you keep an eye on them: whoever the game gives the
@@ -33,6 +34,8 @@ local CLICKS = {
 	{ type = "type2", spell = "spell2", key = "healRight", label = "Right click" },
 	{ type = "type3", spell = "spell3", key = "healMiddle", label = "Middle click" },
 	{ type = "shift-type1", spell = "shift-spell1", key = "healShiftLeft", label = "Shift + left click" },
+	{ type = "shift-type2", spell = "shift-spell2", key = "healShiftRight", label = "Shift + right click" },
+	{ type = "shift-type3", spell = "shift-spell3", key = "healShiftMiddle", label = "Shift + middle click" },
 }
 local BUTTON_HEIGHT, GAP = 24, 2
 local PARTY_COLUMNS = 2 -- a party: the tank alone on the first row, everyone else two by two under them
@@ -475,9 +478,10 @@ end
 -- (UNIT_SPELLCAST_SUCCEEDED).
 local pendingShield
 local CLICK_KEYS = { LeftButton = "healLeft", RightButton = "healRight", MiddleButton = "healMiddle" }
+local SHIFT_CLICK_KEYS = { LeftButton = "healShiftLeft", RightButton = "healShiftRight", MiddleButton = "healShiftMiddle" }
 
 NoteShieldClick = function(button, mouseButton, shift)
-	local key = (shift and mouseButton == "LeftButton") and "healShiftLeft" or CLICK_KEYS[mouseButton]
+	local key = (shift and SHIFT_CLICK_KEYS or CLICK_KEYS)[mouseButton]
 	for _, click in ipairs(CLICKS) do
 		if click.key == key and (click.text == SHIELD or click.text == RENEW) then
 			pendingShield = { button = button, time = GetTime(), spell = click.text }

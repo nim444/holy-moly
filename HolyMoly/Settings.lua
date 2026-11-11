@@ -22,6 +22,8 @@ local DEFAULTS = {
 	healRight = "BIGGEST",
 	healMiddle = "Renew",
 	healShiftLeft = "Power Word: Shield",
+	healShiftRight = "Dispel Magic",
+	healShiftMiddle = "Cure Disease",
 	lowMana = true,
 	lowManaPercent = 20,
 	history = true,
@@ -160,6 +162,10 @@ local function RegisterPanel()
 	Dropdown("healMiddle", "Middle click", "What a middle click on a heal button casts.", ClickChoices("healMiddle"))
 	Dropdown("healShiftLeft", "Shift + left click", "What a left click with Shift held casts on a heal button.",
 		ClickChoices("healShiftLeft"))
+	Dropdown("healShiftRight", "Shift + right click", "What a right click with Shift held casts on a heal button.",
+		ClickChoices("healShiftRight"))
+	Dropdown("healShiftMiddle", "Shift + middle click", "What a middle click with Shift held casts on a heal button.",
+		ClickChoices("healShiftMiddle"))
 
 	Header("Timers and buffs")
 	Checkbox("timers", "HoT and shield timers", "The panel under the box with your heals over time and shields on each person.")
