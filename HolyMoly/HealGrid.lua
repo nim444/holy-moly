@@ -1,8 +1,8 @@
 -- Heal grid: a button for each party or raid member that lights up with a red border when they drop under the
 -- threshold (30% by default) and stays faint above it. Each shows their class icon, their name and how much health
--- they are missing ("-600", nothing at full health); the width is a setting. A left click casts Flash Heal on them, a right click the
--- biggest heal, a middle click Renew, a shift + left click Power Word: Shield, a shift + right click Dispel Magic and a
--- shift + middle click Cure Disease; each can be changed in the settings.
+-- they are missing ("-600", nothing at full health); the width is a setting. Six clicks, each changeable in the settings:
+-- left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle Power Word: Shield, right Penance and
+-- Shift + right the biggest heal. Their tooltip (who it is, what each click casts) shows only while Alt is held.
 -- Works in combat.
 --
 -- The tank's button gets a blue border and a shield mark, so you keep an eye on them: whoever the game gives the
@@ -31,11 +31,11 @@ local STAND_INS = { ["Flash Heal"] = "Lesser Heal" }
 -- setting that picks what each does.
 local CLICKS = {
 	{ type = "type1", spell = "spell1", key = "healLeft", label = "Left click" },
-	{ type = "type2", spell = "spell2", key = "healRight", label = "Right click" },
-	{ type = "type3", spell = "spell3", key = "healMiddle", label = "Middle click" },
 	{ type = "shift-type1", spell = "shift-spell1", key = "healShiftLeft", label = "Shift + left click" },
-	{ type = "shift-type2", spell = "shift-spell2", key = "healShiftRight", label = "Shift + right click" },
+	{ type = "type3", spell = "spell3", key = "healMiddle", label = "Middle click" },
 	{ type = "shift-type3", spell = "shift-spell3", key = "healShiftMiddle", label = "Shift + middle click" },
+	{ type = "type2", spell = "spell2", key = "healRight", label = "Right click" },
+	{ type = "shift-type2", spell = "shift-spell2", key = "healShiftRight", label = "Shift + right click" },
 }
 local BUTTON_HEIGHT, GAP = 24, 2
 local PARTY_COLUMNS = 2 -- a party: the tank alone on the first row, everyone else two by two under them
@@ -110,8 +110,9 @@ handle:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_TOP")
 	GameTooltip:SetText("Holy Moly heals")
 	GameTooltip:AddLine("A button lights up red when that person drops under " .. ns.Get("healGridPercent")
-		.. "% health. The tank has a blue border and a shield; /holy tank marks your target as tank. Drag here to"
-		.. " move the grid with this icon (out of combat).", 1, 1, 1, true)
+		.. "% health. The tank has a blue border and a shield; /holy tank marks your target as tank. Hold Alt over a"
+		.. " button to see who it is and what each click casts. Drag here to move the grid with this icon (out of"
+		.. " combat).", 1, 1, 1, true)
 	GameTooltip:Show()
 end)
 handle:SetScript("OnLeave", GameTooltip_Hide)
@@ -311,6 +312,36 @@ local function ShowTooltip(self)
 	GameTooltip:Show()
 end
 
+-- A button's tooltip shows only while Alt is held, so it doesn't cover the grid while you heal: on entering with Alt
+-- down, or when Alt goes down while the mouse is over a button (and it goes away when Alt is let go).
+local hovered
+local function OnButtonEnter(self)
+	hovered = self
+	if IsAltKeyDown() then
+		ShowTooltip(self)
+	end
+end
+local function OnButtonLeave(self)
+	if hovered == self then
+		hovered = nil
+	end
+	if GameTooltip:IsOwned(self) then
+		GameTooltip:Hide()
+	end
+end
+local altFrame = CreateFrame("Frame")
+altFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
+altFrame:SetScript("OnEvent", function(_, _, key)
+	if not hovered or (key ~= "LALT" and key ~= "RALT") then
+		return
+	end
+	if IsAltKeyDown() then
+		ShowTooltip(hovered)
+	elseif GameTooltip:IsOwned(hovered) then
+		GameTooltip:Hide()
+	end
+end)
+
 local function Place(button, column, row, width)
 	button:ClearAllPoints()
 	button:SetSize(width or ButtonWidth(), BUTTON_HEIGHT)
@@ -437,8 +468,8 @@ local function CreateUnitButton(parent, unit, index, columns)
 	renew:SetAlpha(0)
 	button.renew = renew
 
-	button:HookScript("OnEnter", ShowTooltip)
-	button:HookScript("OnLeave", GameTooltip_Hide)
+	button:HookScript("OnEnter", OnButtonEnter)
+	button:HookScript("OnLeave", OnButtonLeave)
 	button:HookScript("OnShow", QueueUpdate)
 	button:HookScript("PostClick", function(self, mouseButton)
 		NoteShieldClick(self, mouseButton, IsShiftKeyDown())

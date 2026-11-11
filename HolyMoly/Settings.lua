@@ -19,11 +19,11 @@ local DEFAULTS = {
 	healGridWidth = 120, -- one heal button's width; a party's tank row spans two
 	healGridPercent = 30,
 	healLeft = "Flash Heal", -- a spell name, "BIGGEST" (the biggest heal known) or "TARGET"
-	healRight = "BIGGEST",
+	healShiftLeft = "Lesser Heal",
 	healMiddle = "Renew",
-	healShiftLeft = "Power Word: Shield",
-	healShiftRight = "Dispel Magic",
-	healShiftMiddle = "Cure Disease",
+	healShiftMiddle = "Power Word: Shield",
+	healRight = "Penance", -- the biggest heal until it is learned
+	healShiftRight = "BIGGEST",
 	lowMana = true,
 	lowManaPercent = 20,
 	history = true,
@@ -37,6 +37,29 @@ local CLICK_SPELLS = {
 }
 
 local listeners = {}
+
+-- The click defaults before 11 Nov 2026 (the second set). A saved click still on its old default moves to the new
+-- one; a click someone picked themselves stays. Runs once, before the panel registers the settings.
+local OLD_CLICK_DEFAULTS = {
+	healRight = "BIGGEST",
+	healShiftLeft = "Power Word: Shield",
+	healShiftRight = "Dispel Magic",
+	healShiftMiddle = "Cure Disease",
+}
+local CLICK_DEFAULTS_VERSION = 2
+
+local function MigrateClickDefaults()
+	if (HolyMolyDB.clickDefaults or 1) >= CLICK_DEFAULTS_VERSION then
+		return
+	end
+	local settings = HolyMolyDB.settings
+	for key, old in pairs(OLD_CLICK_DEFAULTS) do
+		if settings[key] == old then
+			settings[key] = nil
+		end
+	end
+	HolyMolyDB.clickDefaults = CLICK_DEFAULTS_VERSION
+end
 
 function ns.Get(key)
 	local settings = HolyMolyDB and HolyMolyDB.settings
@@ -158,14 +181,14 @@ local function RegisterPanel()
 	Slider("healGridPercent", "Low-health threshold", "The health percent where a heal button lights up.", 10, 60, 5,
 		Percent)
 	Dropdown("healLeft", "Left click", "What a left click on a heal button casts.", ClickChoices("healLeft"))
-	Dropdown("healRight", "Right click", "What a right click on a heal button casts.", ClickChoices("healRight"))
-	Dropdown("healMiddle", "Middle click", "What a middle click on a heal button casts.", ClickChoices("healMiddle"))
 	Dropdown("healShiftLeft", "Shift + left click", "What a left click with Shift held casts on a heal button.",
 		ClickChoices("healShiftLeft"))
-	Dropdown("healShiftRight", "Shift + right click", "What a right click with Shift held casts on a heal button.",
-		ClickChoices("healShiftRight"))
+	Dropdown("healMiddle", "Middle click", "What a middle click on a heal button casts.", ClickChoices("healMiddle"))
 	Dropdown("healShiftMiddle", "Shift + middle click", "What a middle click with Shift held casts on a heal button.",
 		ClickChoices("healShiftMiddle"))
+	Dropdown("healRight", "Right click", "What a right click on a heal button casts.", ClickChoices("healRight"))
+	Dropdown("healShiftRight", "Shift + right click", "What a right click with Shift held casts on a heal button.",
+		ClickChoices("healShiftRight"))
 
 	Header("Timers and buffs")
 	Checkbox("timers", "HoT and shield timers", "The panel under the box with your heals over time and shields on each person.")
@@ -191,6 +214,7 @@ frame:SetScript("OnEvent", function(self, _, loaded)
 	HolyMolyDB.healed = HolyMolyDB.healed or {}
 	HolyMolyDB.history = HolyMolyDB.history or {}
 	HolyMolyDB.tanks = HolyMolyDB.tanks or {}
+	MigrateClickDefaults()
 	local ok, err = pcall(RegisterPanel)
 	if not ok then
 		print("Holy Moly: the settings page could not be added: " .. tostring(err))

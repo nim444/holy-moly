@@ -23,9 +23,9 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 - **Heal buttons:** a grid of your party or raid, one button per person with class icon, name, health bar and
   the health they are missing ("-600", nothing at full health); the width is a setting. Faint while
   they are fine, a red border under 30% health (Forever hides health from addons, so the game itself applies the
-  threshold). Left click casts Flash Heal, right click Greater Heal (or the biggest heal you know), middle click Renew,
-  Shift + left click Power Word: Shield, Shift + right click Dispel Magic, Shift + middle click Cure Disease, in
-  combat too; each click can be changed in the settings.
+  threshold). Six clicks, in combat too: left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle
+  Power Word: Shield, right Penance (the biggest heal until you learn it), Shift + right the biggest heal you know;
+  each can be changed in the settings. Hold Alt over a button for its tooltip (who it is, what each click casts).
   The tank has a blue border and a shield mark: the tank role from the group finder, a raid's main tank, or whoever
   you mark with `/holy tank` (target them first; again to unmark, `/holy tank clear` to clear all).
   Each shows health and percent; in a party the tank has the first row to themselves, the rest two by two.
