@@ -20,7 +20,8 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 - **Buff check:** out of combat, buttons for Priest buffs someone in the group is missing or has under 5 minutes
   left on (Fortitude, Divine Spirit, Shadow Protection, Inner Fire, Fear Ward); a click casts it on the first one
   who needs it, missing before running out.
-- **Heal buttons:** a grid of your party or raid, one button per person with name and health bar. Faint while
+- **Heal buttons:** a grid of your party or raid, one button per person with class icon, name, health bar and
+  the health they are missing ("-600", nothing at full health); the width is a setting. Faint while
   they are fine, a red border under 30% health (Forever hides health from addons, so the game itself applies the
   threshold). Left click casts Flash Heal, right click Greater Heal (or the biggest heal you know), middle click Renew,
   Shift + left click Power Word: Shield, in combat too; each click can be changed in the settings.

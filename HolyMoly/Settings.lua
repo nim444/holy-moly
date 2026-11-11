@@ -16,6 +16,7 @@ local DEFAULTS = {
 	buffCheck = true,
 	healGrid = true,
 	healGridScale = 1,
+	healGridWidth = 120, -- one heal button's width; a party's tank row spans two
 	healGridPercent = 30,
 	healLeft = "Flash Heal", -- a spell name, "BIGGEST" (the biggest heal known) or "TARGET"
 	healRight = "BIGGEST",
@@ -150,6 +151,8 @@ local function RegisterPanel()
 	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat.")
 	Slider("healGridScale", "Size", "Makes the heal buttons bigger or smaller, apart from the box.", 0.6, 2, 0.05,
 		function(value) return Percent(value * 100 + 0.5) end)
+	Slider("healGridWidth", "Width", "How wide each heal button is, for longer names or a narrower grid. In a party the tank's button spans two. A change made in combat waits for the fight to end.",
+		80, 260, 10, function(value) return ("%d"):format(value) end)
 	Slider("healGridPercent", "Low-health threshold", "The health percent where a heal button lights up.", 10, 60, 5,
 		Percent)
 	Dropdown("healLeft", "Left click", "What a left click on a heal button casts.", ClickChoices("healLeft"))

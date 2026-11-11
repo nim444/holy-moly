@@ -1,5 +1,6 @@
 -- Heal grid: a button for each party or raid member that lights up with a red border when they drop under the
--- threshold (30% by default) and stays faint above it. A left click casts Flash Heal on them, a right click the
+-- threshold (30% by default) and stays faint above it. Each shows their class icon, their name and how much health
+-- they are missing ("-600", nothing at full health); the width is a setting. A left click casts Flash Heal on them, a right click the
 -- biggest heal, a middle click Renew, a shift + left click Power Word: Shield; each can be changed in the settings.
 -- Works in combat.
 --
@@ -33,16 +34,27 @@ local CLICKS = {
 	{ type = "type3", spell = "spell3", key = "healMiddle", label = "Middle click" },
 	{ type = "shift-type1", spell = "shift-spell1", key = "healShiftLeft", label = "Shift + left click" },
 }
-local BUTTON_WIDTH, BUTTON_HEIGHT, GAP = 120, 24, 2
+local BUTTON_HEIGHT, GAP = 24, 2
 local PARTY_COLUMNS = 2 -- a party: the tank alone on the first row, everyone else two by two under them
 local RAID_COLUMNS = 5
 local FADED_ALPHA = 0.4
 local HANDLE_HEIGHT = 14
 local TANK_ICON_SIZE = 12
+local CLASS_ICON_SIZE = BUTTON_HEIGHT - 8
+-- The class icons' fallback when the client has no "classicon-<class>" atlas: the round icons, cut by CLASS_ICON_TCOORDS.
+local CLASS_ICON_CIRCLES = "Interface\\TargetingFrame\\UI-Classes-Circles"
 local WEAKENED_SOUL_ICON = "Interface\\Icons\\Spell_Holy_AshesToAshes"
 
+-- A button's width comes from the settings (Options > AddOns > Holy Moly > Heal buttons > Width).
+local function ButtonWidth()
+	return ns.Get("healGridWidth")
+end
+
 local grid = CreateFrame("Frame", "HolyMolyHealGrid", UIParent)
-grid:SetSize(PARTY_COLUMNS * BUTTON_WIDTH + (PARTY_COLUMNS - 1) * GAP, HANDLE_HEIGHT + 3 * (BUTTON_HEIGHT + GAP))
+local function SizeGrid()
+	grid:SetSize(PARTY_COLUMNS * ButtonWidth() + (PARTY_COLUMNS - 1) * GAP, HANDLE_HEIGHT + 3 * (BUTTON_HEIGHT + GAP))
+end
+SizeGrid()
 grid:SetClampedToScreen(true)
 grid:SetMovable(true)
 
@@ -101,11 +113,12 @@ handle:SetScript("OnEnter", function(self)
 end)
 handle:SetScript("OnLeave", GameTooltip_Hide)
 
--- Health percent 0-100 for the text: the game evaluates it, the result stays secret and goes straight to text.
-local percentCurve = C_CurveUtil.CreateCurve()
-percentCurve:SetType(Enum.LuaCurveType.Linear)
-percentCurve:AddPoint(0, 0)
-percentCurve:AddPoint(1, 100)
+-- The missing-health text shows below full health and hides at full health: 1 under 100%, 0 at 100%. The number
+-- itself is secret and can't be compared with zero, so the game decides through this curve.
+local missingCurve = C_CurveUtil.CreateCurve()
+missingCurve:SetType(Enum.LuaCurveType.Step)
+missingCurve:AddPoint(0, 1)
+missingCurve:AddPoint(1, 0)
 
 local lowCurve = C_CurveUtil.CreateCurve()
 lowCurve:SetType(Enum.LuaCurveType.Step)
@@ -197,6 +210,26 @@ local function UpdateWeakenedSoul(button)
 	end
 end
 
+-- The class icon: the "classicon-<class>" atlas, or the round class icons where the client lacks it. A class the
+-- game keeps secret leaves the icon as it was; it is only looked up again when the class changes.
+local function UpdateClass(button)
+	local _, classFile = UnitClass(button.unit)
+	if classFile == nil or issecretvalue(classFile) or classFile == button.classFile then
+		return
+	end
+	button.classFile = classFile
+	local icon = button.class
+	if pcall(icon.SetAtlas, icon, "classicon-" .. classFile:lower()) and icon:GetAtlas() then
+		icon:SetAlpha(1)
+	elseif CLASS_ICON_TCOORDS and CLASS_ICON_TCOORDS[classFile] then
+		icon:SetTexture(CLASS_ICON_CIRCLES)
+		icon:SetTexCoord(unpack(CLASS_ICON_TCOORDS[classFile]))
+		icon:SetAlpha(1)
+	else
+		icon:SetAlpha(0)
+	end
+end
+
 local function UpdateButton(button)
 	local unit = button.unit
 	UpdateTank(button)
@@ -207,21 +240,26 @@ local function UpdateButton(button)
 	if not pcall(UpdateRenew, button) then
 		button.renew:SetAlpha(0)
 	end
+	pcall(UpdateClass, button)
 	button.name:SetText(UnitName(unit))
 	button.health:SetMinMaxValues(0, UnitHealthMax(unit))
 	button.health:SetValue(UnitHealth(unit))
 	if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then
 		button.hp:SetText(UnitIsConnected(unit) and "Dead" or "Offline")
+		button.hp:SetTextColor(1, 1, 1)
+		button.hp:SetAlpha(1)
 		button.content:SetAlpha(FADED_ALPHA)
 		button.low:SetAlpha(0)
 	else
-		-- "1.2K 85%": secret values may be formatted and joined, and SetText takes the result; if this client
-		-- refuses, the text stays empty and the bar still works.
+		-- "-600": the health they are missing, what a heal has to fill. Secret values may be formatted and joined,
+		-- and SetText takes the result; if this client refuses, the text stays empty and the bar still works. At
+		-- full health the text hides through missingCurve.
 		local ok, text = pcall(function()
-			return AbbreviateLargeNumbers(UnitHealth(unit)) .. " "
-				.. string.format("%.0f%%", UnitHealthPercent(unit, true, percentCurve))
+			return "-" .. AbbreviateLargeNumbers(UnitHealthMissing(unit))
 		end)
 		button.hp:SetText(ok and text or "")
+		button.hp:SetTextColor(1, 0.45, 0.45)
+		button.hp:SetAlpha(UnitHealthPercent(unit, true, missingCurve))
 		button.content:SetAlpha(UnitHealthPercent(unit, true, fadeCurve))
 		button.low:SetAlpha(UnitHealthPercent(unit, true, lowCurve))
 	end
@@ -272,8 +310,8 @@ end
 
 local function Place(button, column, row, width)
 	button:ClearAllPoints()
-	button:SetSize(width or BUTTON_WIDTH, BUTTON_HEIGHT)
-	button:SetPoint("TOPLEFT", column * (BUTTON_WIDTH + GAP), -row * (BUTTON_HEIGHT + GAP))
+	button:SetSize(width or ButtonWidth(), BUTTON_HEIGHT)
+	button:SetPoint("TOPLEFT", column * (ButtonWidth() + GAP), -row * (BUTTON_HEIGHT + GAP))
 end
 
 local NoteShieldClick -- defined with the click settings below
@@ -281,7 +319,9 @@ local NoteShieldClick -- defined with the click settings below
 local function CreateUnitButton(parent, unit, index, columns)
 	local button = CreateFrame("Button", nil, parent, "SecureUnitButtonTemplate")
 	button.unit = unit
-	Place(button, (index - 1) % columns, math.floor((index - 1) / columns))
+	-- Its spot in the grid, kept for a width change (a party's buttons are moved again by LayoutParty).
+	button.column, button.row = (index - 1) % columns, math.floor((index - 1) / columns)
+	Place(button, button.column, button.row)
 	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
 	button:SetAttribute("unit", unit)
 
@@ -320,7 +360,14 @@ local function CreateUnitButton(parent, unit, index, columns)
 	hp:SetWordWrap(false)
 	button.hp = hp
 
-	name:SetPoint("LEFT", 3, 0)
+	-- The class icon at the left, on the text frame so it stays clear while the bar is faint; the name follows it.
+	local class = text:CreateTexture(nil, "OVERLAY")
+	class:SetSize(CLASS_ICON_SIZE, CLASS_ICON_SIZE)
+	class:SetPoint("LEFT", 3, 0)
+	class:SetAlpha(0)
+	button.class = class
+
+	name:SetPoint("LEFT", class, "RIGHT", 3, 0)
 	name:SetPoint("RIGHT", hp, "LEFT", -3, 0)
 	name:SetJustifyH("LEFT")
 	name:SetWordWrap(false)
@@ -590,7 +637,7 @@ function LayoutParty()
 	lastLayout = key
 	local row = 0
 	if tank then
-		Place(tank, 0, 0, PARTY_COLUMNS * BUTTON_WIDTH + (PARTY_COLUMNS - 1) * GAP)
+		Place(tank, 0, 0, PARTY_COLUMNS * ButtonWidth() + (PARTY_COLUMNS - 1) * GAP)
 		row = 1
 	end
 	for i, button in ipairs(present) do
@@ -655,6 +702,19 @@ ns.OnSettingChanged("healGridScale", function()
 	OutOfCombat(function()
 		grid:SetScale(ns.Get("healGridScale"))
 	end)
+end)
+-- A new width moves every button to its spot at that width; secure buttons can't be resized in combat, so a change
+-- made during a fight waits for its end.
+local function Relayout()
+	SizeGrid()
+	for _, button in ipairs(buttons) do
+		Place(button, button.column, button.row)
+	end
+	lastLayout = nil
+	LayoutParty()
+end
+ns.OnSettingChanged("healGridWidth", function()
+	OutOfCombat(Relayout)
 end)
 
 local frame = CreateFrame("Frame")
