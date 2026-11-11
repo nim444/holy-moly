@@ -16,8 +16,8 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   what the healing cost in mana, with tips in gold and mana potions, flasks and elixirs welcome. Out of combat only,
   never when both totals are 0.
 - **Drink button** on the mana bar: yells a "wait, I need to drink" line with your mana percent. And when a fight
-  ends with your mana under the low-mana threshold, a line in group chat asks them to wait before the next pull
-  (a setting).
+  ends with your mana under the low-mana threshold, a line in group chat asks them to wait before the next pull,
+  with the /oom emote (both settings).
 - **Timers panel** under the box: debuffs you can dispel (red border), then your Renews, shields, other HoTs and
   Weakened Soul on each group member, as icons with the game's own cooldown sweep.
 - **Buff check:** out of combat, buttons for Priest buffs someone in the group is missing or has under 5 minutes

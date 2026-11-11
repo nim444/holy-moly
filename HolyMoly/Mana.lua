@@ -134,6 +134,18 @@ local WAIT_LINES = {
 local TELL_GAP = 20
 local lastTold = 0
 
+-- The game's /oom emote (your character says it is out of mana, with its voice line), done with the group line when
+-- "Also /oom" is on. "none" keeps it untargeted, so it never goes to whoever you have targeted.
+local reportedEmoteError = false
+local function DoOom()
+	local perform = C_ChatInfo and C_ChatInfo.PerformEmote or DoEmote
+	local ok, err = pcall(perform, "OOM", "none")
+	if not ok and not reportedEmoteError then
+		reportedEmoteError = true
+		print("Holy Moly: /oom failed: " .. tostring(err))
+	end
+end
+
 local function TellLowMana()
 	if not ns.Get("lowManaTell") or InCombatLockdown() or UnitIsDeadOrGhost("player")
 		or GetTime() - lastTold < TELL_GAP then
@@ -153,6 +165,9 @@ local function TellLowMana()
 	end
 	if ns.SendChat(ns.RandomLine(WAIT_LINES):format(percent), channel) then
 		lastTold = GetTime()
+	end
+	if ns.Get("lowManaOom") then
+		DoOom()
 	end
 end
 

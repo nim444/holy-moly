@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Low mana: the "wait for me" line after a fight also does the /oom emote ("Also /oom" in the settings, on by default).
 - Low mana: when a fight ends with your mana under the low-mana threshold, a random line in party, raid or instance chat asks the group to wait before the next pull, with your mana percent ("Ask the group to wait" in the settings, on by default, at most every 20 seconds).
 - Heal report: half the time it sends the bill: what the healing cost in mana, with tips in gold and mana potions, flasks and elixirs welcome as donations (20 new lines).
 - Heal buttons: a Preview button in the settings shows a sample party (tank, a low one with a gold flash, a dead one) in the chosen bar style, width, size and threshold, until the settings close; `/holy preview` shows it where the heal buttons sit, for screenshots.

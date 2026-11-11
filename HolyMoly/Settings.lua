@@ -28,6 +28,7 @@ local DEFAULTS = {
 	lowMana = true,
 	lowManaPercent = 20,
 	lowManaTell = true, -- after a fight under the threshold, ask the group to wait (Mana.lua)
+	lowManaOom = true, -- and do the /oom emote with it
 	history = true,
 }
 
@@ -230,6 +231,7 @@ local function RegisterPanel()
 	Checkbox("lowMana", "Low-mana warning", "The mana bar glows red below the threshold, also in combat.")
 	Slider("lowManaPercent", "Low-mana threshold", "The mana percent where the warning starts.", 10, 50, 5, Percent)
 	Checkbox("lowManaTell", "Ask the group to wait", "When a fight ends with your mana under the threshold, a random line in party, raid or instance chat asks them to wait for you before the next pull, with your mana percent. At most every 20 seconds.")
+	Checkbox("lowManaOom", "Also /oom", "Does the /oom emote along with the line, so your character says it is out of mana too.")
 
 	Settings.RegisterAddOnCategory(category)
 end
