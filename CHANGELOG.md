@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons: a Preview button in the settings shows a sample party (tank, a low one with a gold flash, a dead one) in the chosen bar style, width, size and threshold, until the settings close; `/holy preview` shows it where the heal buttons sit, for screenshots.
 - Heal buttons: three bar styles in the settings: 1. Classic, 2. Gilded (our own textures: a brushed bar with a sheen in a thin gold frame, a spark at the edge of the health, a gold flash when your heal from a button lands), 3. Gilded with class colors. Gilded is the new default.
 - Heal buttons: Shift-click the minimap button, or type `/holy heals`, to turn them on or off (in combat it happens when the fight ends).
 - Heal buttons: new click defaults covering six spells: left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle Power Word: Shield, right Penance, Shift + right the biggest heal. Clicks still on the old defaults move to the new ones; clicks you picked yourself stay.

@@ -240,11 +240,7 @@ end
 -- game keeps secret leaves the icon as it was; it is only looked up again when the class changes.
 local ApplyStyle, ColorFill -- defined with the buttons below
 
-local function UpdateClass(button)
-	local _, classFile = UnitClass(button.unit)
-	if classFile == nil or issecretvalue(classFile) or classFile == button.classFile then
-		return
-	end
+local function SetClass(button, classFile)
 	button.classFile = classFile
 	local color = RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]
 	button.classColor = color and { color.r * CLASS_SHADE, color.g * CLASS_SHADE, color.b * CLASS_SHADE } or nil
@@ -259,6 +255,14 @@ local function UpdateClass(button)
 	else
 		icon:SetAlpha(0)
 	end
+end
+
+local function UpdateClass(button)
+	local _, classFile = UnitClass(button.unit)
+	if classFile == nil or issecretvalue(classFile) or classFile == button.classFile then
+		return
+	end
+	SetClass(button, classFile)
 end
 
 local function UpdateButton(button)
@@ -420,15 +424,8 @@ function ApplyStyle(button)
 	button.gild:SetShown(style.gilded == true)
 end
 
-local function CreateUnitButton(parent, unit, index, columns)
-	local button = CreateFrame("Button", nil, parent, "SecureUnitButtonTemplate")
-	button.unit = unit
-	-- Its spot in the grid, kept for a width change (a party's buttons are moved again by LayoutParty).
-	button.column, button.row = (index - 1) % columns, math.floor((index - 1) / columns)
-	Place(button, button.column, button.row)
-	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
-	button:SetAttribute("unit", unit)
-
+-- Everything you see on a heal button, for the real (secure) buttons and the preview's plain ones alike.
+local function BuildLook(button)
 	-- Everything you see sits on a plain child frame, whose alpha can change in combat.
 	local content = CreateFrame("Frame", nil, button)
 	content:SetAllPoints()
@@ -580,6 +577,18 @@ local function CreateUnitButton(parent, unit, index, columns)
 	renew.cooldown:SetHideCountdownNumbers(false)
 	renew:SetAlpha(0)
 	button.renew = renew
+end
+
+local function CreateUnitButton(parent, unit, index, columns)
+	local button = CreateFrame("Button", nil, parent, "SecureUnitButtonTemplate")
+	button.unit = unit
+	-- Its spot in the grid, kept for a width change (a party's buttons are moved again by LayoutParty).
+	button.column, button.row = (index - 1) % columns, math.floor((index - 1) / columns)
+	Place(button, button.column, button.row)
+	button:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
+	button:SetAttribute("unit", unit)
+
+	BuildLook(button)
 
 	button:HookScript("OnEnter", OnButtonEnter)
 	button:HookScript("OnLeave", OnButtonLeave)
@@ -844,6 +853,162 @@ local function Build()
 	QueueUpdate()
 end
 
+-- The preview: a sample party drawn with the current bar style, width, size and low-health threshold, for choosing a
+-- style and for screenshots. Made of plain frames with made-up people and plain numbers, so it never touches the real
+-- group. The settings' Preview button shows it beside the settings until they close; /holy preview shows it where the
+-- heal buttons sit until /holy preview again. Its icon drags it (not saved).
+local SAMPLE = {
+	{ name = "Ironhide", class = "WARRIOR", health = 0.58, max = 5200, tank = true, soul = 9, renew = 12 },
+	{ name = "Lumina", class = "PRIEST", health = 1, max = 3100 },
+	{ name = "Quickstep", class = "ROGUE", health = 0.22, max = 2800, renew = 6 },
+	{ name = "Emberly", class = "MAGE", health = 0.81, max = 2600 },
+	{ name = "Thornwood", class = "DRUID", health = 0, max = 3300 },
+}
+local FLASH_EVERY = 2.5 -- seconds between the preview's gold flashes on the low one
+
+local preview = CreateFrame("Frame", "HolyMolyHealGridPreview", UIParent)
+preview:SetFrameStrata("FULLSCREEN_DIALOG")
+preview:SetClampedToScreen(true)
+preview:SetMovable(true)
+preview:Hide()
+local previewButtons = {}
+local previewFromSettings = false
+-- The sample buttons sit under the drag icon, like the real ones.
+local previewParty = CreateFrame("Frame", nil, preview)
+previewParty:SetPoint("TOPLEFT", 0, -HANDLE_HEIGHT)
+previewParty:SetSize(1, 1)
+
+local previewHandle = CreateFrame("Frame", nil, preview)
+previewHandle:SetPoint("TOPLEFT")
+previewHandle:SetSize(HANDLE_HEIGHT, HANDLE_HEIGHT)
+previewHandle:EnableMouse(true)
+previewHandle:RegisterForDrag("LeftButton")
+local previewIcon = previewHandle:CreateTexture(nil, "OVERLAY")
+previewIcon:SetAllPoints()
+previewIcon:SetTexture("Interface\\AddOns\\HolyMoly\\Media\\Icon")
+previewHandle:SetScript("OnDragStart", function()
+	preview:StartMoving()
+end)
+previewHandle:SetScript("OnDragStop", function()
+	preview:StopMovingOrSizing()
+end)
+
+local function FillPreviewButton(button, sample)
+	ApplyStyle(button)
+	SetClass(button, sample.class)
+	button.name:SetText(sample.name)
+	local current = sample.max * sample.health
+	button.health:SetMinMaxValues(0, sample.max)
+	button.health:SetValue(current)
+	local low = sample.health > 0 and sample.health * 100 < ns.Get("healGridPercent")
+	if sample.health == 0 then
+		button.hp:SetText("Dead")
+		button.hp:SetTextColor(1, 1, 1)
+		button.hp:SetAlpha(1)
+		button.spark:SetAlpha(0)
+		button.content:SetAlpha(FADED_ALPHA)
+	else
+		local missing = sample.max - current
+		button.hp:SetText("-" .. AbbreviateLargeNumbers(math.floor(missing + 0.5)))
+		button.hp:SetTextColor(1, 0.45, 0.45)
+		button.hp:SetAlpha(missing > 0 and 1 or 0)
+		button.spark:SetAlpha(missing > 0 and 1 or 0)
+		button.content:SetAlpha(low and 1 or FADED_ALPHA)
+	end
+	button.low:SetAlpha(low and 1 or 0)
+	button.tank:SetAlpha(sample.tank and 1 or 0)
+	for _, timer in ipairs({ { button.soul, sample.soul }, { button.renew, sample.renew } }) do
+		local icon, left = timer[1], timer[2]
+		if left then
+			icon.cooldown:SetCooldown(GetTime() - (15 - left), 15)
+			icon:SetAlpha(1)
+		else
+			icon.cooldown:Clear()
+			icon:SetAlpha(0)
+		end
+	end
+end
+
+-- Lays the sample out like a party: the tank alone on the first row, everyone else two by two under them.
+local function LayoutPreview()
+	preview:SetScale(ns.Get("healGridScale"))
+	preview:SetSize(PARTY_COLUMNS * ButtonWidth() + (PARTY_COLUMNS - 1) * GAP, HANDLE_HEIGHT + 3 * (BUTTON_HEIGHT + GAP))
+	for i, sample in ipairs(SAMPLE) do
+		local button = previewButtons[i]
+		if not button then
+			button = CreateFrame("Frame", nil, previewParty)
+			BuildLook(button)
+			previewButtons[i] = button
+		end
+		if sample.tank then
+			Place(button, 0, 0, PARTY_COLUMNS * ButtonWidth() + (PARTY_COLUMNS - 1) * GAP)
+		else
+			Place(button, (i - 2) % PARTY_COLUMNS, 1 + math.floor((i - 2) / PARTY_COLUMNS))
+		end
+		FillPreviewButton(button, sample)
+	end
+end
+
+local function RefreshPreview()
+	if preview:IsShown() then
+		LayoutPreview()
+	end
+end
+
+-- A gold flash on the low one now and then, so the gilded styles' flash shows too.
+local sinceFlash = 0
+preview:SetScript("OnUpdate", function(_, elapsed)
+	sinceFlash = sinceFlash + elapsed
+	if sinceFlash < FLASH_EVERY then
+		return
+	end
+	sinceFlash = 0
+	local button = previewButtons[3]
+	if button and button.style and button.style.gilded then
+		button.flash:Stop()
+		button.flash:Play()
+	end
+end)
+
+local function HidePreview()
+	preview:Hide()
+	previewFromSettings = false
+end
+
+local hookedSettings = false
+-- fromSettings: beside the settings window, gone when it closes. Otherwise where the heal buttons sit.
+local function ShowPreview(fromSettings)
+	previewFromSettings = fromSettings
+	preview:ClearAllPoints()
+	local settingsPanel = fromSettings and SettingsPanel
+	if settingsPanel then
+		preview:SetPoint("TOPLEFT", settingsPanel, "TOPRIGHT", 12, 0)
+		if not hookedSettings then
+			hookedSettings = true
+			settingsPanel:HookScript("OnHide", function()
+				if previewFromSettings then
+					HidePreview()
+				end
+			end)
+		end
+	else
+		local point, _, relativePoint, x, y = grid:GetPoint()
+		preview:SetPoint(point or "CENTER", UIParent, relativePoint or "CENTER", x or 0, y or 0)
+	end
+	sinceFlash = FLASH_EVERY - 0.5
+	preview:Show()
+	LayoutPreview()
+end
+
+-- The settings' Preview button (fromSettings) and /holy preview: shows the preview, or hides it when it is showing.
+function ns.TogglePreview(fromSettings)
+	if preview:IsShown() then
+		HidePreview()
+	else
+		ShowPreview(fromSettings)
+	end
+end
+
 ns.OnSettingChanged("healGridPercent", function(percent)
 	lowCurve:ClearPoints()
 	lowCurve:AddPoint(0, 1)
@@ -852,6 +1017,7 @@ ns.OnSettingChanged("healGridPercent", function(percent)
 	fadeCurve:AddPoint(0, 1)
 	fadeCurve:AddPoint(percent / 100, FADED_ALPHA)
 	QueueUpdate()
+	RefreshPreview()
 end)
 for _, click in ipairs(CLICKS) do
 	ns.OnSettingChanged(click.key, function()
@@ -867,6 +1033,7 @@ ns.OnSettingChanged("healGridScale", function()
 	OutOfCombat(function()
 		grid:SetScale(ns.Get("healGridScale"))
 	end)
+	RefreshPreview()
 end)
 -- A new width moves every button to its spot at that width; secure buttons can't be resized in combat, so a change
 -- made during a fight waits for its end.
@@ -880,12 +1047,14 @@ local function Relayout()
 end
 ns.OnSettingChanged("healGridWidth", function()
 	OutOfCombat(Relayout)
+	RefreshPreview()
 end)
 ns.OnSettingChanged("healGridStyle", function()
 	for _, button in ipairs(buttons) do
 		ApplyStyle(button)
 	end
 	QueueUpdate()
+	RefreshPreview()
 end)
 
 -- Shows or hides the heal buttons (Shift-click on the minimap button, /holy heals): the same as the Heal buttons

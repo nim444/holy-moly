@@ -161,6 +161,13 @@ local function ClickChoices(key)
 	end
 end
 
+-- A button row in the panel; quietly left out on a client without settings buttons (/holy preview still works).
+local function Button(label, buttonText, tooltip, onClick)
+	if CreateSettingsButtonInitializer then
+		layout:AddInitializer(CreateSettingsButtonInitializer(label, buttonText, onClick, tooltip, true))
+	end
+end
+
 local function Header(name)
 	layout:AddInitializer(CreateSettingsListSectionHeaderInitializer(name))
 end
@@ -194,6 +201,9 @@ local function RegisterPanel()
 		{ "GILDED", "2. Gilded" },
 		{ "CLASS", "3. Gilded, class colors" },
 	})
+	Button("Preview", "Show preview", "Shows a sample party with the chosen bar style, width, size and threshold beside these settings, until you close them or click again. /holy preview shows it where the heal buttons sit, for screenshots.", function()
+		ns.TogglePreview(true)
+	end)
 	Slider("healGridScale", "Size", "Makes the heal buttons bigger or smaller, apart from the box.", 0.6, 2, 0.05,
 		function(value) return Percent(value * 100 + 0.5) end)
 	Slider("healGridWidth", "Width", "How wide each heal button is, for longer names or a narrower grid. In a party the tank's button spans two. A change made in combat waits for the fight to end.",

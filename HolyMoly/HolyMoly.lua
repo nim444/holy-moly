@@ -690,6 +690,8 @@ SlashCmdList.HOLYMOLY = function(msg)
 		ns.CheckHealButtons()
 	elseif msg == "heals" then
 		ns.ToggleHealGrid()
+	elseif msg == "preview" then
+		ns.TogglePreview(false)
 	elseif msg == "soul" then
 		ns.DebugWeakenedSoul()
 	elseif msg == "tank" then
@@ -697,7 +699,7 @@ SlashCmdList.HOLYMOLY = function(msg)
 	elseif msg == "tank clear" then
 		ns.ClearTanks()
 	else
-		print("Holy Moly: /holy reset | show | hide | heals | config | check | tank | tank clear. Drag the box to move it.")
+		print("Holy Moly: /holy reset | show | hide | heals | preview | config | check | tank | tank clear. Drag the box to move it.")
 	end
 end
 

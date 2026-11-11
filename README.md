@@ -28,7 +28,8 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   each can be changed in the settings. Hold Alt over a button for its tooltip (who it is, what each click casts).
   Three bar styles: Classic, Gilded (a textured bar in a thin gold frame, a spark at the edge of the health, a gold
   flash when your heal lands) and Gilded with class colors. Shift-click the minimap button or `/holy heals` turns
-  the heal buttons on or off.
+  the heal buttons on or off. The settings' Preview button shows a sample party in the chosen style beside the
+  settings; `/holy preview` shows it where the heal buttons sit, for screenshots.
   The tank has a blue border and a shield mark: the tank role from the group finder, a raid's main tank, or whoever
   you mark with `/holy tank` (target them first; again to unmark, `/holy tank clear` to clear all).
   Each shows health and percent; in a party the tank has the first row to themselves, the rest two by two.
