@@ -688,6 +688,8 @@ SlashCmdList.HOLYMOLY = function(msg)
 		ns.OpenSettings()
 	elseif msg == "check" then
 		ns.CheckHealButtons()
+	elseif msg == "heals" then
+		ns.ToggleHealGrid()
 	elseif msg == "soul" then
 		ns.DebugWeakenedSoul()
 	elseif msg == "tank" then
@@ -695,15 +697,17 @@ SlashCmdList.HOLYMOLY = function(msg)
 	elseif msg == "tank clear" then
 		ns.ClearTanks()
 	else
-		print("Holy Moly: /holy reset | show | hide | config | check | tank | tank clear. Drag the box to move it.")
+		print("Holy Moly: /holy reset | show | hide | heals | config | check | tank | tank clear. Drag the box to move it.")
 	end
 end
 
--- Holy Moly in the minimap's addon menu (## AddonCompartmentFunc): a click shows or hides the box, a right-click
--- opens the settings.
+-- Holy Moly in the minimap's addon menu (## AddonCompartmentFunc), also used by the minimap button: a click shows or
+-- hides the box, a Shift-click the heal buttons, a right-click opens the settings.
 function HolyMoly_OnAddonCompartmentClick(_, buttonName)
 	if buttonName == "RightButton" then
 		ns.OpenSettings()
+	elseif IsShiftKeyDown() then
+		ns.ToggleHealGrid()
 	else
 		box:SetShown(not box:IsShown())
 	end

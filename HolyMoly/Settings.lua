@@ -17,6 +17,7 @@ local DEFAULTS = {
 	healGrid = true,
 	healGridScale = 1,
 	healGridWidth = 120, -- one heal button's width; a party's tank row spans two
+	healGridStyle = "GILDED", -- "CLASSIC", "GILDED" or "CLASS" (gilded with class colors), see HealGrid.lua
 	healGridPercent = 30,
 	healLeft = "Flash Heal", -- a spell name, "BIGGEST" (the biggest heal known) or "TARGET"
 	healShiftLeft = "Lesser Heal",
@@ -86,6 +87,7 @@ local function Notify(key, value)
 end
 
 local category, layout
+local registered = {} -- key -> the panel's setting object
 
 function ns.OpenSettings()
 	if category then
@@ -99,7 +101,20 @@ local function AddSetting(key, varType, label, tooltip, makeControl)
 	setting:SetValueChangedCallback(function(_, value)
 		Notify(key, value)
 	end)
+	registered[key] = setting
 	makeControl(setting, tooltip)
+end
+
+-- Changes a setting from code (a slash command or a click), through the panel's setting when there is one so the
+-- panel shows the new value; its callback saves it and tells the listeners.
+function ns.Set(key, value)
+	local setting = registered[key]
+	if setting then
+		setting:SetValue(value)
+	else
+		HolyMolyDB.settings[key] = value
+		Notify(key, value)
+	end
 end
 
 local function Checkbox(key, label, tooltip)
@@ -173,7 +188,12 @@ local function RegisterPanel()
 	Checkbox("keptUp", "Name who you kept up", "Adds the three others you healed most to the report, as [Name].")
 
 	Header("Heal buttons")
-	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat.")
+	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat. Shift-click the minimap button or type /holy heals to turn them on or off quickly (in combat it happens when the fight ends).")
+	Dropdown("healGridStyle", "Bar style", "How the heal buttons' bars look. Gilded: a textured bar in a thin gold frame, a spark at the edge of the health and a gold flash when your heal lands.", {
+		{ "CLASSIC", "1. Classic" },
+		{ "GILDED", "2. Gilded" },
+		{ "CLASS", "3. Gilded, class colors" },
+	})
 	Slider("healGridScale", "Size", "Makes the heal buttons bigger or smaller, apart from the box.", 0.6, 2, 0.05,
 		function(value) return Percent(value * 100 + 0.5) end)
 	Slider("healGridWidth", "Width", "How wide each heal button is, for longer names or a narrower grid. In a party the tank's button spans two. A change made in combat waits for the fight to end.",

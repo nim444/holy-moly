@@ -3,6 +3,11 @@
 -- they are missing ("-600", nothing at full health); the width is a setting. Six clicks, each changeable in the settings:
 -- left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle Power Word: Shield, right Penance and
 -- Shift + right the biggest heal. Their tooltip (who it is, what each click casts) shows only while Alt is held.
+--
+-- Bar styles (a setting): 1. Classic, the flat bar; 2. Gilded, our own textures from tools/make_bars.py (a brushed
+-- fill with a sheen, a groove behind it, a thin gold frame, a spark at the fill's edge, and a gold flash when your heal
+-- from a button lands); 3. the same with each person's class color. The spark is pinned to the fill texture's right
+-- edge, so the game places it from the secret health value; no addon code touches the number.
 -- Works in combat.
 --
 -- The tank's button gets a blue border and a shield mark, so you keep an eye on them: whoever the game gives the
@@ -47,6 +52,23 @@ local CLASS_ICON_SIZE = BUTTON_HEIGHT - 8
 -- The class icons' fallback when the client has no "classicon-<class>" atlas: the round icons, cut by CLASS_ICON_TCOORDS.
 local CLASS_ICON_CIRCLES = "Interface\\TargetingFrame\\UI-Classes-Circles"
 local WEAKENED_SOUL_ICON = "Interface\\Icons\\Spell_Holy_AshesToAshes"
+
+local BARS = "Interface\\AddOns\\HolyMoly\\Media\\Bars\\"
+local FRAME_SLICE = 5 -- the gold frame's nine-slice margins, in pixels of Frame.tga
+local SPARK_WIDTH = 10
+-- Class colors are darkened in the class-color style, so the white name stays readable on a priest's or rogue's bar.
+local CLASS_SHADE = 0.68
+local STYLES = {
+	CLASSIC = {
+		fill = "Interface\\TargetingFrame\\UI-StatusBar", color = { 0.1, 0.75, 0.25 },
+		missing = { 0.65, 0.08, 0.08, 0.9 }, inset = 1,
+	},
+	GILDED = {
+		fill = BARS .. "Fill", color = { 0.15, 0.78, 0.3 },
+		missingTexture = BARS .. "Background", missing = { 0.8, 0.14, 0.14, 1 }, inset = 3, gilded = true,
+	},
+}
+STYLES.CLASS = setmetatable({ classColor = true }, { __index = STYLES.GILDED })
 
 -- A button's width comes from the settings (Options > AddOns > Holy Moly > Heal buttons > Width).
 local function ButtonWidth()
@@ -216,12 +238,17 @@ end
 
 -- The class icon: the "classicon-<class>" atlas, or the round class icons where the client lacks it. A class the
 -- game keeps secret leaves the icon as it was; it is only looked up again when the class changes.
+local ApplyStyle, ColorFill -- defined with the buttons below
+
 local function UpdateClass(button)
 	local _, classFile = UnitClass(button.unit)
 	if classFile == nil or issecretvalue(classFile) or classFile == button.classFile then
 		return
 	end
 	button.classFile = classFile
+	local color = RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]
+	button.classColor = color and { color.r * CLASS_SHADE, color.g * CLASS_SHADE, color.b * CLASS_SHADE } or nil
+	ColorFill(button)
 	local icon = button.class
 	if pcall(icon.SetAtlas, icon, "classicon-" .. classFile:lower()) and icon:GetAtlas() then
 		icon:SetAlpha(1)
@@ -252,6 +279,7 @@ local function UpdateButton(button)
 		button.hp:SetText(UnitIsConnected(unit) and "Dead" or "Offline")
 		button.hp:SetTextColor(1, 1, 1)
 		button.hp:SetAlpha(1)
+		button.spark:SetAlpha(0)
 		button.content:SetAlpha(FADED_ALPHA)
 		button.low:SetAlpha(0)
 	else
@@ -264,6 +292,7 @@ local function UpdateButton(button)
 		button.hp:SetText(ok and text or "")
 		button.hp:SetTextColor(1, 0.45, 0.45)
 		button.hp:SetAlpha(UnitHealthPercent(unit, true, missingCurve))
+		button.spark:SetAlpha(UnitHealthPercent(unit, true, missingCurve))
 		button.content:SetAlpha(UnitHealthPercent(unit, true, fadeCurve))
 		button.low:SetAlpha(UnitHealthPercent(unit, true, lowCurve))
 	end
@@ -348,7 +377,48 @@ local function Place(button, column, row, width)
 	button:SetPoint("TOPLEFT", column * (ButtonWidth() + GAP), -row * (BUTTON_HEIGHT + GAP))
 end
 
-local NoteShieldClick -- defined with the click settings below
+local NoteClick -- defined with the click settings below
+
+-- The bar style's look on one button: fill texture and color, the missing-health layer, the inset that keeps the fill
+-- inside the gold frame, and the gilded layers on or off. Plain textures only, so this also works in combat.
+function ColorFill(button)
+	local style = button.style
+	if not style then
+		return
+	end
+	local color = style.classColor and button.classColor or style.color
+	button.health:SetStatusBarColor(color[1], color[2], color[3])
+end
+
+function ApplyStyle(button)
+	local style = STYLES[ns.Get("healGridStyle")] or STYLES.GILDED
+	button.style = style
+	local health = button.health
+	health:ClearAllPoints()
+	health:SetPoint("TOPLEFT", style.inset, -style.inset)
+	health:SetPoint("BOTTOMRIGHT", -style.inset, style.inset)
+	health:SetStatusBarTexture(style.fill)
+	ColorFill(button)
+	local missing = button.missing
+	if style.missingTexture then
+		missing:SetTexture(style.missingTexture)
+		missing:SetVertexColor(unpack(style.missing))
+	else
+		missing:SetVertexColor(1, 1, 1, 1)
+		missing:SetColorTexture(unpack(style.missing))
+	end
+	-- Pinned to the fill texture, whose right edge the game moves with the health.
+	local fill = health:GetStatusBarTexture()
+	button.gloss:ClearAllPoints()
+	button.gloss:SetPoint("TOPLEFT", fill)
+	button.gloss:SetPoint("BOTTOMRIGHT", fill)
+	button.spark:ClearAllPoints()
+	button.spark:SetPoint("CENTER", fill, "RIGHT")
+	button.spark:SetHeight(BUTTON_HEIGHT - 2 * style.inset + 6)
+	button.gloss:SetShown(style.gilded == true)
+	button.spark:SetShown(style.gilded == true)
+	button.gild:SetShown(style.gilded == true)
+end
 
 local function CreateUnitButton(parent, unit, index, columns)
 	local button = CreateFrame("Button", nil, parent, "SecureUnitButtonTemplate")
@@ -367,22 +437,65 @@ local function CreateUnitButton(parent, unit, index, columns)
 	background:SetAllPoints()
 	background:SetColorTexture(0, 0, 0, 0.75)
 
+	-- The health bar; its texture, color and inset come from the bar style (ApplyStyle).
 	local health = CreateFrame("StatusBar", nil, content)
-	health:SetPoint("TOPLEFT", 1, -1)
-	health:SetPoint("BOTTOMRIGHT", -1, 1)
-	health:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
-	health:SetStatusBarColor(0.1, 0.75, 0.25)
-	-- The missing health shows red behind the green.
+	button.health = health
+	-- The missing health shows red behind the fill.
 	local missing = health:CreateTexture(nil, "BACKGROUND")
 	missing:SetAllPoints()
-	missing:SetColorTexture(0.65, 0.08, 0.08, 0.9)
-	button.health = health
+	button.missing = missing
+	-- Gilded styles: a sheen over the fill and a spark at its edge, both added light (ADD), both pinned to the fill
+	-- texture in ApplyStyle.
+	local gloss = health:CreateTexture(nil, "OVERLAY")
+	gloss:SetTexture(BARS .. "Gloss")
+	gloss:SetBlendMode("ADD")
+	button.gloss = gloss
+	local spark = health:CreateTexture(nil, "OVERLAY", nil, 2)
+	spark:SetTexture(BARS .. "Spark")
+	spark:SetBlendMode("ADD")
+	spark:SetSize(SPARK_WIDTH, BUTTON_HEIGHT)
+	spark:SetAlpha(0)
+	button.spark = spark
+	-- Gilded styles: the thin gold frame over the bar, a nine-slice so its corners keep their shape at any width; a
+	-- plain gold edge where the client can't slice textures.
+	local gild = CreateFrame("Frame", nil, content, "BackdropTemplate")
+	gild:SetAllPoints()
+	gild:SetFrameLevel(health:GetFrameLevel() + 1)
+	local gildTexture = gild:CreateTexture(nil, "OVERLAY")
+	gildTexture:SetAllPoints()
+	gildTexture:SetTexture(BARS .. "Frame")
+	if not pcall(gildTexture.SetTextureSliceMargins, gildTexture, FRAME_SLICE, FRAME_SLICE, FRAME_SLICE, FRAME_SLICE) then
+		gildTexture:Hide()
+		gild:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 2 })
+		gild:SetBackdropBorderColor(0.83, 0.67, 0.31)
+	end
+	button.gild = gild
 
 	-- The text sits on its own frame on the button, not on the content, so the name and health stay readable while
 	-- the bar is faint (healthy people) or someone is dead.
 	local text = CreateFrame("Frame", nil, button)
 	text:SetAllPoints()
-	text:SetFrameLevel(health:GetFrameLevel() + 3)
+	text:SetFrameLevel(health:GetFrameLevel() + 4)
+	-- The gold flash when your heal from this button lands (gilded styles): added light over the bar, on the text frame
+	-- so a faint (healthy) bar doesn't dim it, under the name.
+	local flash = text:CreateTexture(nil, "BACKGROUND")
+	flash:SetPoint("TOPLEFT", health)
+	flash:SetPoint("BOTTOMRIGHT", health)
+	flash:SetColorTexture(1, 0.82, 0.35)
+	flash:SetBlendMode("ADD")
+	flash:SetAlpha(0)
+	local flashAnimation = flash:CreateAnimationGroup()
+	local rise = flashAnimation:CreateAnimation("Alpha")
+	rise:SetFromAlpha(0)
+	rise:SetToAlpha(0.55)
+	rise:SetDuration(0.1)
+	rise:SetOrder(1)
+	local fall = flashAnimation:CreateAnimation("Alpha")
+	fall:SetFromAlpha(0.55)
+	fall:SetToAlpha(0)
+	fall:SetDuration(0.45)
+	fall:SetOrder(2)
+	button.flash = flashAnimation
 	local name = text:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	local hp = text:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	for _, fontString in ipairs({ name, hp }) do
@@ -409,7 +522,7 @@ local function CreateUnitButton(parent, unit, index, columns)
 
 	local low = CreateFrame("Frame", nil, content, "BackdropTemplate")
 	low:SetAllPoints()
-	low:SetFrameLevel(health:GetFrameLevel() + 1)
+	low:SetFrameLevel(health:GetFrameLevel() + 2)
 	low:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 2 })
 	low:SetBackdropBorderColor(1, 0.1, 0.1)
 	low:SetAlpha(0)
@@ -472,7 +585,7 @@ local function CreateUnitButton(parent, unit, index, columns)
 	button:HookScript("OnLeave", OnButtonLeave)
 	button:HookScript("OnShow", QueueUpdate)
 	button:HookScript("PostClick", function(self, mouseButton)
-		NoteShieldClick(self, mouseButton, IsShiftKeyDown())
+		NoteClick(self, mouseButton, IsShiftKeyDown())
 		if GetTime() < checkUntil then
 			local clickTime, shift = GetTime(), IsShiftKeyDown()
 			C_Timer.After(0.3, function()
@@ -480,6 +593,7 @@ local function CreateUnitButton(parent, unit, index, columns)
 			end)
 		end
 	end)
+	ApplyStyle(button)
 	RegisterUnitWatch(button)
 	buttons[#buttons + 1] = button
 end
@@ -505,17 +619,23 @@ local function ClickAction(choice)
 	return "spell", FirstKnown(BIGGEST_HEALS)
 end
 
--- A click on a heal button set to Power Word: Shield or Renew waits here until the cast goes off
--- (UNIT_SPELLCAST_SUCCEEDED).
-local pendingShield
+-- A click on a heal button that casts a spell waits here until the cast goes off (UNIT_SPELLCAST_SUCCEEDED): Power
+-- Word: Shield and Renew then start their timers, and a gilded button flashes gold. Instants wait 1.5 s, spells with a
+-- cast time up to 4 s; an interrupted cast drops it.
+local pendingCast
+local INSTANT_WAIT, CAST_WAIT = 1.5, 4
 local CLICK_KEYS = { LeftButton = "healLeft", RightButton = "healRight", MiddleButton = "healMiddle" }
 local SHIFT_CLICK_KEYS = { LeftButton = "healShiftLeft", RightButton = "healShiftRight", MiddleButton = "healShiftMiddle" }
 
-NoteShieldClick = function(button, mouseButton, shift)
+NoteClick = function(button, mouseButton, shift)
 	local key = (shift and SHIFT_CLICK_KEYS or CLICK_KEYS)[mouseButton]
 	for _, click in ipairs(CLICKS) do
-		if click.key == key and (click.text == SHIELD or click.text == RENEW) then
-			pendingShield = { button = button, time = GetTime(), spell = click.text }
+		if click.key == key then
+			if click.text and click.text ~= "Target" then
+				local instant = click.text == SHIELD or click.text == RENEW
+				pendingCast = { button = button, time = GetTime(), spell = click.text,
+					wait = instant and INSTANT_WAIT or CAST_WAIT }
+			end
 			return
 		end
 	end
@@ -535,14 +655,19 @@ local function StartRenew(button)
 	C_Timer.After(RENEW_SECONDS + 0.1, QueueUpdate)
 end
 
-local shieldFrame = CreateFrame("Frame")
-shieldFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
-shieldFrame:SetScript("OnEvent", function(_, _, _, _, spellID)
-	local pending = pendingShield
-	if not pending or GetTime() - pending.time > 1.5 then
+local castFrame = CreateFrame("Frame")
+castFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
+castFrame:RegisterUnitEvent("UNIT_SPELLCAST_INTERRUPTED", "player")
+castFrame:SetScript("OnEvent", function(_, event, _, _, spellID)
+	local pending = pendingCast
+	if event == "UNIT_SPELLCAST_INTERRUPTED" then
+		pendingCast = nil
 		return
 	end
-	pendingShield = nil
+	if not pending or GetTime() - pending.time > pending.wait then
+		return
+	end
+	pendingCast = nil
 	-- The spell may be secret in combat; then the click right before it is taken at its word.
 	if spellID ~= nil and not issecretvalue(spellID) then
 		local name = C_Spell.GetSpellName(spellID)
@@ -552,8 +677,13 @@ shieldFrame:SetScript("OnEvent", function(_, _, _, _, spellID)
 	end
 	if pending.spell == RENEW then
 		StartRenew(pending.button)
-	else
+	elseif pending.spell == SHIELD then
 		StartWeakenedSoul(pending.button)
+	end
+	local button = pending.button
+	if button.style and button.style.gilded then
+		button.flash:Stop()
+		button.flash:Play()
 	end
 end)
 
@@ -751,6 +881,21 @@ end
 ns.OnSettingChanged("healGridWidth", function()
 	OutOfCombat(Relayout)
 end)
+ns.OnSettingChanged("healGridStyle", function()
+	for _, button in ipairs(buttons) do
+		ApplyStyle(button)
+	end
+	QueueUpdate()
+end)
+
+-- Shows or hides the heal buttons (Shift-click on the minimap button, /holy heals): the same as the Heal buttons
+-- checkbox in the settings. Secure buttons can't be hidden in combat, so then it happens when the fight ends.
+function ns.ToggleHealGrid()
+	local shown = not ns.Get("healGrid")
+	ns.Set("healGrid", shown)
+	local when = InCombatLockdown() and " when this fight ends" or ""
+	print(("Holy Moly: heal buttons %s%s."):format(shown and "shown" or "hidden", when))
+end
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
