@@ -46,7 +46,7 @@ buffs need a refresh. Built for Forever's addon rules: it works in combat withou
   click Power Word: Shield. Every click can be changed in the settings.
 - **The box:** your healing, absorbs, dispels and group deaths, a mana bar that glows red when mana runs low, and
   the mana each fight cost, with mana per minute.
-- **Hover the box after a fight:** healing per spell with icons and shares, who you healed and how often, and your
+- **Hold Alt over the box after a fight:** healing per spell with icons and shares, who you healed and how often, and your
   recent fights compared to the one before.
 - **HoT, shield and dispel timers:** a panel with debuffs you can dispel (red border) and your Renews, shields and
   other heals over time on each group member, with the game's own countdown.

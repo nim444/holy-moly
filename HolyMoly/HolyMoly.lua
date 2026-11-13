@@ -318,9 +318,9 @@ local function AddHistory()
 	end
 end
 
--- Hovering the box: healing per spell, who you healed and recent fights. The first two are secret in combat, so
--- they wait for the end.
-box:SetScript("OnEnter", function(self)
+-- Alt + hovering the box: healing per spell, who you healed and recent fights. The first two are secret in combat,
+-- so they wait for the end. Only with Alt, like the heal buttons, so it doesn't pop up while healing.
+local function ShowDetails(self)
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
 	GameTooltip:SetText("Holy Moly")
 	if InCombatLockdown() then
@@ -367,8 +367,34 @@ box:SetScript("OnEnter", function(self)
 	end
 	AddHistory()
 	GameTooltip:Show()
+end
+local boxHovered = false
+box:SetScript("OnEnter", function(self)
+	boxHovered = true
+	if IsAltKeyDown() then
+		ShowDetails(self)
+	end
 end)
-box:SetScript("OnLeave", GameTooltip_Hide)
+box:SetScript("OnLeave", function(self)
+	boxHovered = false
+	if GameTooltip:IsOwned(self) then
+		GameTooltip:Hide()
+	end
+end)
+
+-- Pressing or letting go of Alt while over the box shows or hides the details.
+local boxAltFrame = CreateFrame("Frame")
+boxAltFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
+boxAltFrame:SetScript("OnEvent", function(_, _, key)
+	if not boxHovered or (key ~= "LALT" and key ~= "RALT") then
+		return
+	end
+	if IsAltKeyDown() then
+		ShowDetails(box)
+	elseif GameTooltip:IsOwned(box) then
+		GameTooltip:Hide()
+	end
+end)
 
 local function ResetTotals()
 	-- This also clears Blizzard's own damage meter.

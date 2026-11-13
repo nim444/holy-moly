@@ -9,7 +9,7 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   damage meter), a mana bar that glows red when mana runs low, and the mana your spells cost in the current or
   last fight, with mana per minute. Drag it to move it; the trash button resets the totals (and Blizzard's
   meter) after asking.
-- **Hover the box:** healing per spell with icons, shares and overheal, who you healed and how often, and your
+- **Hold Alt over the box:** healing per spell with icons, shares and overheal, who you healed and how often, and your
   recent fights with a comparison to the one before.
 - **Speaker button:** sends one line with your totals and the three others you healed most ("[Name]", by first
   name), picked from dozens of Priest lines, as a yell, a say or to group chat; half the time it is the bill instead,
@@ -56,7 +56,7 @@ From a level 34 dungeon run on WoW Forever: the heal buttons for a party, with t
 | ![The box with buff check buttons under it](docs/screenshots/box-buff-check.png) | ![The box and the timers panel with a debuff to dispel](docs/screenshots/box-timers.png) |
 | The box after a few dungeons, buff check buttons under it. | The box and the timers panel: a debuff you can dispel, red border. |
 | ![The box's tooltip after a fight](docs/screenshots/tooltip-after-fight.png) | ![Buff check](docs/screenshots/buff-check.png) |
-| Hover the box after a fight: healing per spell, who you healed, recent fights. | Buff check: a missing Inner Fire, one click to cast it. |
+| Alt + hover the box after a fight: healing per spell, who you healed, recent fights. | Buff check: a missing Inner Fire, one click to cast it. |
 
 In a raid: the heal buttons for everyone, with the click spells in the tooltip.
 
