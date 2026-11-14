@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- The box: a social row along the bottom replaces the speaker and drink buttons. S, Y, P and R pick Say, Yell, Party or Raid; Report, Bill, Thanks and Drink each send one of 20 short lines with the star icon, names only in some. The report no longer turns into the bill by chance.
 - The box: its details (healing per spell, who you healed, recent fights) show only while you hold Alt over it, like the heal buttons.
 - Low mana: the "wait for me" line after a fight also does the /oom emote ("Also /oom" in the settings, on by default).
 - Low mana: when a fight ends with your mana under the low-mana threshold, a random line in party, raid or instance chat asks the group to wait before the next pull, with your mana percent ("Ask the group to wait" in the settings, on by default, at most every 20 seconds).

@@ -9,7 +9,7 @@ local DEFAULTS = {
 	lock = false,
 	scale = 1,
 	minimapButton = true,
-	reportChannel = "YELL", -- "YELL", "SAY", or "GROUP" (party, raid or instance chat)
+	reportChannel = "YELL", -- the social row's chat: "SAY", "YELL", "PARTY" or "RAID" (old saves may say "GROUP")
 	keptUp = true,
 	timers = true,
 	dispels = true,
@@ -189,12 +189,13 @@ local function RegisterPanel()
 	Checkbox("minimapButton", "Minimap button", "Holy Moly's button on the minimap: a click shows or hides the box, a right-click opens these settings. Drag it around the minimap.")
 
 	Header("Reports")
-	Dropdown("reportChannel", "Speaker button sends to", "Where your totals go when you click the speaker button.", {
-		{ "YELL", "Yell" },
+	Dropdown("reportChannel", "Social row sends to", "Where the Report, Bill, Thanks and Drink buttons on the box's bottom row send their lines. The S, Y, P and R letters on that row change it too.", {
 		{ "SAY", "Say" },
-		{ "GROUP", "Party, raid or instance chat" },
+		{ "YELL", "Yell" },
+		{ "PARTY", "Party (instance chat in a finder group)" },
+		{ "RAID", "Raid (party chat outside a raid)" },
 	})
-	Checkbox("keptUp", "Name who you kept up", "Adds the three others you healed most to the report, as [Name].")
+	Checkbox("keptUp", "Name who you kept up", "Lets Report, Bill and Thanks lines name the three others you healed most, as [A, B, C].")
 
 	Header("Heal buttons")
 	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat. Shift-click the minimap button or type /holy heals to turn them on or off quickly (in combat it happens when the fight ends).")

@@ -10,7 +10,7 @@ local MANA = Enum.PowerType.Mana
 
 local bar = CreateFrame("StatusBar", nil, box)
 bar:SetPoint("TOPLEFT", 10, -93)
-bar:SetPoint("TOPRIGHT", -30, -93)
+bar:SetPoint("TOPRIGHT", -10, -93)
 bar:SetHeight(9)
 bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 bar:SetStatusBarColor(0, 0.45, 1)
@@ -90,29 +90,14 @@ local function UpdateBar()
 	UpdateWarning()
 end
 
--- The drink button next to the bar yells one of these; %s is " (23% mana)" when your mana is readable (out of
--- combat), else empty.
-local DRINK_LINES = {
-	"{rt5} Hold the pull, I need to drink%s.",
-	"{rt5} Wait for me, low on mana%s.",
-	"{rt5} Drinking%s. Give me a moment before the next pull.",
-	"{rt5} The Light needs a refill%s. Wait for me!",
-}
-
-local function ManaPercentText()
+-- Your mana percent as "23%" for the social row's Drink lines, or nil when it can't be read (it is secret in combat).
+function ns.ManaPercentText()
 	local mana, maxMana = UnitPower("player", MANA), UnitPowerMax("player", MANA)
 	if issecretvalue(mana) or issecretvalue(maxMana) or maxMana == 0 then
-		return ""
+		return nil
 	end
-	return (" (%d%% mana)"):format(math.floor(mana / maxMana * 100 + 0.5))
+	return ("%d%%"):format(math.floor(mana / maxMana * 100 + 0.5))
 end
-
-local drinkButton = ns.IconButton("Interface\\Icons\\INV_Drink_07", "Drink", "Ask to wait",
-	"Yells that you need to drink.", function()
-		ns.SendChat(ns.RandomLine(DRINK_LINES):format(ManaPercentText()), "YELL")
-	end)
-drinkButton:SetSize(16, 16)
-drinkButton:SetPoint("LEFT", bar, "RIGHT", 6, 0)
 
 -- Low mana after a fight: when a fight ends with your mana under the low-mana threshold and you're in a group, one
 -- of these goes to the group chat (party, raid or instance) so they wait for you before the next pull; %d is your

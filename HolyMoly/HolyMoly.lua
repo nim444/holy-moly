@@ -19,7 +19,7 @@ local playerGUID
 -- Shared with Mana.lua (the mana rows at the bottom of the box) and BuffCheck.lua (the buttons under it).
 local box = CreateFrame("Frame", "HolyMolyBox", UIParent, "BackdropTemplate")
 ns.box = box
-box:SetSize(176, 126)
+box:SetSize(176, 150)
 box:SetClampedToScreen(true)
 box:SetMovable(true)
 box:EnableMouse(true)
@@ -451,102 +451,102 @@ local resetButton = IconButton("Interface\\AddOns\\HolyMoly\\Media\\Trash.tga", 
 	end)
 resetButton:SetPoint("TOPRIGHT", -10, -8)
 
--- The report is one line, picked at random (never the same twice in a row), so repeats don't read like spam.
--- {heal} is the healing total, {names} the people you healed most as "[Pestilen, Razorgir, Hauru]".
--- {rt1} is the star raid icon in chat, in every client language; a second one splits the line in two.
-local REPORT_LINES = {
-	"{rt1} The Light held: {heal} healed. {rt1} Kept up: {names}.",
-	"{rt1} {heal} healing done. {rt1} Most healed: {names}. Stay close to the Priest.",
-	"{rt1} By the Light: {heal} healed. {rt1} Top patients: {names}.",
-	"{rt1} Another fight survived: {heal} healed. {rt1} Thank the Priest, {names}.",
-	"{rt1} Healer bill: {heal} healed. {rt1} Invoices go to {names}.",
-	"{rt1} {heal} healed. {rt1} {names}, you can stop standing in the fire now.",
-	"{rt1} Mana well spent: {heal} healing. {rt1} Frequent flyers: {names}.",
-	"{rt1} Nobody dies on my watch: {heal} healed. {rt1} Mostly {names}.",
-	"{rt1} Holy numbers: {heal} healed. {rt1} {names} owe me a drink.",
-	"{rt1} {heal} healing. {rt1} {names}, the Light says you're welcome.",
-	"{rt1} Patch-up report: {heal} healed. {rt1} Most patched: {names}.",
-	"{rt1} The Priest delivers: {heal} healed. {rt1} Special thanks to my regulars {names}.",
-	"{rt1} Clinic is closing: {heal} healed. {rt1} Last patients out: {names}.",
-	"{rt1} {heal} healed. {rt1} {names}, your insurance has been cancelled.",
-	"{rt1} Bandages used: all of them. {rt1} {heal} healed, mostly {names}.",
-	"{rt1} Healing bill: {heal}. {rt1} {names} took the damage, I paid for it.",
-	"{rt1} Today's blood donors: {names}. {rt1} Refilled for {heal}.",
-	"{rt1} Warranty repairs complete: {heal} healed. {rt1} Repaired units: {names}.",
-	"{rt1} Loyalty card stamped for {names}. {rt1} Total healed: {heal}.",
-	"{rt1} {heal} healed. {rt1} {names}, try dodging next time.",
-	"{rt1} I've seen worse: {heal} healed. {rt1} Actually no I haven't, {names}.",
-	"{rt1} Prayers answered: {heal} worth. {rt1} Most prayed for: {names}.",
-	"{rt1} {heal} healing done. {rt1} Still breathing: {names}.",
-	"{rt1} Ghost run cancelled for {names}. {rt1} You're welcome: {heal} healed.",
-	"{rt1} Spirit Healer is out of work today. {rt1} {heal} healed, {names} safe.",
-	"{rt1} Priest shift report: {heal} healed. {rt1} Repeat offenders: {names}.",
-	"{rt1} {names}, that was {heal} healing. {rt1} Tips are accepted in gold.",
-	"{rt1} Health restored: {heal}. {rt1} Dignity restored for {names}: none.",
-	"{rt1} Graveyard stays empty: {heal} healed. {rt1} Nearly filled by {names}.",
-	"{rt1} That's {heal} healing. {rt1} {names} didn't even say thanks.",
-	"{rt1} Your health bars called in sick: {heal} healed. {rt1} Doctor's notes for {names}.",
-	"{rt1} Emergency room closed: {heal} healed. {rt1} Sent home with a lollipop: {names}.",
-	"{rt1} I went to school for this: {heal} healed. {rt1} Student loans paid by {names}.",
-	"{rt1} Today's special: {heal} healing. {rt1} Back for seconds: {names}.",
-	"{rt1} Aggro is not a personality: {heal} healed. {rt1} Listen up, {names}.",
-	"{rt1} The floor is lava, apparently that's news: {heal} healed. {rt1} Looking at you, {names}.",
-	"{rt1} My mana bar filed for divorce: {heal} healed. {rt1} Named in the papers: {names}.",
-	"{rt1} Free healing ended five pulls ago: {heal} healed. {rt1} Collecting from {names}.",
-	"{rt1} Stop hugging the boss: {heal} healed. {rt1} Restraining order for {names}.",
-	"{rt1} Not a single thank-you card: {heal} healed. {rt1} Still waiting on {names}.",
+-- The social row along the bottom of the box: where the lines go (S Say, Y Yell, P Party, R Raid) and four kinds
+-- of line: Report, Bill, Thanks and Drink. Each click sends one line picked at random, never the same twice in a row.
+-- {star} becomes the star raid icon ({rt1}, in every client language); {heal} is the healing total, {mana} the mana
+-- the last fight cost, {pct} your mana percent and {names} the three others you healed most as "[A, B, C]". A line
+-- is only picked when everything it names is known right now, so the ones without names keep it short.
+local SOCIAL_LINES = {
+	report = {
+		"{star} Healer report: {heal} healed. {star} Nobody died, you're welcome.",
+		"{star} {heal} healed. {star} Most rescued: {names}.",
+		"{star} The Light delivered {heal} healing today.",
+		"{star} {heal} healed. {star} {names}, the floor is not a bed.",
+		"{star} Shift report: {heal} healed, zero funerals.",
+		"{star} {heal} healing. {star} {names}, stop hugging the boss.",
+		"{star} Patched up: {names}. {star} Total: {heal}.",
+		"{star} {heal} healed. {star} Same time next pull?",
+		"{star} Healing done: {heal}. {star} Complaints go to the tank.",
+		"{star} {heal} healed and I didn't even spill my drink.",
+		"{star} {heal} healed. {star} {names}, I saw that pull. I said nothing.",
+		"{star} Today's miracle count: {heal} healing.",
+		"{star} {heal} healed. {star} The graveyard is disappointed.",
+		"{star} Kept alive: {names}. {star} Barely, but alive.",
+		"{star} {heal} healing poured in. {star} Not a drop wasted. Mostly.",
+		"{star} {heal} healed. {star} The Spirit Healer has the day off.",
+		"{star} Health restored: {heal}. {star} Dignity not included.",
+		"{star} {heal} healed. {star} {names} made it interesting.",
+		"{star} Priest report: {heal} healed, zero tears shed.",
+		"{star} {heal} healed. {star} Next time, try dodging.",
+	},
+	bill = {
+		"{star} Invoice: {heal} healed for {mana} mana. {star} Tips accepted in gold.",
+		"{star} Healing isn't free: {mana} mana. {star} {names}, pay up.",
+		"{star} Mana bill: {mana}. {star} Payable in gold or mana potions.",
+		"{star} {heal} healed. {star} The tip jar is open.",
+		"{star} Your health insurance cost {mana} mana. {star} Premiums due now.",
+		"{star} {heal} healing delivered. {star} {names}, donations welcome.",
+		"{star} Priest services: {heal} healed. {star} Gold, potions or compliments.",
+		"{star} The collection plate is coming around. {star} {mana} mana well spent.",
+		"{star} Bill for {names}: {heal} healing. {star} No refunds.",
+		"{star} I heal for the Light, but the Light accepts tips.",
+		"{star} {mana} mana spent on you lot. {star} Gold whispers welcome.",
+		"{star} Healing fee: {heal}. {star} I take gold, potions and hugs.",
+		"{star} {names}, your account is overdue. {star} {mana} mana outstanding.",
+		"{star} Mana is expensive. {star} So is your time on the floor.",
+		"{star} {heal} healed. {star} Leave a tip, keep the healer happy.",
+		"{star} Today's special: {heal} healing. {star} Price: one mana potion.",
+		"{star} Receipt: {heal} healed, {mana} mana. {star} Keep it for your records.",
+		"{star} Donations keep this Priest drinking. {star} Water isn't free.",
+		"{star} {names}, the Light sends its invoice. {star} Pay in gold.",
+		"{star} {mana} mana gone. {star} A tip won't bring it back, but it helps.",
+	},
+	thanks = {
+		"{star} Great run, everyone. {star} Thanks for the group!",
+		"{star} GG all. {star} Easiest heals of my life.",
+		"{star} Thanks for not standing in the fire.",
+		"{star} Lovely group. {star} Would heal again.",
+		"{star} Tank, you were a rock. {star} Thank you!",
+		"{star} Smooth run. {star} Good luck with your loot.",
+		"{star} Thanks, team. {star} The Light is proud of you.",
+		"{star} That was fun. {star} See you next dungeon.",
+		"{star} Thanks for the run. {star} You made healing easy.",
+		"{star} Best group today. {star} Thank you all.",
+		"{star} GG. {star} May your loot be purple.",
+		"{star} Thanks, everyone. {star} Nobody stood in anything. Proud.",
+		"{star} That was clean. {star} Thanks for the patience.",
+		"{star} Fun run! {star} Safe travels, heroes.",
+		"{star} Thanks for waiting on my drinks. {star} You're the best.",
+		"{star} Great pulls, great people. {star} Thank you.",
+		"{star} Thanks, {names}. {star} Easy to keep alive.",
+		"{star} Well played, team. {star} The Light smiles on you.",
+		"{star} Thanks for the group. {star} Add me for the next one.",
+		"{star} GG all. {star} Go sell those greens.",
+	},
+	drink = {
+		"{star} Drinking. {star} Hold the pull, please.",
+		"{star} Low mana. {star} Give me a moment.",
+		"{star} The Light needs a refill. {star} Wait for me.",
+		"{star} Pull now and you heal yourselves.",
+		"{star} Mana break. {star} One sip, then we go.",
+		"{star} Healer is drinking. {star} Tank, take a breath.",
+		"{star} At {pct} mana. {star} Drinking now.",
+		"{star} Healer on {pct} mana. {star} Wait for the drink.",
+		"{star} Drink break. {star} Thirty seconds, tops.",
+		"{star} Out of holy juice. {star} Refilling.",
+		"{star} Mana low, patience high. {star} One moment.",
+		"{star} Hold up, sipping. {star} Then we go.",
+		"{star} No mana, no heals. {star} Drinking.",
+		"{star} {pct} mana left. {star} Please wait before pulling.",
+		"{star} The Priest is recharging. {star} Do not pull.",
+		"{star} Water time. {star} Back in a moment.",
+		"{star} Tank, wait for me. {star} I'm drinking.",
+		"{star} Low battery. {star} Plugging in.",
+		"{star} Give me ten seconds. {star} Then go wild.",
+		"{star} Drinking. {star} Whoever pulls tanks the floor.",
+	},
 }
--- The same without names, for when nobody else was healed or "Name who you kept up" is off.
-local REPORT_LINES_NO_NAMES = {
-	"{rt1} The Light held: {heal} healed.",
-	"{rt1} {heal} healing done. {rt1} Stay close to the Priest.",
-	"{rt1} By the Light: {heal} healed.",
-	"{rt1} Another fight survived: {heal} healed.",
-	"{rt1} Healer bill: {heal} healed. {rt1} Payment in gold, please.",
-	"{rt1} Mana well spent: {heal} healing.",
-	"{rt1} Nobody dies on my watch: {heal} healed.",
-	"{rt1} Clinic is closing: {heal} healed today.",
-	"{rt1} Bandages used: all of them. {rt1} {heal} healed.",
-	"{rt1} Holy numbers: {heal} healed.",
-	"{rt1} Priest shift report: {heal} healed. {rt1} No complaints filed.",
-	"{rt1} Spirit Healer is out of work today: {heal} healed.",
-	"{rt1} Graveyard stays empty: {heal} healed.",
-	"{rt1} Prayers answered: {heal} worth of them.",
-	"{rt1} Warranty repairs complete: {heal} healed.",
-	"{rt1} Health restored: {heal}. {rt1} Tips are accepted in gold.",
-	"{rt1} Still breathing, all of you: {heal} healed.",
-	"{rt1} Ghost runs cancelled today: {heal} healed.",
-	"{rt1} The Light sends its invoice: {heal} healed.",
-	"{rt1} Another day at the clinic: {heal} healed.",
-}
-
--- Half the time the report sends the bill instead: what the healing cost in mana ({mana}, your own sum of spell costs
--- in the last fight, from Mana.lua), with gold tips and mana potions, flasks and elixirs welcome. Only when that sum
--- is known; otherwise the lines above.
-local MANA_BILL_LINES = {
-	"{rt1} {heal} healed for {mana} mana. {rt1} Invoice sent to {names}; tips accepted in gold.",
-	"{rt1} That healing cost me {mana} mana. {rt1} {names}, mana potions are welcome donations.",
-	"{rt1} {heal} healed, {mana} mana spent. {rt1} {names}, flasks and elixirs make lovely thank-you gifts.",
-	"{rt1} Healing isn't free: {mana} mana for {heal}. {rt1} {names}, tips in gold, potions also accepted.",
-	"{rt1} Mana bill: {mana} for {heal} healing. {rt1} Payable by {names} in gold or mana potions.",
-	"{rt1} {heal} healing, paid with {mana} of my mana. {rt1} Elixir donations from {names} gladly accepted.",
-	"{rt1} Invoice #{heal}: {mana} mana. {rt1} Due from {names}. Gold, potions or flasks.",
-	"{rt1} {names} cost me {mana} mana. {rt1} {heal} healed. The tip jar takes gold and mana potions.",
-	"{rt1} The Light charged {mana} mana for {heal} healing. {rt1} {names}, the collection plate is coming around.",
-	"{rt1} {heal} healed on {mana} mana. {rt1} {names}, I accept gold, potions, flasks and compliments.",
-	"{rt1} Priest services rendered: {heal} healing, {mana} mana. {rt1} Tips from {names} accepted in gold.",
-	"{rt1} {mana} mana poured into {names}. {rt1} {heal} healed. A mana potion says thank you best.",
-}
-local MANA_BILL_LINES_NO_NAMES = {
-	"{rt1} {heal} healed for {mana} mana. {rt1} Tips accepted in gold.",
-	"{rt1} Healing isn't free: {mana} mana for {heal}. {rt1} Mana potions welcome as donations.",
-	"{rt1} Mana bill: {mana} for {heal} healing. {rt1} Payable in gold, potions or flasks.",
-	"{rt1} {heal} healed, {mana} mana spent. {rt1} Elixirs and flasks make lovely thank-you gifts.",
-	"{rt1} Invoice #{heal}: {mana} mana. {rt1} Gold, potions or flasks accepted.",
-	"{rt1} The Light charged {mana} mana for {heal} healing. {rt1} The collection plate is coming around.",
-	"{rt1} {heal} healed on {mana} mana. {rt1} I accept gold, potions, flasks and compliments.",
-	"{rt1} Priest services rendered: {heal} healing, {mana} mana. {rt1} The tip jar takes gold.",
-}
+ns.SOCIAL_LINES = SOCIAL_LINES
 
 -- 33143 -> "33.1k", 2000000 -> "2M"
 local function ShortNumber(n)
@@ -627,54 +627,174 @@ local function GroupChannel()
 end
 ns.GroupChannel = GroupChannel
 
--- The speaker button: your healing, then who you kept up, to the chat picked in the settings.
-local function ReportTotals()
-	local ok, heal = pcall(function()
-		return PlayerTotal(HEALING) or 0
-	end)
-	if not ok then
-		print("Holy Moly error: " .. tostring(heal))
-		return
+-- Where a social line goes. Party is instance chat in a finder group; Raid falls back to party chat outside a raid.
+-- "GROUP" is the setting's old value (before the social row) and counts as Party.
+local CHANNELS = {
+	{ "SAY", "S", "Say" },
+	{ "YELL", "Y", "Yell" },
+	{ "PARTY", "P", "Party (instance chat in a finder group)" },
+	{ "RAID", "R", "Raid (party chat when you're not in a raid)" },
+}
+
+local function SocialChannel()
+	local pick = ns.Get("reportChannel")
+	if pick == "SAY" or pick == "YELL" then
+		return pick
+	elseif IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+		return "INSTANCE_CHAT"
+	elseif pick == "RAID" and IsInRaid() then
+		return "RAID"
+	elseif IsInGroup() then
+		return "PARTY"
 	end
-	-- Chat refuses secret text from addons, and the totals are secret during combat.
-	if issecretvalue(heal) then
-		print("Holy Moly: totals can't be yelled during combat; try again after the fight.")
-		return
-	end
-	if heal == 0 then
-		print("Holy Moly: nothing healed yet.")
-		return
-	end
-	local channel = "YELL"
-	if ns.Get("reportChannel") == "SAY" then
-		channel = "SAY"
-	elseif ns.Get("reportChannel") == "GROUP" then
-		channel = GroupChannel()
-		if not channel then
-			print("Holy Moly: you're not in a group. Options > AddOns > Holy Moly sets where the totals go.")
-			return
-		end
-	end
-	local names = ns.Get("keptUp") and KeptUpNames()
-	local mana = ns.LastFightMana and ns.LastFightMana()
-	local lines
-	if mana and mana > 0 and math.random() < 0.5 then
-		lines = names and MANA_BILL_LINES or MANA_BILL_LINES_NO_NAMES
-	else
-		lines = names and REPORT_LINES or REPORT_LINES_NO_NAMES
-	end
-	local line = ns.RandomLine(lines)
-	-- A function replacement, so a "%" in a name can't be read as a pattern.
-	line = line:gsub("{heal}", function() return ShortNumber(heal) end)
-		:gsub("{mana}", function() return ShortNumber(mana or 0) end)
-		:gsub("{names}", function() return names or "" end)
-	ns.SendChat(line, channel)
 end
 
-local yellButton = IconButton("voicechat-icon-speaker", "Yell", "Report totals",
-	"Sends your healing and the three people you healed most in one line. Out of combat only. Where it goes: "
-	.. "Options > AddOns > Holy Moly.", ReportTotals)
-yellButton:SetPoint("RIGHT", resetButton, "LEFT", -6, 0)
+local lastSocial = {} -- kind -> the line sent last, so a click never repeats it
+
+-- A random line of this kind whose placeholders are all in values, with them filled in; nil when none fits.
+local function PickSocial(kind, values)
+	local pool = {}
+	for _, line in ipairs(SOCIAL_LINES[kind]) do
+		local fits = line ~= lastSocial[kind]
+		for key in line:gmatch("{(%a+)}") do
+			if key ~= "star" and values[key] == nil then
+				fits = false
+			end
+		end
+		if fits then
+			pool[#pool + 1] = line
+		end
+	end
+	if #pool == 0 then
+		return nil
+	end
+	local line = pool[math.random(#pool)]
+	lastSocial[kind] = line
+	-- A function replacement, so a "%" in a name can't be read as a pattern.
+	return (line:gsub("{(%a+)}", function(key)
+		return key == "star" and "{rt1}" or values[key]
+	end))
+end
+
+-- One click on the social row. Report and Bill need your totals, which are secret in combat, so they wait for the
+-- end of the fight; Thanks and Drink work any time.
+local function SendSocial(kind)
+	local channel = SocialChannel()
+	if not channel then
+		print("Holy Moly: you're not in a group. Pick S or Y on the box's bottom row to say it instead.")
+		return
+	end
+	local values = {}
+	if kind == "report" or kind == "bill" then
+		local ok, heal = pcall(function()
+			return PlayerTotal(HEALING) or 0
+		end)
+		if not ok then
+			print("Holy Moly error: " .. tostring(heal))
+			return
+		end
+		if issecretvalue(heal) then
+			print("Holy Moly: totals can't be sent during combat; try again after the fight.")
+			return
+		end
+		if heal == 0 then
+			print("Holy Moly: nothing healed yet.")
+			return
+		end
+		values.heal = ShortNumber(heal)
+		local mana = ns.LastFightMana and ns.LastFightMana()
+		if mana and mana > 0 then
+			values.mana = ShortNumber(mana)
+		end
+	end
+	if kind == "drink" and ns.ManaPercentText then
+		values.pct = ns.ManaPercentText()
+	end
+	if kind ~= "drink" and ns.Get("keptUp") and not InCombatLockdown() then
+		values.names = KeptUpNames()
+	end
+	local line = PickSocial(kind, values)
+	if line then
+		ns.SendChat(line, channel)
+	end
+end
+ns.SendSocial = SendSocial
+
+local socialDivider = box:CreateTexture(nil, "ARTWORK")
+socialDivider:SetTexture("Interface\\Common\\UI-TooltipDivider-Transparent")
+socialDivider:SetPoint("TOPLEFT", 8, -119)
+socialDivider:SetPoint("TOPRIGHT", -8, -119)
+socialDivider:SetHeight(8)
+
+local channelButtons = {}
+
+local function PaintChannels()
+	local pick = ns.Get("reportChannel")
+	if pick == "GROUP" then
+		pick = "PARTY"
+	end
+	for _, button in ipairs(channelButtons) do
+		local on = button.key == pick
+		button.label:SetTextColor(on and 1 or 0.55, on and 0.82 or 0.55, on and 0.3 or 0.55)
+		button.mark:SetShown(on)
+	end
+end
+
+for i, channel in ipairs(CHANNELS) do
+	local button = CreateFrame("Button", nil, box)
+	button:SetSize(15, 16)
+	button:SetPoint("TOPLEFT", 8 + (i - 1) * 15, -128)
+	button.key = channel[1]
+	button.label = button:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	button.label:SetPoint("CENTER")
+	button.label:SetText(channel[2])
+	button.mark = button:CreateTexture(nil, "ARTWORK")
+	button.mark:SetColorTexture(1, 0.82, 0.3)
+	button.mark:SetHeight(1)
+	button.mark:SetPoint("BOTTOMLEFT", 3, 0)
+	button.mark:SetPoint("BOTTOMRIGHT", -3, 0)
+	local highlight = button:CreateTexture(nil, "HIGHLIGHT")
+	highlight:SetAllPoints()
+	highlight:SetColorTexture(1, 1, 1, 0.12)
+	button:SetScript("OnClick", function()
+		ns.Set("reportChannel", channel[1])
+		PaintChannels()
+	end)
+	button:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_TOP")
+		GameTooltip:SetText("Send to: " .. channel[3])
+		GameTooltip:AddLine("Where the four buttons on this row send their lines.", 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	button:SetScript("OnLeave", GameTooltip_Hide)
+	channelButtons[i] = button
+end
+ns.OnSettingChanged("reportChannel", PaintChannels)
+
+-- The four kinds, left to right, with an icon each so they're easy to tell apart.
+local SOCIAL_BUTTONS = {
+	{ "report", "voicechat-icon-speaker", "Report", "Report", "A funny line with your healing, sometimes naming who you kept up. After the fight." },
+	{ "bill", "Interface\\Icons\\INV_Misc_Coin_01", "Bill", "Bill", "The invoice: your healing and the mana it cost, tips and potions welcome. After the fight." },
+	{ "thanks", "Interface\\Icons\\Spell_Holy_Renew", "Thanks", "Thanks", "A friendly thank-you to the group, for the end of a good run. Any time." },
+	{ "drink", "Interface\\Icons\\INV_Drink_07", "Drink", "Drink", "Asks the group to wait while you drink, with your mana when it can be read. Any time." },
+}
+for i, entry in ipairs(SOCIAL_BUTTONS) do
+	local kind = entry[1]
+	local button = IconButton(entry[2], entry[3], entry[4], entry[5], function()
+		SendSocial(kind)
+	end)
+	button:SetSize(18, 18)
+	button:SetPoint("TOPLEFT", 74 + (i - 1) * 21, -127)
+end
+
+local channelSetup = CreateFrame("Frame")
+channelSetup:RegisterEvent("PLAYER_LOGIN")
+channelSetup:SetScript("OnEvent", function()
+	if ns.Get("reportChannel") == "GROUP" then
+		ns.Set("reportChannel", "PARTY") -- the old "party, raid or instance chat" choice
+	end
+	PaintChannels()
+end)
 
 local function SavePosition()
 	local point, _, relativePoint, x, y = box:GetPoint()

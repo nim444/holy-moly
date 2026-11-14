@@ -52,9 +52,8 @@ buffs need a refresh. Built for Forever's addon rules: it works in combat withou
   other heals over time on each group member, with the game's own countdown.
 - **Buff check:** out of combat, one-click buttons for Fortitude, Divine Spirit, Shadow Protection, Inner Fire and
   Fear Ward when someone is missing them or has under 5 minutes left.
-- **Reports:** one click yells your totals with a Priest line and names the three people you kept up. Choose yell,
-  say or group chat.
-- **Drink button:** asks the group to wait while you drink, with your mana percent.
+- **Social row:** pick Say, Yell, Party or Raid, then Report (your healing with a joke), Bill (an invoice for the
+  mana), Thanks (for a good run) or Drink (wait for me). 20 short lines of each, picked at random.
 - **Minimap button:** click to show or hide the box, right-click for the settings, drag it around the minimap.
 
 ## Commands
