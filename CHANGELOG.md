@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons: your mana on the top row, above the tank: a blue bar that turns orange under the low-mana threshold (20% by default), with your mana percent and what's missing ("-850", or "Full"). Display only, no clicks.
 - The box: a social row along the bottom replaces the speaker and drink buttons. S, Y, P and R pick Say, Yell, Party or Raid; Report, Bill, Thanks and Drink each send one of 20 short lines with the star icon, names only in some. The report no longer turns into the bill by chance.
 - The box: its details (healing per spell, who you healed, recent fights) show only while you hold Alt over it, like the heal buttons.
 - Low mana: the "wait for me" line after a fight also does the /oom emote ("Also /oom" in the settings, on by default).

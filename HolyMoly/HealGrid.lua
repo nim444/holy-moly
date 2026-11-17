@@ -1094,3 +1094,132 @@ frame:SetScript("OnEvent", function(_, event)
 	end
 	QueueUpdate()
 end)
+
+-- Your mana on the heal grid's top row, beside the drag icon and above the tank: blue, orange under the low-mana
+-- threshold (Mana settings, 20% by default), with your mana percent at the left and what's missing at the right
+-- ("-850", or "Full"). Only a display: it takes no clicks. It shows with the drag icon, so only in a group.
+-- Mana can be secret in combat, so the code never compares it: the bar gets the raw values, the orange layer and the
+-- "-850" / "Full" texts get their alpha from step curves, and the texts are formatted from the secret values (if this
+-- client refuses that, they keep their last readable value).
+local MANA = Enum.PowerType.Mana
+local MANA_BAR_HEIGHT = 12
+local MANA_ORANGE = { 1, 0.55, 0.05 }
+
+local manaLowCurve = C_CurveUtil.CreateCurve()
+manaLowCurve:SetType(Enum.LuaCurveType.Step)
+local manaFullCurve = C_CurveUtil.CreateCurve() -- 1 at full mana, 0 below
+manaFullCurve:SetType(Enum.LuaCurveType.Step)
+manaFullCurve:AddPoint(0, 0)
+manaFullCurve:AddPoint(1, 1)
+local manaPercentCurve = C_CurveUtil.CreateCurve() -- 0 to 100, for the percent text
+manaPercentCurve:SetType(Enum.LuaCurveType.Linear)
+manaPercentCurve:AddPoint(0, 0)
+manaPercentCurve:AddPoint(1, 100)
+
+local function BuildManaBar(owner, gridFrame)
+	local strip = CreateFrame("Frame", nil, owner)
+	strip:SetPoint("LEFT", owner, "RIGHT", 3, 0)
+	strip:SetPoint("RIGHT", gridFrame, "TOPRIGHT", 0, -HANDLE_HEIGHT / 2)
+	strip:SetHeight(MANA_BAR_HEIGHT)
+	local background = strip:CreateTexture(nil, "BACKGROUND")
+	background:SetAllPoints()
+	background:SetColorTexture(0, 0, 0, 0.55)
+
+	local function Bar(r, g, b, level)
+		local bar = CreateFrame("StatusBar", nil, strip)
+		bar:SetPoint("TOPLEFT", 1, -1)
+		bar:SetPoint("BOTTOMRIGHT", -1, 1)
+		bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+		bar:SetStatusBarColor(r, g, b)
+		bar:SetFrameLevel(strip:GetFrameLevel() + level)
+		return bar
+	end
+	strip.blue = Bar(0, 0.45, 1, 1)
+	strip.orange = Bar(MANA_ORANGE[1], MANA_ORANGE[2], MANA_ORANGE[3], 2)
+
+	local text = CreateFrame("Frame", nil, strip)
+	text:SetAllPoints()
+	text:SetFrameLevel(strip:GetFrameLevel() + 3)
+	local function Label(justify)
+		local label = text:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		label:SetPoint(justify, justify == "LEFT" and 3 or -3, 0)
+		label:SetJustifyH(justify)
+		label:SetShadowColor(0, 0, 0, 1)
+		label:SetShadowOffset(1, -1)
+		return label
+	end
+	strip.percent = Label("LEFT")
+	strip.missing = Label("RIGHT")
+	strip.full = Label("RIGHT")
+	strip.full:SetText("Full")
+	return strip
+end
+
+local manaBar = BuildManaBar(handle, grid)
+local previewManaBar = BuildManaBar(previewHandle, preview)
+
+local function UpdateManaBar()
+	local maxMana = UnitPowerMax("player", MANA)
+	local mana = UnitPower("player", MANA)
+	for _, bar in ipairs({ manaBar.blue, manaBar.orange }) do
+		bar:SetMinMaxValues(0, maxMana)
+		bar:SetValue(mana)
+	end
+	manaBar.orange:SetAlpha(UnitPowerPercent("player", MANA, false, manaLowCurve))
+	local fullAlpha = UnitPowerPercent("player", MANA, false, manaFullCurve)
+	manaBar.full:SetAlpha(fullAlpha)
+	manaBar.missing:SetAlpha(UnitPowerPercent("player", MANA, false, missingCurve))
+	if not issecretvalue(mana) and not issecretvalue(maxMana) then
+		manaBar.percent:SetText(maxMana > 0 and ("%d%%"):format(math.floor(mana / maxMana * 100 + 0.5)) or "")
+		manaBar.missing:SetText("-" .. AbbreviateLargeNumbers(maxMana - mana))
+		return
+	end
+	local ok, percent = pcall(function()
+		return ("%d%%"):format(UnitPowerPercent("player", MANA, false, manaPercentCurve))
+	end)
+	if ok then
+		manaBar.percent:SetText(percent)
+	end
+	local okMissing, missing = pcall(function()
+		return "-" .. AbbreviateLargeNumbers(UnitPowerMissing("player", MANA))
+	end)
+	if okMissing then
+		manaBar.missing:SetText(missing)
+	end
+end
+
+-- The preview's strip: a made-up 64% (orange only if the low-mana threshold is set above that).
+local function FillPreviewManaBar()
+	local maxMana, mana = 3100, 1984
+	for _, bar in ipairs({ previewManaBar.blue, previewManaBar.orange }) do
+		bar:SetMinMaxValues(0, maxMana)
+		bar:SetValue(mana)
+	end
+	previewManaBar.orange:SetAlpha(mana / maxMana * 100 < ns.Get("lowManaPercent") and 1 or 0)
+	previewManaBar.percent:SetText("64%")
+	previewManaBar.missing:SetText("-" .. AbbreviateLargeNumbers(maxMana - mana))
+	previewManaBar.full:SetAlpha(0)
+end
+
+local function SafeUpdateManaBar()
+	local ok, err = pcall(UpdateManaBar)
+	if not ok and not reportedError then
+		reportedError = true
+		print("Holy Moly mana bar error: " .. tostring(err))
+	end
+end
+
+ns.OnSettingChanged("lowManaPercent", function(percent)
+	manaLowCurve:ClearPoints()
+	manaLowCurve:AddPoint(0, 1)
+	manaLowCurve:AddPoint(percent / 100, 0)
+	SafeUpdateManaBar()
+	FillPreviewManaBar()
+end)
+
+local manaFrame = CreateFrame("Frame")
+manaFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+manaFrame:RegisterUnitEvent("UNIT_POWER_FREQUENT", "player")
+manaFrame:RegisterUnitEvent("UNIT_MAXPOWER", "player")
+manaFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", "player")
+manaFrame:SetScript("OnEvent", SafeUpdateManaBar)
