@@ -32,6 +32,8 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   each can be changed in the settings. Hold Alt over a button for its tooltip (who it is, what each click casts).
   Your own mana sits on the top row, above the tank: blue, orange under the low-mana threshold, with your mana
   percent and what's missing ("-850", or "Full").
+- **Mana bar:** the same mana bar on its own, in and out of a group: drag it anywhere, set its width, or turn it
+  (and the heal buttons' one) off in the settings' Mana section.
   Three bar styles: Classic, Gilded (a textured bar in a thin gold frame, a spark at the edge of the health, a gold
   flash when your heal lands) and Gilded with class colors. Shift-click the minimap button or `/holy heals` turns
   the heal buttons on or off. The settings' Preview button shows a sample party in the chosen style beside the

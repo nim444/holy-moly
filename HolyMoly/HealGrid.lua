@@ -1095,15 +1095,20 @@ frame:SetScript("OnEvent", function(_, event)
 	QueueUpdate()
 end)
 
--- Your mana on the heal grid's top row, beside the drag icon and above the tank: blue, orange under the low-mana
--- threshold (Mana settings, 20% by default), with your mana percent at the left and what's missing at the right
--- ("-850", or "Full"). Only a display: it takes no clicks. It shows with the drag icon, so only in a group.
--- Mana can be secret in combat, so the code never compares it: the bar gets the raw values, the orange layer and the
+-- Your mana, in two places (each can be turned off in the settings):
+--   1. on the heal grid's top row, beside the drag icon and above the tank; it shows with the drag icon, so only in
+--      a group ("Mana on the heal buttons");
+--   2. as its own bar anywhere on the screen, in and out of a group, dragged to move it (unless the box is locked),
+--      with a width setting ("Mana bar", "Mana bar width").
+-- Both are blue, orange under the low-mana threshold (20% by default), with your mana percent at the left and what's
+-- missing at the right ("-850", or "Full"). Only displays: no clicks.
+-- Mana can be secret in combat, so the code never compares it: the bars get the raw values, the orange layer and the
 -- "-850" / "Full" texts get their alpha from step curves, and the texts are formatted from the secret values (if this
 -- client refuses that, they keep their last readable value).
 local MANA = Enum.PowerType.Mana
-local MANA_BAR_HEIGHT = 12
 local MANA_ORANGE = { 1, 0.55, 0.05 }
+local GRID_MANA_HEIGHT = 12
+local OWN_MANA_HEIGHT = 18
 
 local manaLowCurve = C_CurveUtil.CreateCurve()
 manaLowCurve:SetType(Enum.LuaCurveType.Step)
@@ -1116,11 +1121,10 @@ manaPercentCurve:SetType(Enum.LuaCurveType.Linear)
 manaPercentCurve:AddPoint(0, 0)
 manaPercentCurve:AddPoint(1, 100)
 
-local function BuildManaBar(owner, gridFrame)
-	local strip = CreateFrame("Frame", nil, owner)
-	strip:SetPoint("LEFT", owner, "RIGHT", 3, 0)
-	strip:SetPoint("RIGHT", gridFrame, "TOPRIGHT", 0, -HANDLE_HEIGHT / 2)
-	strip:SetHeight(MANA_BAR_HEIGHT)
+-- A mana bar inside parent, filling it: background, the blue bar, the orange bar over it, and the texts.
+local function BuildManaBar(parent, font)
+	local strip = CreateFrame("Frame", nil, parent)
+	strip:SetAllPoints()
 	local background = strip:CreateTexture(nil, "BACKGROUND")
 	background:SetAllPoints()
 	background:SetColorTexture(0, 0, 0, 0.55)
@@ -1141,8 +1145,8 @@ local function BuildManaBar(owner, gridFrame)
 	text:SetAllPoints()
 	text:SetFrameLevel(strip:GetFrameLevel() + 3)
 	local function Label(justify)
-		local label = text:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-		label:SetPoint(justify, justify == "LEFT" and 3 or -3, 0)
+		local label = text:CreateFontString(nil, "OVERLAY", font)
+		label:SetPoint(justify, justify == "LEFT" and 4 or -4, 0)
 		label:SetJustifyH(justify)
 		label:SetShadowColor(0, 0, 0, 1)
 		label:SetShadowOffset(1, -1)
@@ -1155,37 +1159,84 @@ local function BuildManaBar(owner, gridFrame)
 	return strip
 end
 
-local manaBar = BuildManaBar(handle, grid)
-local previewManaBar = BuildManaBar(previewHandle, preview)
+-- 1. On the heal grid's top row, from the drag icon to the grid's right edge.
+local gridManaHolder = CreateFrame("Frame", nil, handle)
+gridManaHolder:SetPoint("LEFT", handle, "RIGHT", 3, 0)
+gridManaHolder:SetPoint("RIGHT", grid, "TOPRIGHT", 0, -HANDLE_HEIGHT / 2)
+gridManaHolder:SetHeight(GRID_MANA_HEIGHT)
+local gridManaBar = BuildManaBar(gridManaHolder, "GameFontHighlightSmall")
 
-local function UpdateManaBar()
+local previewManaHolder = CreateFrame("Frame", nil, previewHandle)
+previewManaHolder:SetPoint("LEFT", previewHandle, "RIGHT", 3, 0)
+previewManaHolder:SetPoint("RIGHT", preview, "TOPRIGHT", 0, -HANDLE_HEIGHT / 2)
+previewManaHolder:SetHeight(GRID_MANA_HEIGHT)
+local previewManaBar = BuildManaBar(previewManaHolder, "GameFontHighlightSmall")
+
+-- 2. Its own bar: dragged to move it, its spot saved.
+local ownMana = CreateFrame("Frame", "HolyMolyManaBar", UIParent)
+ownMana:SetHeight(OWN_MANA_HEIGHT)
+ownMana:SetClampedToScreen(true)
+ownMana:SetMovable(true)
+ownMana:EnableMouse(true)
+ownMana:RegisterForDrag("LeftButton")
+ownMana:Hide()
+ownMana:SetScript("OnDragStart", function(self)
+	if not ns.Get("lock") then
+		self:StartMoving()
+	end
+end)
+ownMana:SetScript("OnDragStop", function(self)
+	self:StopMovingOrSizing()
+	local point, _, relativePoint, x, y = self:GetPoint()
+	HolyMolyDB.manaBarPosition = { point, relativePoint, x, y }
+end)
+local ownManaBar = BuildManaBar(ownMana, "GameFontHighlight")
+
+local function PlaceOwnMana()
+	local pos = HolyMolyDB and HolyMolyDB.manaBarPosition
+	ownMana:ClearAllPoints()
+	if pos then
+		ownMana:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4])
+	else
+		-- Under the middle of the screen, above the action bars.
+		ownMana:SetPoint("CENTER", UIParent, "CENTER", 0, -200)
+	end
+end
+
+local function FillManaBar(strip)
 	local maxMana = UnitPowerMax("player", MANA)
 	local mana = UnitPower("player", MANA)
-	for _, bar in ipairs({ manaBar.blue, manaBar.orange }) do
+	for _, bar in ipairs({ strip.blue, strip.orange }) do
 		bar:SetMinMaxValues(0, maxMana)
 		bar:SetValue(mana)
 	end
-	manaBar.orange:SetAlpha(UnitPowerPercent("player", MANA, false, manaLowCurve))
-	local fullAlpha = UnitPowerPercent("player", MANA, false, manaFullCurve)
-	manaBar.full:SetAlpha(fullAlpha)
-	manaBar.missing:SetAlpha(UnitPowerPercent("player", MANA, false, missingCurve))
+	strip.orange:SetAlpha(UnitPowerPercent("player", MANA, false, manaLowCurve))
+	strip.full:SetAlpha(UnitPowerPercent("player", MANA, false, manaFullCurve))
+	strip.missing:SetAlpha(UnitPowerPercent("player", MANA, false, missingCurve))
 	if not issecretvalue(mana) and not issecretvalue(maxMana) then
-		manaBar.percent:SetText(maxMana > 0 and ("%d%%"):format(math.floor(mana / maxMana * 100 + 0.5)) or "")
-		manaBar.missing:SetText("-" .. AbbreviateLargeNumbers(maxMana - mana))
+		strip.percent:SetText(maxMana > 0 and ("%d%%"):format(math.floor(mana / maxMana * 100 + 0.5)) or "")
+		strip.missing:SetText("-" .. AbbreviateLargeNumbers(maxMana - mana))
 		return
 	end
 	local ok, percent = pcall(function()
 		return ("%d%%"):format(UnitPowerPercent("player", MANA, false, manaPercentCurve))
 	end)
 	if ok then
-		manaBar.percent:SetText(percent)
+		strip.percent:SetText(percent)
 	end
 	local okMissing, missing = pcall(function()
 		return "-" .. AbbreviateLargeNumbers(UnitPowerMissing("player", MANA))
 	end)
 	if okMissing then
-		manaBar.missing:SetText(missing)
+		strip.missing:SetText(missing)
 	end
+end
+
+-- Both are filled even while hidden, so one that appears (joining a group) is right at once, also at full mana when
+-- no power event comes.
+local function UpdateManaBars()
+	FillManaBar(gridManaBar)
+	FillManaBar(ownManaBar)
 end
 
 -- The preview's strip: a made-up 64% (orange only if the low-mana threshold is set above that).
@@ -1199,10 +1250,11 @@ local function FillPreviewManaBar()
 	previewManaBar.percent:SetText("64%")
 	previewManaBar.missing:SetText("-" .. AbbreviateLargeNumbers(maxMana - mana))
 	previewManaBar.full:SetAlpha(0)
+	previewManaHolder:SetShown(ns.Get("gridMana"))
 end
 
-local function SafeUpdateManaBar()
-	local ok, err = pcall(UpdateManaBar)
+local function SafeUpdateManaBars()
+	local ok, err = pcall(UpdateManaBars)
 	if not ok and not reportedError then
 		reportedError = true
 		print("Holy Moly mana bar error: " .. tostring(err))
@@ -1213,13 +1265,32 @@ ns.OnSettingChanged("lowManaPercent", function(percent)
 	manaLowCurve:ClearPoints()
 	manaLowCurve:AddPoint(0, 1)
 	manaLowCurve:AddPoint(percent / 100, 0)
-	SafeUpdateManaBar()
+	SafeUpdateManaBars()
 	FillPreviewManaBar()
+end)
+ns.OnSettingChanged("gridMana", function(shown)
+	gridManaHolder:SetShown(shown)
+	SafeUpdateManaBars()
+	FillPreviewManaBar()
+end)
+ns.OnSettingChanged("manaBar", function(shown)
+	ownMana:SetShown(shown)
+	SafeUpdateManaBars()
+end)
+ns.OnSettingChanged("manaBarWidth", function(width)
+	ownMana:SetWidth(width)
 end)
 
 local manaFrame = CreateFrame("Frame")
+manaFrame:RegisterEvent("PLAYER_LOGIN")
 manaFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+manaFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
 manaFrame:RegisterUnitEvent("UNIT_POWER_FREQUENT", "player")
 manaFrame:RegisterUnitEvent("UNIT_MAXPOWER", "player")
 manaFrame:RegisterUnitEvent("UNIT_DISPLAYPOWER", "player")
-manaFrame:SetScript("OnEvent", SafeUpdateManaBar)
+manaFrame:SetScript("OnEvent", function(_, event)
+	if event == "PLAYER_LOGIN" then
+		PlaceOwnMana()
+	end
+	SafeUpdateManaBars()
+end)

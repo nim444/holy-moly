@@ -29,6 +29,9 @@ local DEFAULTS = {
 	lowManaPercent = 20,
 	lowManaTell = true, -- after a fight under the threshold, ask the group to wait (Mana.lua)
 	lowManaOom = true, -- and do the /oom emote with it
+	gridMana = true, -- your mana on the heal buttons' top row (HealGrid.lua)
+	manaBar = true, -- your mana as its own bar, dragged anywhere (HealGrid.lua)
+	manaBarWidth = 220,
 	history = true,
 }
 
@@ -229,6 +232,10 @@ local function RegisterPanel()
 	Checkbox("buffCheck", "Buff check", "Out of combat, buttons for Priest buffs someone in the group is missing or has under 5 minutes left on.")
 
 	Header("Mana")
+	Checkbox("manaBar", "Mana bar", "Your mana as its own bar, in and out of a group: blue, orange under the low-mana threshold, with your mana percent and what's missing (\"-850\", or \"Full\"). Drag it to move it.")
+	Slider("manaBarWidth", "Mana bar width", "How wide your own mana bar is.", 100, 500, 10,
+		function(value) return ("%d"):format(value) end)
+	Checkbox("gridMana", "Mana on the heal buttons", "The same mana bar on the heal buttons' top row, above the tank (shows in a group).")
 	Checkbox("lowMana", "Low-mana warning", "The mana bar glows red below the threshold, also in combat.")
 	Slider("lowManaPercent", "Low-mana threshold", "The mana percent where the warning starts.", 10, 50, 5, Percent)
 	Checkbox("lowManaTell", "Ask the group to wait", "When a fight ends with your mana under the threshold, a random line in party, raid or instance chat asks them to wait for you before the next pull, with your mana percent. At most every 20 seconds.")
