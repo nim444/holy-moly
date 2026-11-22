@@ -60,10 +60,25 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 
 ## Screenshots
 
-From a level 34 dungeon run on WoW Forever: the heal buttons for a party, with the tank alone on the first row
-(blue border) and health and percent on each button.
+From WoW Forever at level 58 (22 Nov 2026).
 
-![Heal buttons in a dungeon party](docs/screenshots/dungeon-heal-buttons.png)
+Stratholme: the heal buttons for a party. The tank has the first row to themselves (blue border, shield mark), each
+button shows the health they are missing ("-37"), and your mana sits on top.
+
+![Heal buttons in Stratholme](docs/screenshots/stratholme-heal-buttons.png)
+
+After a wipe: "Dead" on each button, and your mana turns orange under the low-mana threshold.
+
+![Heal buttons after a wipe](docs/screenshots/wipe-heal-buttons.png)
+
+A 15-player battleground (Darkspear Islands): everyone, five to a row.
+
+![Heal buttons in a battleground](docs/screenshots/battleground-heal-buttons.png)
+
+The heal-button settings (Options > AddOns > Holy Moly): bar style, size, width, the low-health threshold and what
+each click casts, with Ctrl + left and Ctrl + right for the dispels.
+
+![Heal button settings](docs/screenshots/settings-heal-buttons.png)
 
 | | |
 |---|---|
@@ -72,15 +87,11 @@ From a level 34 dungeon run on WoW Forever: the heal buttons for a party, with t
 | ![The box's tooltip after a fight](docs/screenshots/tooltip-after-fight.png) | ![Buff check](docs/screenshots/buff-check.png) |
 | Alt + hover the box after a fight: healing per spell, who you healed, recent fights. | Buff check: a missing Inner Fire, one click to cast it. |
 
-In a raid: the heal buttons for everyone, with the click spells in the tooltip.
-
-![Heal buttons in a raid](docs/screenshots/raid-heal-buttons.png)
-
 The speaker button's report in party chat and the "kept up" line:
 
 ![Report in chat](docs/screenshots/report-in-chat.png)
 
-Player names are blurred in all screenshots.
+Names are blurred only in the older screenshots (the box, timers, tooltip, buff check and report, 10-11 Nov 2026).
 
 ## Support
 
