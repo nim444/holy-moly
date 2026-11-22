@@ -29,8 +29,8 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
   they are fine, a red border under 30% health (Forever hides health from addons, so the game itself applies the
   threshold). Eight clicks, in combat too: left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle
   Power Word: Shield, right Penance (the biggest heal until you learn it), Shift + right the biggest heal you know,
-  Alt + left Dispel Magic, Alt + right Abolish Disease (Cure Disease until you learn it); each can be changed in the
-  settings. Hold Ctrl over a button for its tooltip (who it is, what each click casts).
+  Ctrl + left Dispel Magic, Ctrl + right Abolish Disease (Cure Disease until you learn it); each can be changed in the
+  settings. Hold Alt over a button for its tooltip (who it is, what each click casts).
   A debuff you can dispel shows on the button, also in combat: a glow around it in the debuff's color (Magic blue,
   Disease brown, Curse purple, Poison green) and up to three of their icons with the time left, left of the
   missing-health text. The game draws them itself (Forever hides debuffs from addons in combat); "Debuffs you can

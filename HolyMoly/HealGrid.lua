@@ -2,8 +2,8 @@
 -- threshold (30% by default) and stays faint above it. Each shows their class icon, their name and how much health
 -- they are missing ("-600", nothing at full health); the width is a setting. Eight clicks, each changeable in the settings:
 -- left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle Power Word: Shield, right Penance,
--- Shift + right the biggest heal, Alt + left Dispel Magic and Alt + right Abolish Disease. Their tooltip (who it is,
--- what each click casts) shows only while Ctrl is held.
+-- Shift + right the biggest heal, Ctrl + left Dispel Magic and Ctrl + right Abolish Disease. Their tooltip (who it is,
+-- what each click casts) shows only while Alt is held.
 --
 -- Debuffs you can dispel: a glow around the button in the debuff type's color (Magic blue, Disease brown, Curse
 -- purple, Poison green) and up to three of their icons with a countdown sweep, left of the missing-health text; see
@@ -37,7 +37,7 @@ local _, ns = ...
 local BIGGEST_HEALS = { "Greater Heal", "Heal", "Lesser Heal" }
 -- What a click casts while its spell isn't learned yet; any other unlearned spell casts the biggest heal.
 local STAND_INS = { ["Flash Heal"] = "Lesser Heal", ["Abolish Disease"] = "Cure Disease" }
--- The clicks by the secure attributes they set ("shift-" or "alt-" makes an attribute apply only with that key held),
+-- The clicks by the secure attributes they set ("shift-" or "ctrl-" makes an attribute apply only with that key held),
 -- with the setting that picks what each does. press is the modifier prefix and mouse button, as Press() reads a click.
 local CLICKS = {
 	{ type = "type1", spell = "spell1", key = "healLeft", label = "Left click", press = "LeftButton" },
@@ -49,13 +49,14 @@ local CLICKS = {
 	{ type = "type2", spell = "spell2", key = "healRight", label = "Right click", press = "RightButton" },
 	{ type = "shift-type2", spell = "shift-spell2", key = "healShiftRight", label = "Shift + right click",
 		press = "shift-RightButton" },
-	{ type = "alt-type1", spell = "alt-spell1", key = "healAltLeft", label = "Alt + left click", press = "alt-LeftButton" },
-	{ type = "alt-type2", spell = "alt-spell2", key = "healAltRight", label = "Alt + right click",
-		press = "alt-RightButton" },
+	{ type = "ctrl-type1", spell = "ctrl-spell1", key = "healCtrlLeft", label = "Ctrl + left click",
+		press = "ctrl-LeftButton" },
+	{ type = "ctrl-type2", spell = "ctrl-spell2", key = "healCtrlRight", label = "Ctrl + right click",
+		press = "ctrl-RightButton" },
 }
 
 -- A click as the secure button reads it: the held modifiers in the game's order (alt, ctrl, shift) and the mouse
--- button. A combination no click is set for (Ctrl, or Alt and Shift together) casts nothing.
+-- button. A combination no click is set for (Alt, or Ctrl and Shift together) casts nothing.
 local function Press(mouseButton)
 	return (IsAltKeyDown() and "alt-" or "") .. (IsControlKeyDown() and "ctrl-" or "")
 		.. (IsShiftKeyDown() and "shift-" or "") .. tostring(mouseButton)
@@ -169,8 +170,8 @@ handle:SetScript("OnEnter", function(self)
 	GameTooltip:SetText("Holy Moly heals")
 	GameTooltip:AddLine("A button lights up red when that person drops under " .. ns.Get("healGridPercent")
 		.. "% health. The tank has a blue border and a shield; /holy tank marks your target as tank. A glow in the"
-		.. " debuff's color and its icon show a debuff you can dispel: Alt + left click casts Dispel Magic, Alt + right"
-		.. " click Abolish Disease. Hold Ctrl over a button to see who it is and what each click casts. Drag here to"
+		.. " debuff's color and its icon show a debuff you can dispel: Ctrl + left click casts Dispel Magic, Ctrl + right"
+		.. " click Abolish Disease. Hold Alt over a button to see who it is and what each click casts. Drag here to"
 		.. " move the grid with this icon (out of combat).", 1, 1, 1, true)
 	GameTooltip:Show()
 end)
@@ -382,13 +383,13 @@ local function ShowTooltip(self)
 	GameTooltip:Show()
 end
 
--- A button's tooltip shows only while Ctrl is held, so it doesn't cover the grid while you heal: on entering with Ctrl
--- down, or when Ctrl goes down while the mouse is over a button (and it goes away when Ctrl is let go). Not Alt or
--- Shift, which pick the click's spell; a click with Ctrl held casts nothing.
+-- A button's tooltip shows only while Alt is held, so it doesn't cover the grid while you heal: on entering with Alt
+-- down, or when Alt goes down while the mouse is over a button (and it goes away when Alt is let go). Not Ctrl or
+-- Shift, which pick the click's spell; a click with Alt held casts nothing.
 local hovered
 local function OnButtonEnter(self)
 	hovered = self
-	if IsControlKeyDown() then
+	if IsAltKeyDown() then
 		ShowTooltip(self)
 	end
 end
@@ -400,13 +401,13 @@ local function OnButtonLeave(self)
 		GameTooltip:Hide()
 	end
 end
-local ctrlFrame = CreateFrame("Frame")
-ctrlFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
-ctrlFrame:SetScript("OnEvent", function(_, _, key)
-	if not hovered or (key ~= "LCTRL" and key ~= "RCTRL") then
+local altFrame = CreateFrame("Frame")
+altFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
+altFrame:SetScript("OnEvent", function(_, _, key)
+	if not hovered or (key ~= "LALT" and key ~= "RALT") then
 		return
 	end
-	if IsControlKeyDown() then
+	if IsAltKeyDown() then
 		ShowTooltip(hovered)
 	elseif GameTooltip:IsOwned(hovered) then
 		GameTooltip:Hide()
