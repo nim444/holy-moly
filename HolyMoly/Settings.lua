@@ -27,6 +27,8 @@ local DEFAULTS = {
 	healShiftRight = "BIGGEST",
 	healCtrlLeft = "Dispel Magic",
 	healCtrlRight = "Abolish Disease", -- Cure Disease until it is learned
+	healAltLeft = "COMECLOSE", -- the "come close, you are out of my range" line (HealGrid.lua)
+	healGridRange = true, -- the heal buttons gray out beyond about 40 yards
 	healGridDebuffs = true, -- the glow and icons of debuffs you can dispel on the heal buttons (HealGrid.lua)
 	lowMana = true,
 	lowManaPercent = 20,
@@ -157,7 +159,8 @@ end
 -- (plus the saved one, so the dropdown can always show it).
 local function ClickChoices(key)
 	return function()
-		local choices = { { "BIGGEST", "Biggest heal you know" }, { "TARGET", "Target them" } }
+		local choices = { { "BIGGEST", "Biggest heal you know" }, { "TARGET", "Target them" },
+			{ "COMECLOSE", "Tell them to come close" } }
 		for _, spell in ipairs(CLICK_SPELLS) do
 			if ns.Knows(spell) then
 				choices[#choices + 1] = { spell, spell }
@@ -204,7 +207,7 @@ local function RegisterPanel()
 	Checkbox("keptUp", "Name who you kept up", "Lets Report, Bill and Thanks lines name the three others you healed most, as [A, B, C].")
 
 	Header("Heal buttons")
-	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat. Hold Alt over a button to see what each click casts. Shift-click the minimap button or type /holy heals to turn them on or off quickly (in combat it happens when the fight ends).")
+	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat. Hold Alt over a button to see what each click does. Shift-click the minimap button or type /holy heals to turn them on or off quickly (in combat it happens when the fight ends).")
 	Dropdown("healGridStyle", "Bar style", "How the heal buttons' bars look. Gilded: a textured bar in a thin gold frame, a spark at the edge of the health and a gold flash when your heal lands.", {
 		{ "CLASSIC", "1. Classic" },
 		{ "GILDED", "2. Gilded" },
@@ -232,6 +235,9 @@ local function RegisterPanel()
 		ClickChoices("healCtrlLeft"))
 	Dropdown("healCtrlRight", "Ctrl + right click", "What a right click with Ctrl held casts on a heal button.",
 		ClickChoices("healCtrlRight"))
+	Dropdown("healAltLeft", "Alt + left click", "What a left click with Alt held does on a heal button. \"Tell them to come close\" sends \"<name>, come close to me! You are out of my range!\" to the chat the box's S, Y, P and R letters pick (Yell by default).",
+		ClickChoices("healAltLeft"))
+	Checkbox("healGridRange", "Gray when out of range", "A heal button turns gray while that person is beyond about 40 yards, the range of your heals. Works in combat.")
 	Checkbox("healGridDebuffs", "Debuffs you can dispel", "A glow in the debuff's color around a heal button (Magic blue, Disease brown, Curse purple, Poison green) and up to three icons of debuffs you can remove, with their time left. Works in combat. A change made in combat waits for the fight to end.")
 
 	Header("Timers and buffs")

@@ -649,6 +649,8 @@ local function SocialChannel()
 	end
 end
 
+ns.SocialChannel = SocialChannel
+
 local lastSocial = {} -- kind -> the line sent last, so a click never repeats it
 
 -- A random line of this kind whose placeholders are all in values, with them filled in; nil when none fits.

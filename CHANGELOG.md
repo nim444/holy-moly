@@ -4,6 +4,8 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons: a button turns gray while that person is out of range (about 40 yards, your heals' range), also in combat. "Gray when out of range" in the settings, on by default.
+- Heal buttons: Alt + left click sends "<name>, come close to me! You are out of my range!" to the box's social-row chat (Yell by default). "Tell them to come close" is a choice for every click.
 - Heal buttons: debuffs you can dispel show on the button, also in combat: a glow in the debuff's color (Magic blue, Disease brown, Curse purple, Poison green) and up to three of their icons with the time left, drawn by the game itself the way X-Perl does it. "Debuffs you can dispel" in the settings, on by default; the preview shows two.
 - Heal buttons: Ctrl + left click casts Dispel Magic and Ctrl + right click Abolish Disease (Cure Disease until it is learned), each changeable in the settings, next to the Shift clicks.
 - Mana bar: your mana as its own bar too, in and out of a group, dragged anywhere, with a width setting (100 to 500). Both it and the heal buttons' mana bar can be turned off in the settings' Mana section.

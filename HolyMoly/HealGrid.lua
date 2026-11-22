@@ -1,9 +1,12 @@
 -- Heal grid: a button for each party or raid member that lights up with a red border when they drop under the
 -- threshold (30% by default) and stays faint above it. Each shows their class icon, their name and how much health
--- they are missing ("-600", nothing at full health); the width is a setting. Eight clicks, each changeable in the settings:
+-- they are missing ("-600", nothing at full health); the width is a setting. Nine clicks, each changeable in the settings:
 -- left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle Power Word: Shield, right Penance,
--- Shift + right the biggest heal, Ctrl + left Dispel Magic and Ctrl + right Abolish Disease. Their tooltip (who it is,
--- what each click casts) shows only while Alt is held.
+-- Shift + right the biggest heal, Ctrl + left Dispel Magic, Ctrl + right Abolish Disease and Alt + left a "come close"
+-- line to that person (see "Come close" below). Their tooltip (who it is, what each click does) shows only while Alt
+-- is held.
+--
+-- Out of range: the bar turns gray while that person is beyond about 40 yards, your heals' range (see "Range" below).
 --
 -- Debuffs you can dispel: a glow around the button in the debuff type's color (Magic blue, Disease brown, Curse
 -- purple, Poison green) and up to three of their icons with a countdown sweep, left of the missing-health text; see
@@ -37,26 +40,30 @@ local _, ns = ...
 local BIGGEST_HEALS = { "Greater Heal", "Heal", "Lesser Heal" }
 -- What a click casts while its spell isn't learned yet; any other unlearned spell casts the biggest heal.
 local STAND_INS = { ["Flash Heal"] = "Lesser Heal", ["Abolish Disease"] = "Cure Disease" }
+-- The click choice that sends the "come close" line instead of casting (see "Come close" below).
+local COME_CLOSE = "COMECLOSE"
 -- The clicks by the secure attributes they set ("shift-" or "ctrl-" makes an attribute apply only with that key held),
--- with the setting that picks what each does. press is the modifier prefix and mouse button, as Press() reads a click.
+-- with the setting that picks what each does. press is the modifier prefix and mouse button, as Press() reads a click;
+-- the attribute names (type, spell, macrotext) all follow from it.
 local CLICKS = {
-	{ type = "type1", spell = "spell1", key = "healLeft", label = "Left click", press = "LeftButton" },
-	{ type = "shift-type1", spell = "shift-spell1", key = "healShiftLeft", label = "Shift + left click",
-		press = "shift-LeftButton" },
-	{ type = "type3", spell = "spell3", key = "healMiddle", label = "Middle click", press = "MiddleButton" },
-	{ type = "shift-type3", spell = "shift-spell3", key = "healShiftMiddle", label = "Shift + middle click",
-		press = "shift-MiddleButton" },
-	{ type = "type2", spell = "spell2", key = "healRight", label = "Right click", press = "RightButton" },
-	{ type = "shift-type2", spell = "shift-spell2", key = "healShiftRight", label = "Shift + right click",
-		press = "shift-RightButton" },
-	{ type = "ctrl-type1", spell = "ctrl-spell1", key = "healCtrlLeft", label = "Ctrl + left click",
-		press = "ctrl-LeftButton" },
-	{ type = "ctrl-type2", spell = "ctrl-spell2", key = "healCtrlRight", label = "Ctrl + right click",
-		press = "ctrl-RightButton" },
+	{ key = "healLeft", label = "Left click", mods = "", button = 1, press = "LeftButton" },
+	{ key = "healShiftLeft", label = "Shift + left click", mods = "shift-", button = 1, press = "shift-LeftButton" },
+	{ key = "healMiddle", label = "Middle click", mods = "", button = 3, press = "MiddleButton" },
+	{ key = "healShiftMiddle", label = "Shift + middle click", mods = "shift-", button = 3, press = "shift-MiddleButton" },
+	{ key = "healRight", label = "Right click", mods = "", button = 2, press = "RightButton" },
+	{ key = "healShiftRight", label = "Shift + right click", mods = "shift-", button = 2, press = "shift-RightButton" },
+	{ key = "healCtrlLeft", label = "Ctrl + left click", mods = "ctrl-", button = 1, press = "ctrl-LeftButton" },
+	{ key = "healCtrlRight", label = "Ctrl + right click", mods = "ctrl-", button = 2, press = "ctrl-RightButton" },
+	{ key = "healAltLeft", label = "Alt + left click", mods = "alt-", button = 1, press = "alt-LeftButton" },
 }
+for _, click in ipairs(CLICKS) do
+	click.type = click.mods .. "type" .. click.button
+	click.spell = click.mods .. "spell" .. click.button
+	click.macrotext = click.mods .. "macrotext" .. click.button
+end
 
 -- A click as the secure button reads it: the held modifiers in the game's order (alt, ctrl, shift) and the mouse
--- button. A combination no click is set for (Alt, or Ctrl and Shift together) casts nothing.
+-- button. A combination no click is set for (Ctrl and Shift together, say) does nothing.
 local function Press(mouseButton)
 	return (IsAltKeyDown() and "alt-" or "") .. (IsControlKeyDown() and "ctrl-" or "")
 		.. (IsShiftKeyDown() and "shift-" or "") .. tostring(mouseButton)
@@ -171,8 +178,9 @@ handle:SetScript("OnEnter", function(self)
 	GameTooltip:AddLine("A button lights up red when that person drops under " .. ns.Get("healGridPercent")
 		.. "% health. The tank has a blue border and a shield; /holy tank marks your target as tank. A glow in the"
 		.. " debuff's color and its icon show a debuff you can dispel: Ctrl + left click casts Dispel Magic, Ctrl + right"
-		.. " click Abolish Disease. Hold Alt over a button to see who it is and what each click casts. Drag here to"
-		.. " move the grid with this icon (out of combat).", 1, 1, 1, true)
+		.. " click Abolish Disease. A gray bar is out of your heals' range; Alt + left click tells them to come close."
+		.. " Hold Alt over a button to see who it is and what each click does. Drag here to move the grid with this"
+		.. " icon (out of combat).", 1, 1, 1, true)
 	GameTooltip:Show()
 end)
 handle:SetScript("OnLeave", GameTooltip_Hide)
@@ -303,9 +311,29 @@ local function UpdateClass(button)
 	SetClass(button, classFile)
 end
 
+-- Range: UnitInRange (about 40 yards, the range of your heals) answers with a secret in Forever, which only widgets can
+-- read, so SetAlphaFromBoolean shows the gray layer from it. Asked on every button update, on UNIT_IN_RANGE_UPDATE and
+-- twice a second while the buttons show. Your own button never grays; "Gray when out of range" turns it off.
+local FAR_ALPHA = 0.8
+local function UpdateRange(button)
+	if button.unit == "player" or not ns.Get("healGridRange") then
+		button.far:SetAlpha(0)
+		return
+	end
+	local inRange = UnitInRange(button.unit)
+	if issecretvalue(inRange) then
+		button.far:SetAlphaFromBoolean(inRange, 0, FAR_ALPHA)
+	else
+		button.far:SetAlpha(inRange and 0 or FAR_ALPHA)
+	end
+end
+
 local function UpdateButton(button)
 	local unit = button.unit
 	UpdateTank(button)
+	if not pcall(UpdateRange, button) then
+		button.far:SetAlpha(0)
+	end
 	-- Its own pcall, so a problem here never stops the health bar.
 	if not pcall(UpdateWeakenedSoul, button) then
 		button.soul:SetAlpha(0)
@@ -385,7 +413,7 @@ end
 
 -- A button's tooltip shows only while Alt is held, so it doesn't cover the grid while you heal: on entering with Alt
 -- down, or when Alt goes down while the mouse is over a button (and it goes away when Alt is let go). Not Ctrl or
--- Shift, which pick the click's spell; a click with Alt held casts nothing.
+-- Shift, which pick the click's spell; Alt + left click sends the "come close" line.
 local hovered
 local function OnButtonEnter(self)
 	hovered = self
@@ -506,6 +534,17 @@ local function BuildLook(button)
 		gild:SetBackdropBorderColor(0.83, 0.67, 0.31)
 	end
 	button.gild = gild
+
+	-- Out of range: a gray layer over the bar, under the red low-health border, the name and the health text; on the
+	-- button, not the content, so it stays solid while the bar is faint. Shown through its alpha (UpdateRange).
+	local far = CreateFrame("Frame", nil, button)
+	far:SetAllPoints()
+	far:SetFrameLevel(health:GetFrameLevel() + 1)
+	local farTexture = far:CreateTexture(nil, "ARTWORK")
+	farTexture:SetAllPoints()
+	farTexture:SetColorTexture(0.3, 0.3, 0.3, 1)
+	far:SetAlpha(0)
+	button.far = far
 
 	-- The text sits on its own frame on the button, not on the content, so the name and health stay readable while
 	-- the bar is faint (healthy people) or someone is dead.
@@ -772,6 +811,8 @@ end
 local function ClickAction(choice)
 	if choice == "TARGET" then
 		return "target"
+	elseif choice == COME_CLOSE then
+		return "macro"
 	elseif choice ~= "BIGGEST" and ns.Knows(choice) then
 		return "spell", choice
 	elseif STAND_INS[choice] and ns.Knows(STAND_INS[choice]) then
@@ -790,7 +831,7 @@ local INSTANTS = { ["Dispel Magic"] = true, ["Cure Disease"] = true, ["Abolish D
 
 NoteClick = function(button, press)
 	local click = ClickFor(press)
-	if click and click.text and click.text ~= "Target" then
+	if click and click.action == "spell" and click.text then
 		local instant = click.text == SHIELD or click.text == RENEW or INSTANTS[click.text]
 		pendingCast = { button = button, time = GetTime(), spell = click.text,
 			wait = instant and INSTANT_WAIT or CAST_WAIT }
@@ -843,13 +884,37 @@ castFrame:SetScript("OnEvent", function(_, event, _, _, spellID)
 	end
 end)
 
+-- Come close: a click that sends "<name>, come close to me! You are out of my range!" to the box's social-row chat
+-- (Yell by default; Say, Yell, Party or Raid with the S, Y, P and R letters). The game may keep names secret in
+-- combat, and a click there can't run addon code that chats, so each button gets the line ready as a secure macro,
+-- made out of combat with the name in it (on roster changes, name updates and channel changes). Your own button
+-- gets none. Boss fights may block Say and Yell from macros; Party still goes through then.
+local COME_CLOSE_LINE = "%s, come close to me! You are out of my range!"
+local SLASH = { SAY = "/s", YELL = "/y", PARTY = "/p", RAID = "/ra", INSTANCE_CHAT = "/i" }
+
+local function ComeCloseMacro(unit)
+	if unit == "player" or not UnitExists(unit) then
+		return nil
+	end
+	local name = UnitName(unit)
+	local channel = ns.SocialChannel and ns.SocialChannel()
+	if not name or issecretvalue(name) or name == "" or not SLASH[channel] then
+		return nil
+	end
+	return SLASH[channel] .. " " .. COME_CLOSE_LINE:format(name)
+end
+
 local function ApplySpells()
 	for _, click in ipairs(CLICKS) do
 		local actionType, spell = ClickAction(ns.Get(click.key))
-		click.text = actionType == "target" and "Target" or spell
+		click.action = actionType
+		click.text = (actionType == "target" and "Target") or (actionType == "macro" and "Tell them to come close")
+			or spell
 		for _, button in ipairs(buttons) do
-			button:SetAttribute(click.type, actionType)
+			local macro = actionType == "macro" and ComeCloseMacro(button.unit) or nil
+			button:SetAttribute(click.type, (actionType ~= "macro" or macro) and actionType or nil)
 			button:SetAttribute(click.spell, spell)
+			button:SetAttribute(click.macrotext, macro)
 		end
 	end
 end
@@ -865,6 +930,8 @@ function ns.CheckHealButtons()
 		local actionType = button:GetAttribute(click.type)
 		local spell = button:GetAttribute(click.spell)
 		local detail = actionType == "spell" and (tostring(spell) .. (spell and ns.Knows(spell) and "" or " (not known!)"))
+			or click.action == "macro" and (click.text .. ", for example: " .. tostring(
+				(buttons[2] and buttons[2]:GetAttribute(click.macrotext)) or "(nobody else in your group)"))
 			or tostring(actionType)
 		print(("Holy Moly check: %s = %s"):format(click.label, detail))
 	end
@@ -887,7 +954,9 @@ function ReportClick(press, clickTime)
 		return
 	end
 	local label = click.label
-	if sentTime < clickTime then
+	if click.action == "macro" then
+		print(("Holy Moly check: %s sends the come-close line."):format(label))
+	elseif sentTime < clickTime then
 		print(("Holy Moly check: %s cast nothing (not ready, out of range, no mana or not known)."):format(label))
 	elseif issecretvalue(sentTarget) or issecretvalue(sentSpellID) then
 		print(("Holy Moly check: %s cast a spell the game keeps hidden right now."):format(label))
@@ -1006,7 +1075,7 @@ end
 -- heal buttons sit until /holy preview again. Its icon drags it (not saved).
 local SAMPLE = {
 	{ name = "Ironhide", class = "WARRIOR", health = 0.58, max = 5200, tank = true, soul = 9, renew = 12 },
-	{ name = "Lumina", class = "PRIEST", health = 1, max = 3100 },
+	{ name = "Lumina", class = "PRIEST", health = 1, max = 3100, far = true },
 	{ name = "Quickstep", class = "ROGUE", health = 0.22, max = 2800, renew = 6,
 		debuffs = { { "Magic", "Interface\\Icons\\Spell_Frost_FrostNova" } } },
 	{ name = "Emberly", class = "MAGE", health = 0.81, max = 2600,
@@ -1118,6 +1187,7 @@ local function FillPreviewButton(button, sample)
 	end
 	button.low:SetAlpha(low and 1 or 0)
 	button.tank:SetAlpha(sample.tank and 1 or 0)
+	button.far:SetAlpha((sample.far and ns.Get("healGridRange")) and FAR_ALPHA or 0)
 	for _, timer in ipairs({ { button.soul, sample.soul }, { button.renew, sample.renew } }) do
 		local icon, left = timer[1], timer[2]
 		if left then
@@ -1226,6 +1296,32 @@ for _, click in ipairs(CLICKS) do
 		OutOfCombat(ApplySpells)
 	end)
 end
+ns.OnSettingChanged("reportChannel", function()
+	OutOfCombat(ApplySpells) -- the come-close lines go to that chat
+end)
+ns.OnSettingChanged("healGridRange", function()
+	QueueUpdate()
+	RefreshPreview()
+end)
+-- Range has no reliable event for every client, so the visible buttons ask twice a second while in a group.
+local RANGE_EVERY = 0.5
+local rangeFrame = CreateFrame("Frame")
+local sinceRange = 0
+rangeFrame:SetScript("OnUpdate", function(_, elapsed)
+	sinceRange = sinceRange + elapsed
+	if sinceRange < RANGE_EVERY then
+		return
+	end
+	sinceRange = 0
+	if not IsInGroup() then
+		return
+	end
+	for _, button in ipairs(buttons) do
+		if button:IsVisible() and not pcall(UpdateRange, button) then
+			button.far:SetAlpha(0)
+		end
+	end
+end)
 ns.OnSettingChanged("healGridDebuffs", function()
 	OutOfCombat(RefreshDebuffs)
 	RefreshPreview()
@@ -1283,6 +1379,7 @@ frame:RegisterEvent("UNIT_MAXHEALTH")
 frame:RegisterEvent("UNIT_CONNECTION")
 frame:RegisterEvent("UNIT_NAME_UPDATE")
 frame:RegisterEvent("UNIT_AURA")
+pcall(frame.RegisterEvent, frame, "UNIT_IN_RANGE_UPDATE")
 -- Role changes; an event this client doesn't have would raise an error, so it is tried.
 pcall(frame.RegisterEvent, frame, "PLAYER_ROLES_ASSIGNED")
 frame:SetScript("OnEvent", function(_, event)
@@ -1299,6 +1396,9 @@ frame:SetScript("OnEvent", function(_, event)
 		OutOfCombat(ApplySpells)
 	elseif event == "GROUP_ROSTER_UPDATE" or event == "PLAYER_ENTERING_WORLD" then
 		OutOfCombat(RefreshDebuffs)
+		OutOfCombat(ApplySpells) -- the come-close lines carry names
+	elseif event == "UNIT_NAME_UPDATE" then
+		OutOfCombat(ApplySpells)
 	end
 	QueueUpdate()
 end)

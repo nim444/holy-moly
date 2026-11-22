@@ -27,10 +27,14 @@ loads it on the Forever client and nowhere else, and the code is built around Fo
 - **Heal buttons:** a grid of your party or raid, one button per person with class icon, name, health bar and
   the health they are missing ("-600", nothing at full health); the width is a setting. Faint while
   they are fine, a red border under 30% health (Forever hides health from addons, so the game itself applies the
-  threshold). Eight clicks, in combat too: left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle
+  threshold). Nine clicks, in combat too: left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle
   Power Word: Shield, right Penance (the biggest heal until you learn it), Shift + right the biggest heal you know,
-  Ctrl + left Dispel Magic, Ctrl + right Abolish Disease (Cure Disease until you learn it); each can be changed in the
-  settings. Hold Alt over a button for its tooltip (who it is, what each click casts).
+  Ctrl + left Dispel Magic, Ctrl + right Abolish Disease (Cure Disease until you learn it), and Alt + left "come
+  close": it sends "<name>, come close to me! You are out of my range!" to the chat the box's S, Y, P and R letters
+  pick (Yell by default; boss fights may block Say and Yell, Party still works). Each can be changed in the settings.
+  Hold Alt over a button for its tooltip (who it is, what each click does).
+  A button turns gray while that person is beyond about 40 yards, the range of your heals, also in combat ("Gray when
+  out of range" in the settings).
   A debuff you can dispel shows on the button, also in combat: a glow around it in the debuff's color (Magic blue,
   Disease brown, Curse purple, Poison green) and up to three of their icons with the time left, left of the
   missing-health text. The game draws them itself (Forever hides debuffs from addons in combat); "Debuffs you can
