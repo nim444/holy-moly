@@ -1,0 +1,41 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<!--
+	One debuff icon on a heal button (HealGrid.lua, "Debuffs you can dispel"). The game's aura container makes these
+	and fills them in: the icon, the countdown sweep, the stack count and the border in the debuff type's color.
+	-->
+	<Button name="HolyMolyDebuffIconTemplate" virtual="true">
+		<Size x="18" y="18"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Icon" setAllPoints="true"/>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture parentKey="Border" file="Interface\Buttons\UI-Debuff-Overlays" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-1" y="1"/>
+						<Anchor point="BOTTOMRIGHT" x="1" y="-1"/>
+					</Anchors>
+					<TexCoords left="0.296875" right="0.5703125" top="0" bottom="0.515625"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="CooldownHolder" setAllPoints="true">
+				<Frames>
+					<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true" reverse="true" drawEdge="false" hideCountdownNumbers="true" hidden="true"/>
+				</Frames>
+			</Frame>
+			<Frame parentKey="TextHolder" setAllPoints="true">
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString parentKey="Count" inherits="NumberFontNormalSmall" justifyH="RIGHT">
+							<Anchors>
+								<Anchor point="BOTTOMRIGHT" x="1" y="-1"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Button>
+</Ui>

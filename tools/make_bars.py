@@ -8,6 +8,9 @@ Output, all in HolyMoly/Media/Bars/:
 - Background.tga (256x32): the missing-health part behind the fill, gray with fine diagonal lines, tinted red.
 - Frame.tga (32x32): a thin gold bevel frame, drawn as a nine-slice with 5-pixel margins.
 - Spark.tga (16x32): the glow at the fill's moving edge, drawn with ADD blending.
+- Glow.tga (32x32): a white glow around a heal button when someone has a debuff you can dispel, drawn as a nine-slice
+  with 8-pixel margins and ADD blending; the game tints it with the debuff type's color. It is placed 4 pixels
+  outside the button, so the bright line sits on the button's edge and fades both ways.
 All sizes are powers of two, which the game needs. Pass a directory to also write PNG previews there.
 Run from the repo root: python3 tools/make_bars.py [preview-dir]
 """
@@ -109,6 +112,17 @@ def spark(x, y, w, h):
     return (*rgb, alpha)
 
 
+def glow(x, y, w, h):
+    d = min(x, y, w - x, h - y)
+    # The button's edge is 4 pixels in: a bright line there, a soft glow outwards and a shorter one inwards.
+    if d >= 8:
+        return (255, 255, 255, 0)
+    off = d - 4
+    line = 1.0 if abs(off) < 1 else 0.0
+    soft = math.exp(-(off ** 2) / (2 * (1.6 if off < 0 else 1.1) ** 2))
+    return (255, 255, 255, max(line, soft) * (1 - smooth(6, 8, d)))
+
+
 def render(shader, w, h, ss):
     pixels = []
     for py in range(h):
@@ -160,6 +174,7 @@ def main():
         ("Background", background, 256, 32, 1),
         ("Frame", frame, 32, 32, 4),
         ("Spark", spark, 16, 32, 4),
+        ("Glow", glow, 32, 32, 4),
     ):
         pixels = render(shader, w, h, ss)
         write_tga(BARS / f"{name}.tga", pixels, w, h)

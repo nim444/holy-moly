@@ -1,8 +1,13 @@
 -- Heal grid: a button for each party or raid member that lights up with a red border when they drop under the
 -- threshold (30% by default) and stays faint above it. Each shows their class icon, their name and how much health
--- they are missing ("-600", nothing at full health); the width is a setting. Six clicks, each changeable in the settings:
--- left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle Power Word: Shield, right Penance and
--- Shift + right the biggest heal. Their tooltip (who it is, what each click casts) shows only while Alt is held.
+-- they are missing ("-600", nothing at full health); the width is a setting. Eight clicks, each changeable in the settings:
+-- left Flash Heal, Shift + left Lesser Heal, middle Renew, Shift + middle Power Word: Shield, right Penance,
+-- Shift + right the biggest heal, Alt + left Dispel Magic and Alt + right Abolish Disease. Their tooltip (who it is,
+-- what each click casts) shows only while Ctrl is held.
+--
+-- Debuffs you can dispel: a glow around the button in the debuff type's color (Magic blue, Disease brown, Curse
+-- purple, Poison green) and up to three of their icons with a countdown sweep, left of the missing-health text; see
+-- "Debuffs you can dispel" below for how the game draws them in combat.
 --
 -- Bar styles (a setting): 1. Classic, the flat bar; 2. Gilded, our own textures from tools/make_bars.py (a brushed
 -- fill with a sheen, a groove behind it, a thin gold frame, a spark at the fill's edge, and a gold flash when your heal
@@ -31,17 +36,38 @@ local _, ns = ...
 -- "Biggest heal" in the click settings: the first of these the player knows.
 local BIGGEST_HEALS = { "Greater Heal", "Heal", "Lesser Heal" }
 -- What a click casts while its spell isn't learned yet; any other unlearned spell casts the biggest heal.
-local STAND_INS = { ["Flash Heal"] = "Lesser Heal" }
--- The clicks by the secure attributes they set ("shift-" makes an attribute apply only with Shift held), with the
--- setting that picks what each does.
+local STAND_INS = { ["Flash Heal"] = "Lesser Heal", ["Abolish Disease"] = "Cure Disease" }
+-- The clicks by the secure attributes they set ("shift-" or "alt-" makes an attribute apply only with that key held),
+-- with the setting that picks what each does. press is the modifier prefix and mouse button, as Press() reads a click.
 local CLICKS = {
-	{ type = "type1", spell = "spell1", key = "healLeft", label = "Left click" },
-	{ type = "shift-type1", spell = "shift-spell1", key = "healShiftLeft", label = "Shift + left click" },
-	{ type = "type3", spell = "spell3", key = "healMiddle", label = "Middle click" },
-	{ type = "shift-type3", spell = "shift-spell3", key = "healShiftMiddle", label = "Shift + middle click" },
-	{ type = "type2", spell = "spell2", key = "healRight", label = "Right click" },
-	{ type = "shift-type2", spell = "shift-spell2", key = "healShiftRight", label = "Shift + right click" },
+	{ type = "type1", spell = "spell1", key = "healLeft", label = "Left click", press = "LeftButton" },
+	{ type = "shift-type1", spell = "shift-spell1", key = "healShiftLeft", label = "Shift + left click",
+		press = "shift-LeftButton" },
+	{ type = "type3", spell = "spell3", key = "healMiddle", label = "Middle click", press = "MiddleButton" },
+	{ type = "shift-type3", spell = "shift-spell3", key = "healShiftMiddle", label = "Shift + middle click",
+		press = "shift-MiddleButton" },
+	{ type = "type2", spell = "spell2", key = "healRight", label = "Right click", press = "RightButton" },
+	{ type = "shift-type2", spell = "shift-spell2", key = "healShiftRight", label = "Shift + right click",
+		press = "shift-RightButton" },
+	{ type = "alt-type1", spell = "alt-spell1", key = "healAltLeft", label = "Alt + left click", press = "alt-LeftButton" },
+	{ type = "alt-type2", spell = "alt-spell2", key = "healAltRight", label = "Alt + right click",
+		press = "alt-RightButton" },
 }
+
+-- A click as the secure button reads it: the held modifiers in the game's order (alt, ctrl, shift) and the mouse
+-- button. A combination no click is set for (Ctrl, or Alt and Shift together) casts nothing.
+local function Press(mouseButton)
+	return (IsAltKeyDown() and "alt-" or "") .. (IsControlKeyDown() and "ctrl-" or "")
+		.. (IsShiftKeyDown() and "shift-" or "") .. tostring(mouseButton)
+end
+
+local function ClickFor(press)
+	for _, click in ipairs(CLICKS) do
+		if click.press == press then
+			return click
+		end
+	end
+end
 local BUTTON_HEIGHT, GAP = 24, 2
 local PARTY_COLUMNS = 2 -- a party: the tank alone on the first row, everyone else two by two under them
 local RAID_COLUMNS = 5
@@ -52,6 +78,16 @@ local CLASS_ICON_SIZE = BUTTON_HEIGHT - 8
 -- The class icons' fallback when the client has no "classicon-<class>" atlas: the round icons, cut by CLASS_ICON_TCOORDS.
 local CLASS_ICON_CIRCLES = "Interface\\TargetingFrame\\UI-Classes-Circles"
 local WEAKENED_SOUL_ICON = "Interface\\Icons\\Spell_Holy_AshesToAshes"
+-- Debuffs you can dispel: up to DEBUFF_ICONS icons left of the missing-health text (DEBUFF_TEXT_ROOM keeps "-1.2K"
+-- clear), and a glow DEBUFF_GLOW_OUTSET pixels outside the button (Glow.tga's bright line sits that far in).
+local DEBUFF_ICON_SIZE = BUTTON_HEIGHT - 6
+local DEBUFF_ICONS = 3
+local DEBUFF_TEXT_ROOM = 34
+local DEBUFF_GLOW_OUTSET = 4
+local GLOW_SLICE = 8 -- Glow.tga's nine-slice margins
+-- Harmful auras the player can remove (RAID on a harmful filter), and only those with a dispel type, for the glow.
+local DISPEL_FILTER = "HARMFUL|RAID"
+local DISPEL_TYPES = { includeDispelTypes = { Magic = true, Curse = true, Disease = true, Poison = true } }
 
 local BARS = "Interface\\AddOns\\HolyMoly\\Media\\Bars\\"
 local FRAME_SLICE = 5 -- the gold frame's nine-slice margins, in pixels of Frame.tga
@@ -132,9 +168,10 @@ handle:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_TOP")
 	GameTooltip:SetText("Holy Moly heals")
 	GameTooltip:AddLine("A button lights up red when that person drops under " .. ns.Get("healGridPercent")
-		.. "% health. The tank has a blue border and a shield; /holy tank marks your target as tank. Hold Alt over a"
-		.. " button to see who it is and what each click casts. Drag here to move the grid with this icon (out of"
-		.. " combat).", 1, 1, 1, true)
+		.. "% health. The tank has a blue border and a shield; /holy tank marks your target as tank. A glow in the"
+		.. " debuff's color and its icon show a debuff you can dispel: Alt + left click casts Dispel Magic, Alt + right"
+		.. " click Abolish Disease. Hold Ctrl over a button to see who it is and what each click casts. Drag here to"
+		.. " move the grid with this icon (out of combat).", 1, 1, 1, true)
 	GameTooltip:Show()
 end)
 handle:SetScript("OnLeave", GameTooltip_Hide)
@@ -345,12 +382,13 @@ local function ShowTooltip(self)
 	GameTooltip:Show()
 end
 
--- A button's tooltip shows only while Alt is held, so it doesn't cover the grid while you heal: on entering with Alt
--- down, or when Alt goes down while the mouse is over a button (and it goes away when Alt is let go).
+-- A button's tooltip shows only while Ctrl is held, so it doesn't cover the grid while you heal: on entering with Ctrl
+-- down, or when Ctrl goes down while the mouse is over a button (and it goes away when Ctrl is let go). Not Alt or
+-- Shift, which pick the click's spell; a click with Ctrl held casts nothing.
 local hovered
 local function OnButtonEnter(self)
 	hovered = self
-	if IsAltKeyDown() then
+	if IsControlKeyDown() then
 		ShowTooltip(self)
 	end
 end
@@ -362,13 +400,13 @@ local function OnButtonLeave(self)
 		GameTooltip:Hide()
 	end
 end
-local altFrame = CreateFrame("Frame")
-altFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
-altFrame:SetScript("OnEvent", function(_, _, key)
-	if not hovered or (key ~= "LALT" and key ~= "RALT") then
+local ctrlFrame = CreateFrame("Frame")
+ctrlFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
+ctrlFrame:SetScript("OnEvent", function(_, _, key)
+	if not hovered or (key ~= "LCTRL" and key ~= "RCTRL") then
 		return
 	end
-	if IsAltKeyDown() then
+	if IsControlKeyDown() then
 		ShowTooltip(hovered)
 	elseif GameTooltip:IsOwned(hovered) then
 		GameTooltip:Hide()
@@ -579,6 +617,112 @@ local function BuildLook(button)
 	button.renew = renew
 end
 
+-- Debuffs you can dispel. Forever hides auras from addon code in combat, so no addon code reads them: each heal
+-- button gets two of the game's own aura containers (CustomAuraContainerTemplate), pointed once at the button's unit
+-- with the DISPEL_FILTER. The game fills them in, also in combat: the glow's single slot takes the first such debuff
+-- and the game colors the glow texture by its type; the icon group shows up to DEBUFF_ICONS of them with icon,
+-- countdown sweep, stack count and a border in the type's color. X-Perl draws its debuff highlight and aura rows the
+-- same way. The containers' buttons are set up once as the game makes them (initializeFrame), before it locks them
+-- away from addon code; they take no clicks, so a click on an icon or the glow still casts the heal button's spell.
+-- A container's size is secret once it shows auras, so nothing is anchored to one.
+
+-- The glow's look on a texture (also the preview's): white Glow.tga, nine-sliced, added light.
+local function SetGlowLook(texture)
+	texture:SetTexture(BARS .. "Glow")
+	pcall(texture.SetTextureSliceMargins, texture, GLOW_SLICE, GLOW_SLICE, GLOW_SLICE, GLOW_SLICE)
+	texture:SetBlendMode("ADD")
+	texture:SetAllPoints()
+end
+
+-- The frame the glow sits on: the button's size plus DEBUFF_GLOW_OUTSET on each side, above the bar and its borders.
+local function GlowHolder(button)
+	local holder = CreateFrame("Frame", nil, button)
+	holder:SetPoint("TOPLEFT", -DEBUFF_GLOW_OUTSET, DEBUFF_GLOW_OUTSET)
+	holder:SetPoint("BOTTOMRIGHT", DEBUFF_GLOW_OUTSET, -DEBUFF_GLOW_OUTSET)
+	holder:SetFrameLevel(button:GetFrameLevel() + 7)
+	return holder
+end
+
+-- Where the icons start: right of the name, left of the missing-health text, growing to the left.
+local function PlaceDebuffIcons(frame, button)
+	frame:SetPoint("TOPRIGHT", button, "TOPRIGHT", -DEBUFF_TEXT_ROOM, -(BUTTON_HEIGHT - DEBUFF_ICON_SIZE) / 2)
+	frame:SetFrameLevel(button:GetFrameLevel() + 8)
+end
+
+local function InitGlowSlot(slot, holder)
+	slot:SetUsingParentLevel(true)
+	slot:EnableMouse(false)
+	slot:SetAllPoints(holder)
+	local glow = slot:CreateTexture(nil, "OVERLAY")
+	SetGlowLook(glow)
+	slot:AddDispelTypeTexture(glow, {
+		showWhenHarmful = true,
+		style = Enum.CustomAuraButtonDispelTypeTextureStyle.PreserveAsset,
+	})
+end
+
+local function InitDebuffIcon(icon)
+	icon:EnableMouse(false)
+	icon:SetSize(DEBUFF_ICON_SIZE, DEBUFF_ICON_SIZE)
+	icon.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+	icon.TextHolder:SetFrameLevel(icon.CooldownHolder.Cooldown:GetFrameLevel() + 1)
+	icon:SetIcon(icon.Icon)
+	icon:SetApplicationCount(icon.TextHolder.Count)
+	icon:SetDurationCooldown(icon.CooldownHolder.Cooldown)
+	icon:AddDispelTypeTexture(icon.Border, {
+		showWhenHarmful = true,
+		showWithoutDispelType = true,
+		style = Enum.CustomAuraButtonDispelTypeTextureStyle.PreserveAsset,
+	})
+end
+
+local function BuildDebuffs(button)
+	local holder = GlowHolder(button)
+	local glow = CreateFrame("AuraContainer", nil, holder, "CustomAuraContainerTemplate")
+	glow:SetUsingParentLevel(true)
+	glow:SetAllPoints()
+	glow:AddAuraSlot("debuff", "HARMFUL", {
+		candidateFilters = DISPEL_TYPES,
+		initializeFrame = function(slot)
+			InitGlowSlot(slot, holder)
+		end,
+	})
+	glow:SetAuraSlotFilterString("debuff", DISPEL_FILTER)
+
+	local icons = CreateFrame("AuraContainer", nil, button,
+		"CustomAuraContainerTemplate, DisableUntrustedLayoutScriptsTemplate")
+	PlaceDebuffIcons(icons, button)
+	icons:AddAuraGroup("debuffs", "HARMFUL", {
+		templateNames = { "HolyMolyDebuffIconTemplate" },
+		initializeFrame = InitDebuffIcon,
+		layout = { elementSpacing = 2, lineSpacing = 1, layoutIndex = 1 },
+	})
+	icons:SetAuraGroupFilterString("debuffs", DISPEL_FILTER)
+	icons:SetAuraGroupMaxFrameCount("debuffs", DEBUFF_ICONS)
+	icons:SetFlowLayoutAxis(AnchorUtil.FlowLayoutAxis.Horizontal)
+	icons:SetFlowLayoutAnchorPoint("TOPRIGHT")
+	icons:SetFlowLayoutGrowthDirection(AnchorUtil.FlowDirection.Left, AnchorUtil.FlowDirection.Down)
+
+	button.debuffContainers = { glow, icons }
+	for _, container in ipairs(button.debuffContainers) do
+		container:SetUnit(button.unit)
+		container:SetEnabled(ns.Get("healGridDebuffs") and true or false)
+	end
+end
+
+-- Turns the debuff display on or off (the setting) and refreshes it; a unit token may now be someone else (a roster
+-- change), which the containers are told by refreshing. Out of combat only.
+local function RefreshDebuffs()
+	local on = ns.Get("healGridDebuffs") and true or false
+	for _, button in ipairs(buttons) do
+		for _, container in ipairs(button.debuffContainers or {}) do
+			pcall(container.SetEnabled, container, on)
+			pcall(container.UpdateAllAuras, container)
+		end
+	end
+end
+
+local debuffError = false
 local function CreateUnitButton(parent, unit, index, columns)
 	local button = CreateFrame("Button", nil, parent, "SecureUnitButtonTemplate")
 	button.unit = unit
@@ -589,16 +733,23 @@ local function CreateUnitButton(parent, unit, index, columns)
 	button:SetAttribute("unit", unit)
 
 	BuildLook(button)
+	-- Its own pcall, so a client without aura containers still gets working heal buttons.
+	local ok, err = pcall(BuildDebuffs, button)
+	if not ok and not debuffError then
+		debuffError = true
+		print("Holy Moly: the heal buttons can't show debuffs on this client: " .. tostring(err))
+	end
 
 	button:HookScript("OnEnter", OnButtonEnter)
 	button:HookScript("OnLeave", OnButtonLeave)
 	button:HookScript("OnShow", QueueUpdate)
 	button:HookScript("PostClick", function(self, mouseButton)
-		NoteClick(self, mouseButton, IsShiftKeyDown())
+		local press = Press(mouseButton)
+		NoteClick(self, press)
 		if GetTime() < checkUntil then
-			local clickTime, shift = GetTime(), IsShiftKeyDown()
+			local clickTime = GetTime()
 			C_Timer.After(0.3, function()
-				ReportClick(mouseButton, shift, clickTime)
+				ReportClick(press, clickTime)
 			end)
 		end
 	end)
@@ -633,20 +784,15 @@ end
 -- cast time up to 4 s; an interrupted cast drops it.
 local pendingCast
 local INSTANT_WAIT, CAST_WAIT = 1.5, 4
-local CLICK_KEYS = { LeftButton = "healLeft", RightButton = "healRight", MiddleButton = "healMiddle" }
-local SHIFT_CLICK_KEYS = { LeftButton = "healShiftLeft", RightButton = "healShiftRight", MiddleButton = "healShiftMiddle" }
+-- Instants besides the two timed ones; their cast goes off at once too.
+local INSTANTS = { ["Dispel Magic"] = true, ["Cure Disease"] = true, ["Abolish Disease"] = true }
 
-NoteClick = function(button, mouseButton, shift)
-	local key = (shift and SHIFT_CLICK_KEYS or CLICK_KEYS)[mouseButton]
-	for _, click in ipairs(CLICKS) do
-		if click.key == key then
-			if click.text and click.text ~= "Target" then
-				local instant = click.text == SHIELD or click.text == RENEW
-				pendingCast = { button = button, time = GetTime(), spell = click.text,
-					wait = instant and INSTANT_WAIT or CAST_WAIT }
-			end
-			return
-		end
+NoteClick = function(button, press)
+	local click = ClickFor(press)
+	if click and click.text and click.text ~= "Target" then
+		local instant = click.text == SHIELD or click.text == RENEW or INSTANTS[click.text]
+		pendingCast = { button = button, time = GetTime(), spell = click.text,
+			wait = instant and INSTANT_WAIT or CAST_WAIT }
 	end
 end
 
@@ -707,8 +853,6 @@ local function ApplySpells()
 	end
 end
 
-local CLICK_LABELS = { LeftButton = "Left click", RightButton = "Right click", MiddleButton = "Middle click" }
-
 -- Prints what each click is set to, read back from a button's secure attributes, and starts the cast check.
 function ns.CheckHealButtons()
 	local button = buttons[1]
@@ -735,11 +879,13 @@ checkFrame:SetScript("OnEvent", function(_, _, _, target, _, spellID)
 	sentTarget, sentSpellID, sentTime = target, spellID, GetTime()
 end)
 
-function ReportClick(mouseButton, shift, clickTime)
-	local label = CLICK_LABELS[mouseButton] or mouseButton
-	if shift then
-		label = "Shift + " .. label:lower()
+function ReportClick(press, clickTime)
+	local click = ClickFor(press)
+	if not click then
+		print(("Holy Moly check: %s is not a heal-button click; it casts nothing."):format(press))
+		return
 	end
+	local label = click.label
 	if sentTime < clickTime then
 		print(("Holy Moly check: %s cast nothing (not ready, out of range, no mana or not known)."):format(label))
 	elseif issecretvalue(sentTarget) or issecretvalue(sentSpellID) then
@@ -860,10 +1006,64 @@ end
 local SAMPLE = {
 	{ name = "Ironhide", class = "WARRIOR", health = 0.58, max = 5200, tank = true, soul = 9, renew = 12 },
 	{ name = "Lumina", class = "PRIEST", health = 1, max = 3100 },
-	{ name = "Quickstep", class = "ROGUE", health = 0.22, max = 2800, renew = 6 },
-	{ name = "Emberly", class = "MAGE", health = 0.81, max = 2600 },
+	{ name = "Quickstep", class = "ROGUE", health = 0.22, max = 2800, renew = 6,
+		debuffs = { { "Magic", "Interface\\Icons\\Spell_Frost_FrostNova" } } },
+	{ name = "Emberly", class = "MAGE", health = 0.81, max = 2600,
+		debuffs = { { "Disease", "Interface\\Icons\\Spell_Shadow_CallofBone" },
+			{ "Magic", "Interface\\Icons\\Spell_Shadow_ShadowWordPain" } } },
 	{ name = "Thornwood", class = "DRUID", health = 0, max = 3300 },
 }
+-- The preview draws the debuff colors itself; the game's own table where it has one.
+local PREVIEW_DEBUFF_COLORS = {
+	Magic = { 0.2, 0.6, 1 }, Curse = { 0.6, 0, 1 }, Disease = { 0.6, 0.4, 0 }, Poison = { 0, 0.6, 0 },
+}
+local function DebuffColor(dispelType)
+	local color = DebuffTypeColor and DebuffTypeColor[dispelType]
+	if color then
+		return color.r, color.g, color.b
+	end
+	return unpack(PREVIEW_DEBUFF_COLORS[dispelType])
+end
+
+-- The preview's copy of the debuff glow and icons: plain textures colored here, since the sample people have no
+-- real auras. Made the first time a sample button needs them.
+local function PreviewDebuffs(button, debuffs)
+	if not button.previewGlow then
+		local holder = GlowHolder(button)
+		button.previewGlow = holder:CreateTexture(nil, "OVERLAY")
+		SetGlowLook(button.previewGlow)
+		local row = CreateFrame("Frame", nil, button)
+		PlaceDebuffIcons(row, button)
+		row:SetSize(DEBUFF_ICONS * (DEBUFF_ICON_SIZE + 2), DEBUFF_ICON_SIZE)
+		button.previewIcons = {}
+		for i = 1, DEBUFF_ICONS do
+			local icon = row:CreateTexture(nil, "ARTWORK")
+			icon:SetSize(DEBUFF_ICON_SIZE, DEBUFF_ICON_SIZE)
+			icon:SetPoint("TOPRIGHT", -(i - 1) * (DEBUFF_ICON_SIZE + 2), 0)
+			icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+			local border = row:CreateTexture(nil, "OVERLAY")
+			border:SetTexture("Interface\\Buttons\\UI-Debuff-Overlays")
+			border:SetTexCoord(0.296875, 0.5703125, 0, 0.515625)
+			border:SetPoint("TOPLEFT", icon, -1, 1)
+			border:SetPoint("BOTTOMRIGHT", icon, 1, -1)
+			button.previewIcons[i] = { icon = icon, border = border }
+		end
+	end
+	debuffs = ns.Get("healGridDebuffs") and debuffs or {}
+	button.previewGlow:SetShown(debuffs[1] ~= nil)
+	if debuffs[1] then
+		button.previewGlow:SetVertexColor(DebuffColor(debuffs[1][1]))
+	end
+	for i, slot in ipairs(button.previewIcons) do
+		local debuff = debuffs[i]
+		slot.icon:SetShown(debuff ~= nil)
+		slot.border:SetShown(debuff ~= nil)
+		if debuff then
+			slot.icon:SetTexture(debuff[2])
+			slot.border:SetVertexColor(DebuffColor(debuff[1]))
+		end
+	end
+end
 local FLASH_EVERY = 2.5 -- seconds between the preview's gold flashes on the low one
 
 local preview = CreateFrame("Frame", "HolyMolyHealGridPreview", UIParent)
@@ -927,6 +1127,7 @@ local function FillPreviewButton(button, sample)
 			icon:SetAlpha(0)
 		end
 	end
+	PreviewDebuffs(button, sample.debuffs or {})
 end
 
 -- Lays the sample out like a party: the tank alone on the first row, everyone else two by two under them.
@@ -1024,6 +1225,10 @@ for _, click in ipairs(CLICKS) do
 		OutOfCombat(ApplySpells)
 	end)
 end
+ns.OnSettingChanged("healGridDebuffs", function()
+	OutOfCombat(RefreshDebuffs)
+	RefreshPreview()
+end)
 ns.OnSettingChanged("healGrid", function()
 	OutOfCombat(function()
 		grid:SetShown(ns.Get("healGrid"))
@@ -1091,6 +1296,8 @@ frame:SetScript("OnEvent", function(_, event)
 		end
 	elseif event == "SPELLS_CHANGED" then
 		OutOfCombat(ApplySpells)
+	elseif event == "GROUP_ROSTER_UPDATE" or event == "PLAYER_ENTERING_WORLD" then
+		OutOfCombat(RefreshDebuffs)
 	end
 	QueueUpdate()
 end)

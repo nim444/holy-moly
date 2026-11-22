@@ -14,5 +14,6 @@ HolyMoly.lua
 Mana.lua
 HotTimers.lua
 BuffCheck.lua
+HealGrid.xml
 HealGrid.lua
 MinimapButton.lua

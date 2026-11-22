@@ -4,6 +4,9 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons: debuffs you can dispel show on the button, also in combat: a glow in the debuff's color (Magic blue, Disease brown, Curse purple, Poison green) and up to three of their icons with the time left, drawn by the game itself the way X-Perl does it. "Debuffs you can dispel" in the settings, on by default; the preview shows two.
+- Heal buttons: Alt + left click casts Dispel Magic and Alt + right click Abolish Disease (Cure Disease until it is learned), each changeable in the settings.
+- Heal buttons: the tooltip now shows while you hold Ctrl (it was Alt, which now picks the dispel clicks).
 - Mana bar: your mana as its own bar too, in and out of a group, dragged anywhere, with a width setting (100 to 500). Both it and the heal buttons' mana bar can be turned off in the settings' Mana section.
 - Heal buttons: your mana on the top row, above the tank: a blue bar that turns orange under the low-mana threshold (20% by default), with your mana percent and what's missing ("-850", or "Full"). Display only, no clicks.
 - The box: a social row along the bottom replaces the speaker and drink buttons. S, Y, P and R pick Say, Yell, Party or Raid; Report, Bill, Thanks and Drink each send one of 20 short lines with the star icon, names only in some. The report no longer turns into the bill by chance.

@@ -25,6 +25,9 @@ local DEFAULTS = {
 	healShiftMiddle = "Power Word: Shield",
 	healRight = "Penance", -- the biggest heal until it is learned
 	healShiftRight = "BIGGEST",
+	healAltLeft = "Dispel Magic",
+	healAltRight = "Abolish Disease", -- Cure Disease until it is learned
+	healGridDebuffs = true, -- the glow and icons of debuffs you can dispel on the heal buttons (HealGrid.lua)
 	lowMana = true,
 	lowManaPercent = 20,
 	lowManaTell = true, -- after a fight under the threshold, ask the group to wait (Mana.lua)
@@ -201,7 +204,7 @@ local function RegisterPanel()
 	Checkbox("keptUp", "Name who you kept up", "Lets Report, Bill and Thanks lines name the three others you healed most, as [A, B, C].")
 
 	Header("Heal buttons")
-	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat. Shift-click the minimap button or type /holy heals to turn them on or off quickly (in combat it happens when the fight ends).")
+	Checkbox("healGrid", "Heal buttons", "A button for each party or raid member that lights up red below the threshold. Click it to heal them, also in combat. Hold Ctrl over a button to see what each click casts. Shift-click the minimap button or type /holy heals to turn them on or off quickly (in combat it happens when the fight ends).")
 	Dropdown("healGridStyle", "Bar style", "How the heal buttons' bars look. Gilded: a textured bar in a thin gold frame, a spark at the edge of the health and a gold flash when your heal lands.", {
 		{ "CLASSIC", "1. Classic" },
 		{ "GILDED", "2. Gilded" },
@@ -225,6 +228,11 @@ local function RegisterPanel()
 	Dropdown("healRight", "Right click", "What a right click on a heal button casts.", ClickChoices("healRight"))
 	Dropdown("healShiftRight", "Shift + right click", "What a right click with Shift held casts on a heal button.",
 		ClickChoices("healShiftRight"))
+	Dropdown("healAltLeft", "Alt + left click", "What a left click with Alt held casts on a heal button.",
+		ClickChoices("healAltLeft"))
+	Dropdown("healAltRight", "Alt + right click", "What a right click with Alt held casts on a heal button.",
+		ClickChoices("healAltRight"))
+	Checkbox("healGridDebuffs", "Debuffs you can dispel", "A glow in the debuff's color around a heal button (Magic blue, Disease brown, Curse purple, Poison green) and up to three icons of debuffs you can remove, with their time left. Works in combat. A change made in combat waits for the fight to end.")
 
 	Header("Timers and buffs")
 	Checkbox("timers", "HoT and shield timers", "The panel under the box with your heals over time and shields on each person.")
