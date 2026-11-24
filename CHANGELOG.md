@@ -4,6 +4,7 @@ One section per release, newest first. The release workflow uses the section who
 
 ## Unreleased
 
+- Heal buttons in a raid: one row per group, your own group on the top row, then a small gap and the other groups, so you heal your group first and still see everyone. A group change during a fight moves the buttons when it ends.
 - Heal buttons: a button turns gray while that person is out of range (about 40 yards, your heals' range), also in combat. "Gray when out of range" in the settings, on by default.
 - Heal buttons: Alt + left click sends "<name>, come close to me! You are out of my range!" to the box's social-row chat (Yell by default). "Tell them to come close" is a choice for every click.
 - Heal buttons: debuffs you can dispel show on the button, also in combat: a glow in the debuff's color (Magic blue, Disease brown, Curse purple, Poison green) and up to three of their icons with the time left, drawn by the game itself the way X-Perl does it. "Debuffs you can dispel" in the settings, on by default; the preview shows two.

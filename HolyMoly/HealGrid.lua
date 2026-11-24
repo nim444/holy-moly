@@ -997,12 +997,89 @@ function ns.ClearTanks()
 end
 
 local partyButtons = {}
-local lastLayout
+local raidButtons = {}
+local lastLayout, lastRaidLayout
+local GROUP_GAP = 0.5 -- extra space, in rows, between your own group and the other groups
+
+-- A raid member's group (1-8), or nil when the game doesn't say or keeps it secret.
+local function Subgroup(index)
+	local ok, _, _, group = pcall(GetRaidRosterInfo, index)
+	if ok and group ~= nil and not issecretvalue(group) then
+		return group
+	end
+end
+
+-- The raid layout: one row per group, your own group on the top row, then a small gap and the other groups in order,
+-- so you heal your group first and still see everyone. Runs out of combat like the party layout; a group change
+-- during a fight waits for its end. If the game names no groups, the buttons keep their order by raid number.
+local function LayoutRaid()
+	if InCombatLockdown() or #raidButtons == 0 or not IsInRaid() then
+		return
+	end
+	local mine
+	local groups = {}
+	for i, button in ipairs(raidButtons) do
+		if UnitExists(button.unit) then
+			local group = Subgroup(i)
+			if not group then
+				return
+			end
+			groups[group] = groups[group] or {}
+			table.insert(groups[group], button)
+			if not mine then
+				local ok, isMe = pcall(UnitIsUnit, button.unit, "player")
+				if ok and not issecretvalue(isMe) and isMe then
+					mine = group
+				end
+			end
+		end
+	end
+	local order = {}
+	if mine then
+		order[1] = mine
+	end
+	for group = 1, 8 do
+		if groups[group] and group ~= mine then
+			order[#order + 1] = group
+		end
+	end
+	local key = ""
+	for _, group in ipairs(order) do
+		key = key .. group .. ":"
+		for _, button in ipairs(groups[group]) do
+			key = key .. button.unit .. ","
+		end
+		key = key .. ";"
+	end
+	if key == lastRaidLayout then
+		return
+	end
+	lastRaidLayout = key
+	local row = 0
+	for n, group in ipairs(order) do
+		for i, button in ipairs(groups[group]) do
+			Place(button, (i - 1) % RAID_COLUMNS, row + math.floor((i - 1) / RAID_COLUMNS))
+		end
+		row = row + math.ceil(#groups[group] / RAID_COLUMNS)
+		if n == 1 and mine then
+			row = row + GROUP_GAP
+		end
+	end
+	-- Buttons of people not in the raid are hidden by the game; park them after the others.
+	local slot = 0
+	for _, button in ipairs(raidButtons) do
+		if not UnitExists(button.unit) then
+			Place(button, slot % RAID_COLUMNS, row + math.floor(slot / RAID_COLUMNS))
+			slot = slot + 1
+		end
+	end
+end
 
 -- The party layout: the tank alone and full width on the first row, everyone else two by two under them; with no
 -- tank known, all two by two. Secure buttons can't move in combat, so this runs out of combat (on roster and role
 -- changes, and after a fight); a change during a fight waits for its end.
 function LayoutParty()
+	pcall(LayoutRaid)
 	if InCombatLockdown() or #partyButtons == 0 then
 		return
 	end
@@ -1062,6 +1139,7 @@ local function Build()
 	RegisterStateDriver(raid, "visibility", "[group:raid] show; hide")
 	for i = 1, 40 do
 		CreateUnitButton(raid, "raid" .. i, i, RAID_COLUMNS)
+		raidButtons[i] = buttons[#buttons]
 	end
 
 	ApplySpells()
@@ -1344,7 +1422,7 @@ local function Relayout()
 	for _, button in ipairs(buttons) do
 		Place(button, button.column, button.row)
 	end
-	lastLayout = nil
+	lastLayout, lastRaidLayout = nil, nil
 	LayoutParty()
 end
 ns.OnSettingChanged("healGridWidth", function()
